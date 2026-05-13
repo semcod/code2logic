@@ -12,13 +12,12 @@ from typing import Dict
 
 # Format-specific hints for LLM prompts
 FORMAT_HINTS: Dict[str, str] = {
-    'yaml': """Parse the YAML structure precisely:
+    "yaml": """Parse the YAML structure precisely:
 - 'modules' contains file definitions
 - 'classes' with 'methods' and 'attrs'
 - 'functions' with 'signature' and 'intent'
 Implement all classes and functions with exact signatures.""",
-
-    'logicml': """Generate VALID, RUNNABLE Python code from LogicML spec.
+    "logicml": """Generate VALID, RUNNABLE Python code from LogicML spec.
 
 SYNTAX RULES:
 - 'sig: (params) -> Type' = def method(params) -> Type:
@@ -34,19 +33,16 @@ CRITICAL REQUIREMENTS:
 3. NO undefined variables
 4. Proper 4-space indentation
 5. Each class/function MUST be complete""",
-
-    'gherkin': """Implement scenarios as SIMPLE, MINIMAL Python code:
+    "gherkin": """Implement scenarios as SIMPLE, MINIMAL Python code:
 - NO extra error classes or exception hierarchies
 - NO over-engineering or unnecessary abstractions
 - Keep code short and direct
 - Focus on core functionality only.""",
-
-    'markdown': """Parse the embedded sections:
+    "markdown": """Parse the embedded sections:
 - YAML blocks contain structure (imports, classes, functions)
 - Gherkin blocks describe behaviors
 Implement all structures with proper type hints.""",
-
-    'json': """Parse the JSON structure:
+    "json": """Parse the JSON structure:
 - 'modules' array with 'path', 'classes', 'functions'
 - 'classes' have 'name', 'methods', 'properties'
 - 'functions' have 'name', 'params', 'returns'
@@ -58,7 +54,7 @@ def get_reproduction_prompt(
     spec: str,
     fmt: str,
     file_name: str,
-    language: str = 'python',
+    language: str = "python",
     max_spec_length: int = 5000,
 ) -> str:
     """Generate optimized reproduction prompt.
@@ -73,7 +69,7 @@ def get_reproduction_prompt(
     Returns:
         Formatted prompt string
     """
-    hint = FORMAT_HINTS.get(fmt, '')
+    hint = FORMAT_HINTS.get(fmt, "")
     spec_truncated = spec[:max_spec_length] if len(spec) > max_spec_length else spec
 
     return f"""Generate {language} code from this {fmt.upper()} specification.
@@ -137,7 +133,7 @@ def get_fix_prompt(code: str, issues: list, spec: str) -> str:
     Returns:
         Fix prompt string
     """
-    issues_text = '\n'.join(f"- {issue}" for issue in issues)
+    issues_text = "\n".join(f"- {issue}" for issue in issues)
 
     return f"""Fix the following issues in this code:
 

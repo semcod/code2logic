@@ -26,9 +26,42 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Union
 
+MAX_3 = 3
+CONSTANT_5 = 5
+CONSTANT_12 = 12
+CONSTANT_60 = 60
+CONSTANT_200 = 200
+MAX_8000 = 8000
+
+
+MAX_3 = MAX_3
+CONSTANT_5 = CONSTANT_5
+CONSTANT_12 = CONSTANT_12
+CONSTANT_60 = CONSTANT_60
+CONSTANT_200 = CONSTANT_200
+MAX_8000 = MAX_8000
+
+
+MAX_3 = MAX_3
+CONSTANT_5 = CONSTANT_5
+CONSTANT_12 = CONSTANT_12
+CONSTANT_60 = CONSTANT_60
+CONSTANT_200 = CONSTANT_200
+MAX_8000 = MAX_8000
+
+
+MAX_3 = MAX_3
+CONSTANT_5 = CONSTANT_5
+CONSTANT_12 = CONSTANT_12
+CONSTANT_60 = CONSTANT_60
+CONSTANT_200 = CONSTANT_200
+MAX_8000 = MAX_8000
+
+
 # Load .env
 try:
     from dotenv import load_dotenv
+
     load_dotenv()
 except ImportError:
     pass
@@ -39,6 +72,7 @@ from .reproduction import compare_code, extract_code_block
 
 class ElementType(Enum):
     """Types of code elements."""
+
     IMPORT = "import"
     CLASS = "class"
     INTERFACE = "interface"
@@ -54,6 +88,7 @@ class ElementType(Enum):
 
 class Language(Enum):
     """Supported languages."""
+
     PYTHON = "python"
     JAVASCRIPT = "javascript"
     TYPESCRIPT = "typescript"
@@ -68,6 +103,7 @@ class Language(Enum):
 @dataclass
 class Parameter:
     """Function/method parameter."""
+
     name: str
     type: str = ""
     default: str = ""
@@ -77,6 +113,7 @@ class Parameter:
 @dataclass
 class CodeElement:
     """Universal representation of a code element."""
+
     type: ElementType
     name: str
     docstring: str = ""
@@ -85,7 +122,7 @@ class CodeElement:
     return_type: str = ""
     body_hash: str = ""  # Hash of body for change detection
     attributes: List[Dict[str, str]] = field(default_factory=list)
-    children: List['CodeElement'] = field(default_factory=list)
+    children: List["CodeElement"] = field(default_factory=list)
     decorators: List[str] = field(default_factory=list)
     modifiers: List[str] = field(default_factory=list)  # public, private, async, etc.
     extends: List[str] = field(default_factory=list)
@@ -95,6 +132,7 @@ class CodeElement:
 @dataclass
 class CodeLogic:
     """Universal code logic representation for a single file."""
+
     source_file: str
     source_language: Language
     source_hash: str
@@ -106,30 +144,30 @@ class CodeLogic:
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         return {
-            'source_file': self.source_file,
-            'source_language': self.source_language.value,
-            'source_hash': self.source_hash,
-            'module_doc': self.module_doc,
-            'imports': self.imports,
-            'elements': [self._element_to_dict(e) for e in self.elements],
-            'metadata': self.metadata,
+            "source_file": self.source_file,
+            "source_language": self.source_language.value,
+            "source_hash": self.source_hash,
+            "module_doc": self.module_doc,
+            "imports": self.imports,
+            "elements": [self._element_to_dict(e) for e in self.elements],
+            "metadata": self.metadata,
         }
 
     def _element_to_dict(self, elem: CodeElement) -> Dict[str, Any]:
         """Convert element to dictionary."""
         return {
-            'type': elem.type.value,
-            'name': elem.name,
-            'docstring': elem.docstring,
-            'signature': elem.signature,
-            'parameters': [asdict(p) for p in elem.parameters],
-            'return_type': elem.return_type,
-            'attributes': elem.attributes,
-            'children': [self._element_to_dict(c) for c in elem.children],
-            'decorators': elem.decorators,
-            'modifiers': elem.modifiers,
-            'extends': elem.extends,
-            'implements': elem.implements,
+            "type": elem.type.value,
+            "name": elem.name,
+            "docstring": elem.docstring,
+            "signature": elem.signature,
+            "parameters": [asdict(p) for p in elem.parameters],
+            "return_type": elem.return_type,
+            "attributes": elem.attributes,
+            "children": [self._element_to_dict(c) for c in elem.children],
+            "decorators": elem.decorators,
+            "modifiers": elem.modifiers,
+            "extends": elem.extends,
+            "implements": elem.implements,
         }
 
     def to_compact(self) -> str:
@@ -154,7 +192,7 @@ class CodeLogic:
         for elem in self.elements:
             lines.extend(self._element_to_compact(elem, 0))
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _element_to_compact(self, elem: CodeElement, indent: int) -> List[str]:
         """Convert element to compact lines."""
@@ -178,21 +216,25 @@ class CodeLogic:
             lines.append(f"{prefix}{dec}")
 
         # Modifiers
-        mods = ' '.join(elem.modifiers) if elem.modifiers else ''
+        mods = " ".join(elem.modifiers) if elem.modifiers else ""
 
         # Main definition
         if elem.type in [ElementType.CLASS, ElementType.INTERFACE, ElementType.STRUCT]:
             extends = f" extends {', '.join(elem.extends)}" if elem.extends else ""
-            implements = f" implements {', '.join(elem.implements)}" if elem.implements else ""
-            lines.append(f"{prefix}{marker} {mods} {elem.name}{extends}{implements}".strip())
+            implements = (
+                f" implements {', '.join(elem.implements)}" if elem.implements else ""
+            )
+            lines.append(
+                f"{prefix}{marker} {mods} {elem.name}{extends}{implements}".strip()
+            )
 
             if elem.docstring:
-                lines.append(f"{prefix}  # {elem.docstring[:60]}")
+                lines.append(f"{prefix}  # {elem.docstring[:CONSTANT_60]}")
 
             # Attributes
             for attr in elem.attributes:
                 attr_line = f"{prefix}  .{attr['name']}: {attr.get('type', 'any')}"
-                if attr.get('default'):
+                if attr.get("default"):
                     attr_line += f" = {attr['default']}"
                 lines.append(attr_line)
 
@@ -201,15 +243,17 @@ class CodeLogic:
                 lines.extend(self._element_to_compact(child, indent + 1))
 
         elif elem.type in [ElementType.FUNCTION, ElementType.METHOD]:
-            params = ', '.join([
-                f"{p.name}: {p.type}" + (f" = {p.default}" if p.default else "")
-                for p in elem.parameters
-            ])
+            params = ", ".join(
+                [
+                    f"{p.name}: {p.type}" + (f" = {p.default}" if p.default else "")
+                    for p in elem.parameters
+                ]
+            )
             ret = f" -> {elem.return_type}" if elem.return_type else ""
             lines.append(f"{prefix}{marker} {mods} {elem.name}({params}){ret}".strip())
 
             if elem.docstring:
-                lines.append(f"{prefix}  # {elem.docstring[:60]}")
+                lines.append(f"{prefix}  # {elem.docstring[:CONSTANT_60]}")
 
         elif elem.type == ElementType.ENUM:
             lines.append(f"{prefix}{marker} {elem.name}")
@@ -225,27 +269,42 @@ class UniversalParser:
 
     # Language detection patterns
     LANG_PATTERNS = {
-        Language.PYTHON: [r'def \w+\(', r'class \w+:', r'import \w+', r'from \w+ import'],
-        Language.JAVASCRIPT: [r'function \w+\(', r'const \w+ =', r'let \w+ =', r'module\.exports'],
-        Language.TYPESCRIPT: [r'interface \w+', r': \w+\[\]', r'export \{', r'type \w+ ='],
-        Language.GO: [r'func \w+\(', r'type \w+ struct', r'package \w+'],
-        Language.RUST: [r'fn \w+\(', r'struct \w+', r'impl \w+', r'pub fn'],
-        Language.JAVA: [r'public class', r'private \w+', r'void \w+\('],
-        Language.SQL: [r'CREATE TABLE', r'SELECT .* FROM', r'INSERT INTO'],
+        Language.PYTHON: [
+            r"def \w+\(",
+            r"class \w+:",
+            r"import \w+",
+            r"from \w+ import",
+        ],
+        Language.JAVASCRIPT: [
+            r"function \w+\(",
+            r"const \w+ =",
+            r"let \w+ =",
+            r"module\.exports",
+        ],
+        Language.TYPESCRIPT: [
+            r"interface \w+",
+            r": \w+\[\]",
+            r"export \{",
+            r"type \w+ =",
+        ],
+        Language.GO: [r"func \w+\(", r"type \w+ struct", r"package \w+"],
+        Language.RUST: [r"fn \w+\(", r"struct \w+", r"impl \w+", r"pub fn"],
+        Language.JAVA: [r"public class", r"private \w+", r"void \w+\("],
+        Language.SQL: [r"CREATE TABLE", r"SELECT .* FROM", r"INSERT INTO"],
     }
 
     def detect_language(self, content: str, file_ext: str) -> Language:
         """Detect programming language from content and extension."""
         ext_map = {
-            '.py': Language.PYTHON,
-            '.js': Language.JAVASCRIPT,
-            '.ts': Language.TYPESCRIPT,
-            '.tsx': Language.TYPESCRIPT,
-            '.go': Language.GO,
-            '.rs': Language.RUST,
-            '.java': Language.JAVA,
-            '.sql': Language.SQL,
-            '.cs': Language.CSHARP,
+            ".py": Language.PYTHON,
+            ".js": Language.JAVASCRIPT,
+            ".ts": Language.TYPESCRIPT,
+            ".tsx": Language.TYPESCRIPT,
+            ".go": Language.GO,
+            ".rs": Language.RUST,
+            ".java": Language.JAVA,
+            ".sql": Language.SQL,
+            ".cs": Language.CSHARP,
         }
 
         if file_ext in ext_map:
@@ -265,7 +324,7 @@ class UniversalParser:
         content = path.read_text()
 
         language = self.detect_language(content, path.suffix)
-        source_hash = hashlib.md5(content.encode()).hexdigest()[:12]
+        source_hash = hashlib.md5(content.encode()).hexdigest()[:CONSTANT_12]
 
         # Parse based on language
         if language == Language.PYTHON:
@@ -293,22 +352,28 @@ class UniversalParser:
             source_hash=hash_,
         )
 
-        for line in content.split('\n'):
+        for line in content.split("\n"):
             stripped = line.strip()
-            if stripped.startswith('use ') and stripped.endswith(';'):
+            if stripped.startswith("use ") and stripped.endswith(";"):
                 logic.imports.append(stripped)
 
-        for m in re.finditer(r'^(?:pub\s+)?struct\s+(\w+)', content, re.MULTILINE):
+        for m in re.finditer(r"^(?:pub\s+)?struct\s+(\w+)", content, re.MULTILINE):
             logic.elements.append(CodeElement(type=ElementType.STRUCT, name=m.group(1)))
 
-        for m in re.finditer(r'^(?:pub\s+)?enum\s+(\w+)', content, re.MULTILINE):
+        for m in re.finditer(r"^(?:pub\s+)?enum\s+(\w+)", content, re.MULTILINE):
             logic.elements.append(CodeElement(type=ElementType.ENUM, name=m.group(1)))
 
-        for m in re.finditer(r'^(?:pub\s+)?trait\s+(\w+)', content, re.MULTILINE):
-            logic.elements.append(CodeElement(type=ElementType.INTERFACE, name=m.group(1)))
+        for m in re.finditer(r"^(?:pub\s+)?trait\s+(\w+)", content, re.MULTILINE):
+            logic.elements.append(
+                CodeElement(type=ElementType.INTERFACE, name=m.group(1))
+            )
 
-        for m in re.finditer(r'^(?:pub\s+)?fn\s+(\w+)\s*\(([^)]*)\)', content, re.MULTILINE):
-            logic.elements.append(CodeElement(type=ElementType.FUNCTION, name=m.group(1)))
+        for m in re.finditer(
+            r"^(?:pub\s+)?fn\s+(\w+)\s*\(([^)]*)\)", content, re.MULTILINE
+        ):
+            logic.elements.append(
+                CodeElement(type=ElementType.FUNCTION, name=m.group(1))
+            )
 
         return logic
 
@@ -320,16 +385,22 @@ class UniversalParser:
             source_hash=hash_,
         )
 
-        for m in re.finditer(r'^import\s+([^;]+);', content, re.MULTILINE):
+        for m in re.finditer(r"^import\s+([^;]+);", content, re.MULTILINE):
             logic.imports.append(f"import {m.group(1).strip()};")
 
-        for m in re.finditer(r'^(?:public\s+)?(?:abstract\s+)?class\s+(\w+)', content, re.MULTILINE):
+        for m in re.finditer(
+            r"^(?:public\s+)?(?:abstract\s+)?class\s+(\w+)", content, re.MULTILINE
+        ):
             logic.elements.append(CodeElement(type=ElementType.CLASS, name=m.group(1)))
 
-        for m in re.finditer(r'^(?:public\s+)?interface\s+(\w+)', content, re.MULTILINE):
-            logic.elements.append(CodeElement(type=ElementType.INTERFACE, name=m.group(1)))
+        for m in re.finditer(
+            r"^(?:public\s+)?interface\s+(\w+)", content, re.MULTILINE
+        ):
+            logic.elements.append(
+                CodeElement(type=ElementType.INTERFACE, name=m.group(1))
+            )
 
-        for m in re.finditer(r'^(?:public\s+)?enum\s+(\w+)', content, re.MULTILINE):
+        for m in re.finditer(r"^(?:public\s+)?enum\s+(\w+)", content, re.MULTILINE):
             logic.elements.append(CodeElement(type=ElementType.ENUM, name=m.group(1)))
 
         return logic
@@ -342,16 +413,22 @@ class UniversalParser:
             source_hash=hash_,
         )
 
-        for m in re.finditer(r'^using\s+([^;]+);', content, re.MULTILINE):
+        for m in re.finditer(r"^using\s+([^;]+);", content, re.MULTILINE):
             logic.imports.append(f"using {m.group(1).strip()};")
 
-        for m in re.finditer(r'^(?:public\s+)?interface\s+(I\w+)', content, re.MULTILINE):
-            logic.elements.append(CodeElement(type=ElementType.INTERFACE, name=m.group(1)))
+        for m in re.finditer(
+            r"^(?:public\s+)?interface\s+(I\w+)", content, re.MULTILINE
+        ):
+            logic.elements.append(
+                CodeElement(type=ElementType.INTERFACE, name=m.group(1))
+            )
 
-        for m in re.finditer(r'^(?:public\s+)?(?:abstract\s+)?class\s+(\w+)', content, re.MULTILINE):
+        for m in re.finditer(
+            r"^(?:public\s+)?(?:abstract\s+)?class\s+(\w+)", content, re.MULTILINE
+        ):
             logic.elements.append(CodeElement(type=ElementType.CLASS, name=m.group(1)))
 
-        for m in re.finditer(r'^(?:public\s+)?record\s+(\w+)', content, re.MULTILINE):
+        for m in re.finditer(r"^(?:public\s+)?record\s+(\w+)", content, re.MULTILINE):
             logic.elements.append(CodeElement(type=ElementType.CLASS, name=m.group(1)))
 
         return logic
@@ -364,7 +441,7 @@ class UniversalParser:
             source_hash=hash_,
         )
 
-        lines = content.split('\n')
+        lines = content.split("\n")
         current_class = None
         in_docstring = False
         docstring_lines = []
@@ -373,7 +450,7 @@ class UniversalParser:
             stripped = line.strip()
 
             # Module docstring
-            if i < 5 and stripped.startswith('"""') and not logic.module_doc:
+            if i < CONSTANT_5 and stripped.startswith('"""') and not logic.module_doc:
                 if stripped.count('"""') >= 2:
                     logic.module_doc = stripped.strip('"""').strip()
                 else:
@@ -384,85 +461,109 @@ class UniversalParser:
             if in_docstring:
                 if '"""' in stripped:
                     docstring_lines.append(stripped.rstrip('"""'))
-                    logic.module_doc = ' '.join(docstring_lines)[:200]
+                    logic.module_doc = " ".join(docstring_lines)[:CONSTANT_200]
                     in_docstring = False
                 else:
                     docstring_lines.append(stripped)
                 continue
 
             # Imports
-            if stripped.startswith('import ') or stripped.startswith('from '):
+            if stripped.startswith("import ") or stripped.startswith("from "):
                 logic.imports.append(stripped)
                 continue
 
             # Decorators
-            if stripped.startswith('@') and not stripped.startswith('@dataclass'):
+            if stripped.startswith("@") and not stripped.startswith("@dataclass"):
                 continue
 
             # Class
-            if stripped.startswith('class '):
-                class_match = re.match(r'class (\w+)(?:\((.*?)\))?:', stripped)
+            if stripped.startswith("class "):
+                class_match = re.match(r"class (\w+)(?:\((.*?)\))?:", stripped)
                 if class_match:
                     name = class_match.group(1)
                     bases = class_match.group(2) or ""
 
-                    is_dataclass = '@dataclass' in '\n'.join(lines[max(0, i-3):i])
+                    is_dataclass = "@dataclass" in "\n".join(
+                        lines[max(0, i - MAX_3) : i]
+                    )
 
                     elem = CodeElement(
                         type=ElementType.CLASS,
                         name=name,
-                        extends=[b.strip() for b in bases.split(',') if b.strip()],
-                        decorators=['@dataclass'] if is_dataclass else [],
+                        extends=[b.strip() for b in bases.split(",") if b.strip()],
+                        decorators=["@dataclass"] if is_dataclass else [],
                     )
                     logic.elements.append(elem)
                     current_class = elem
 
             # Class attributes (for dataclasses)
-            if current_class and ':' in stripped and not stripped.startswith('def '):
-                if stripped.startswith('#') or stripped.startswith('"""'):
+            if current_class and ":" in stripped and not stripped.startswith("def "):
+                if stripped.startswith("#") or stripped.startswith('"""'):
                     continue
-                if any(x in stripped.lower() for x in ['path to', 'the ', 'a ', 'an ']):
+                if any(x in stripped.lower() for x in ["path to", "the ", "a ", "an "]):
                     continue
 
-                attr_match = re.match(r'(\w+)\s*:\s*([^=]+)(?:\s*=\s*(.+))?', stripped)
+                attr_match = re.match(r"(\w+)\s*:\s*([^=]+)(?:\s*=\s*(.+))?", stripped)
                 if attr_match:
                     attr_name = attr_match.group(1)
                     attr_type = attr_match.group(2).strip()
-                    attr_default = attr_match.group(3).strip() if attr_match.group(3) else ""
+                    attr_default = (
+                        attr_match.group(MAX_3).strip()
+                        if attr_match.group(MAX_3)
+                        else ""
+                    )
 
-                    if attr_name.isidentifier() and attr_name not in ['return', 'if', 'for']:
-                        current_class.attributes.append({
-                            'name': attr_name,
-                            'type': attr_type,
-                            'default': attr_default,
-                        })
+                    if attr_name.isidentifier() and attr_name not in [
+                        "return",
+                        "if",
+                        "for",
+                    ]:
+                        current_class.attributes.append(
+                            {
+                                "name": attr_name,
+                                "type": attr_type,
+                                "default": attr_default,
+                            }
+                        )
 
             # Function/Method
-            if stripped.startswith('def '):
-                func_match = re.match(r'def (\w+)\((.*?)\)(?:\s*->\s*(.+?))?:', stripped)
+            if stripped.startswith("def "):
+                func_match = re.match(
+                    r"def (\w+)\((.*?)\)(?:\s*->\s*(.+?))?:", stripped
+                )
                 if func_match:
                     name = func_match.group(1)
                     params_str = func_match.group(2)
-                    return_type = func_match.group(3) or ""
+                    return_type = func_match.group(MAX_3) or ""
 
                     # Parse parameters
                     params = []
                     if params_str:
-                        for param in params_str.split(','):
+                        for param in params_str.split(","):
                             param = param.strip()
-                            if not param or param == 'self':
+                            if not param or param == "self":
                                 continue
 
-                            param_match = re.match(r'(\w+)(?:\s*:\s*([^=]+))?(?:\s*=\s*(.+))?', param)
+                            param_match = re.match(
+                                r"(\w+)(?:\s*:\s*([^=]+))?(?:\s*=\s*(.+))?", param
+                            )
                             if param_match:
-                                params.append(Parameter(
-                                    name=param_match.group(1),
-                                    type=param_match.group(2).strip() if param_match.group(2) else "",
-                                    default=param_match.group(3).strip() if param_match.group(3) else "",
-                                ))
+                                params.append(
+                                    Parameter(
+                                        name=param_match.group(1),
+                                        type=param_match.group(2).strip()
+                                        if param_match.group(2)
+                                        else "",
+                                        default=param_match.group(MAX_3).strip()
+                                        if param_match.group(MAX_3)
+                                        else "",
+                                    )
+                                )
 
                     elem = CodeElement(
-                        type=ElementType.METHOD if current_class else ElementType.FUNCTION,
+                        type=ElementType.METHOD
+                        if current_class
+                        else ElementType.FUNCTION,
                         name=name,
                         parameters=params,
                         return_type=return_type.strip() if return_type else "",
@@ -474,13 +575,22 @@ class UniversalParser:
                         logic.elements.append(elem)
 
             # End of class (rough heuristic)
-            if current_class and line and not line[0].isspace() and not stripped.startswith('@'):
-                if not stripped.startswith('class ') and not stripped.startswith('def '):
+            if (
+                current_class
+                and line
+                and not line[0].isspace()
+                and not stripped.startswith("@")
+            ):
+                if not stripped.startswith("class ") and not stripped.startswith(
+                    "def "
+                ):
                     current_class = None
 
         return logic
 
-    def _parse_js_ts(self, path: Path, content: str, hash_: str, lang: Language) -> CodeLogic:
+    def _parse_js_ts(
+        self, path: Path, content: str, hash_: str, lang: Language
+    ) -> CodeLogic:
         """Parse JavaScript/TypeScript file."""
         logic = CodeLogic(
             source_file=str(path),
@@ -488,7 +598,7 @@ class UniversalParser:
             source_hash=hash_,
         )
 
-        lines = content.split('\n')
+        lines = content.split("\n")
         current_interface = None
         current_class = None
         brace_depth = 0
@@ -497,26 +607,30 @@ class UniversalParser:
             stripped = line.strip()
 
             # Track braces
-            brace_depth += stripped.count('{') - stripped.count('}')
+            brace_depth += stripped.count("{") - stripped.count("}")
 
             # Imports
-            if stripped.startswith('import ') or (stripped.startswith('const ') and 'require' in stripped):
+            if stripped.startswith("import ") or (
+                stripped.startswith("const ") and "require" in stripped
+            ):
                 logic.imports.append(stripped)
                 continue
 
             # Type alias
-            if stripped.startswith('type ') and '=' in stripped:
-                match = re.match(r'type (\w+)', stripped)
+            if stripped.startswith("type ") and "=" in stripped:
+                match = re.match(r"type (\w+)", stripped)
                 if match:
-                    logic.elements.append(CodeElement(
-                        type=ElementType.TYPE_ALIAS,
-                        name=match.group(1),
-                    ))
+                    logic.elements.append(
+                        CodeElement(
+                            type=ElementType.TYPE_ALIAS,
+                            name=match.group(1),
+                        )
+                    )
                 continue
 
             # Interface (TypeScript)
-            if stripped.startswith('interface '):
-                match = re.match(r'interface (\w+)(?:\s+extends\s+(\w+))?', stripped)
+            if stripped.startswith("interface "):
+                match = re.match(r"interface (\w+)(?:\s+extends\s+(\w+))?", stripped)
                 if match:
                     elem = CodeElement(
                         type=ElementType.INTERFACE,
@@ -529,28 +643,33 @@ class UniversalParser:
                 continue
 
             # Interface properties
-            if current_interface and ':' in stripped and not stripped.startswith('//'):
-                prop_match = re.match(r'(\w+)(?:\?)?:\s*(.+?);?$', stripped)
+            if current_interface and ":" in stripped and not stripped.startswith("//"):
+                prop_match = re.match(r"(\w+)(?:\?)?:\s*(.+?);?$", stripped)
                 if prop_match:
-                    current_interface.attributes.append({
-                        'name': prop_match.group(1),
-                        'type': prop_match.group(2).rstrip(';'),
-                        'optional': '?' in stripped[:stripped.find(':')],
-                    })
+                    current_interface.attributes.append(
+                        {
+                            "name": prop_match.group(1),
+                            "type": prop_match.group(2).rstrip(";"),
+                            "optional": "?" in stripped[: stripped.find(":")],
+                        }
+                    )
 
             # End interface
-            if current_interface and stripped == '}':
+            if current_interface and stripped == "}":
                 current_interface = None
 
             # Class
-            if 'class ' in stripped and not stripped.startswith('//'):
-                match = re.match(r'(?:export\s+)?class (\w+)(?:<[^>]+>)?(?:\s+extends\s+(\w+))?(?:\s+implements\s+(\w+))?', stripped)
+            if "class " in stripped and not stripped.startswith("//"):
+                match = re.match(
+                    r"(?:export\s+)?class (\w+)(?:<[^>]+>)?(?:\s+extends\s+(\w+))?(?:\s+implements\s+(\w+))?",
+                    stripped,
+                )
                 if match:
                     elem = CodeElement(
                         type=ElementType.CLASS,
                         name=match.group(1),
                         extends=[match.group(2)] if match.group(2) else [],
-                        implements=[match.group(3)] if match.group(3) else [],
+                        implements=[match.group(MAX_3)] if match.group(MAX_3) else [],
                     )
                     logic.elements.append(elem)
                     current_class = elem
@@ -558,96 +677,122 @@ class UniversalParser:
                 continue
 
             # Class properties and methods
-            if current_class and not stripped.startswith('//'):
+            if current_class and not stripped.startswith("//"):
                 # Property
-                prop_match = re.match(r'(?:private\s+|public\s+|readonly\s+)?(\w+)(?:\?)?:\s*(.+?);?$', stripped)
-                if prop_match and '(' not in stripped:
-                    current_class.attributes.append({
-                        'name': prop_match.group(1),
-                        'type': prop_match.group(2).rstrip(';'),
-                    })
+                prop_match = re.match(
+                    r"(?:private\s+|public\s+|readonly\s+)?(\w+)(?:\?)?:\s*(.+?);?$",
+                    stripped,
+                )
+                if prop_match and "(" not in stripped:
+                    current_class.attributes.append(
+                        {
+                            "name": prop_match.group(1),
+                            "type": prop_match.group(2).rstrip(";"),
+                        }
+                    )
 
                 # Method
-                method_match = re.match(r'(?:async\s+)?(?:private\s+|public\s+)?(\w+)\s*\(([^)]*)\)(?:\s*:\s*(.+?))?(?:\s*\{)?', stripped)
-                if method_match and stripped.count('(') > 0:
+                method_match = re.match(
+                    r"(?:async\s+)?(?:private\s+|public\s+)?(\w+)\s*\(([^)]*)\)(?:\s*:\s*(.+?))?(?:\s*\{)?",
+                    stripped,
+                )
+                if method_match and stripped.count("(") > 0:
                     name = method_match.group(1)
-                    if name not in ['if', 'for', 'while', 'switch']:
+                    if name not in ["if", "for", "while", "switch"]:
                         params_str = method_match.group(2)
-                        return_type = method_match.group(3) or ""
+                        return_type = method_match.group(MAX_3) or ""
 
                         params = []
                         if params_str:
-                            for param in params_str.split(','):
+                            for param in params_str.split(","):
                                 param = param.strip()
                                 if not param:
                                     continue
-                                pm = re.match(r'(\w+)(?:\?)?(?:\s*:\s*(.+))?', param)
+                                pm = re.match(r"(\w+)(?:\?)?(?:\s*:\s*(.+))?", param)
                                 if pm:
-                                    params.append(Parameter(
-                                        name=pm.group(1),
-                                        type=pm.group(2) or "",
-                                    ))
+                                    params.append(
+                                        Parameter(
+                                            name=pm.group(1),
+                                            type=pm.group(2) or "",
+                                        )
+                                    )
 
-                        current_class.children.append(CodeElement(
-                            type=ElementType.METHOD,
-                            name=name,
-                            parameters=params,
-                            return_type=return_type.rstrip(' {'),
-                        ))
+                        current_class.children.append(
+                            CodeElement(
+                                type=ElementType.METHOD,
+                                name=name,
+                                parameters=params,
+                                return_type=return_type.rstrip(" {"),
+                            )
+                        )
 
             # Standalone function
-            func_match = re.match(r'(?:export\s+)?(?:async\s+)?function\s+(\w+)(?:<[^>]+>)?\s*\(([^)]*)\)(?:\s*:\s*(.+?))?', stripped)
+            func_match = re.match(
+                r"(?:export\s+)?(?:async\s+)?function\s+(\w+)(?:<[^>]+>)?\s*\(([^)]*)\)(?:\s*:\s*(.+?))?",
+                stripped,
+            )
             if func_match:
                 name = func_match.group(1)
                 params_str = func_match.group(2)
-                return_type = func_match.group(3) or ""
+                return_type = func_match.group(MAX_3) or ""
 
                 params = []
                 if params_str:
-                    for param in params_str.split(','):
+                    for param in params_str.split(","):
                         param = param.strip()
                         if not param:
                             continue
-                        pm = re.match(r'(\w+)(?:\?)?(?:\s*:\s*(.+))?', param)
+                        pm = re.match(r"(\w+)(?:\?)?(?:\s*:\s*(.+))?", param)
                         if pm:
-                            params.append(Parameter(
-                                name=pm.group(1),
-                                type=pm.group(2) or "",
-                            ))
+                            params.append(
+                                Parameter(
+                                    name=pm.group(1),
+                                    type=pm.group(2) or "",
+                                )
+                            )
 
-                logic.elements.append(CodeElement(
-                    type=ElementType.FUNCTION,
-                    name=name,
-                    parameters=params,
-                    return_type=return_type.rstrip(' {'),
-                ))
+                logic.elements.append(
+                    CodeElement(
+                        type=ElementType.FUNCTION,
+                        name=name,
+                        parameters=params,
+                        return_type=return_type.rstrip(" {"),
+                    )
+                )
 
             # Arrow function
-            arrow_match = re.match(r'(?:export\s+)?(?:const|let)\s+(\w+)\s*=\s*(?:async\s+)?\(([^)]*)\)(?:\s*:\s*(.+?))?\s*=>', stripped)
+            arrow_match = re.match(
+                r"(?:export\s+)?(?:const|let)\s+(\w+)\s*=\s*(?:async\s+)?\(([^)]*)\)(?:\s*:\s*(.+?))?\s*=>",
+                stripped,
+            )
             if arrow_match:
                 name = arrow_match.group(1)
                 params_str = arrow_match.group(2)
-                return_type = arrow_match.group(3) or ""
+                return_type = arrow_match.group(MAX_3) or ""
 
                 params = []
                 if params_str:
-                    for param in params_str.split(','):
+                    for param in params_str.split(","):
                         param = param.strip()
                         if not param:
                             continue
-                        pm = re.match(r'(\w+)(?:\?)?(?:\s*:\s*(.+))?', param)
+                        pm = re.match(r"(\w+)(?:\?)?(?:\s*:\s*(.+))?", param)
                         if pm:
-                            params.append(Parameter(
-                                name=pm.group(1),
-                                type=pm.group(2) or "",
-                            ))
+                            params.append(
+                                Parameter(
+                                    name=pm.group(1),
+                                    type=pm.group(2) or "",
+                                )
+                            )
 
-                logic.elements.append(CodeElement(
-                    type=ElementType.FUNCTION,
-                    name=name,
-                    parameters=params,
-                    return_type=return_type,
-                ))
+                logic.elements.append(
+                    CodeElement(
+                        type=ElementType.FUNCTION,
+                        name=name,
+                        parameters=params,
+                        return_type=return_type,
+                    )
+                )
 
         return logic
 
@@ -659,40 +804,44 @@ class UniversalParser:
             source_hash=hash_,
         )
 
-        lines = content.split('\n')
+        lines = content.split("\n")
 
         for line in lines:
             stripped = line.strip()
 
             # Package
-            if stripped.startswith('package '):
-                logic.metadata['package'] = stripped.split()[1]
+            if stripped.startswith("package "):
+                logic.metadata["package"] = stripped.split()[1]
 
             # Imports
-            if stripped.startswith('import '):
+            if stripped.startswith("import "):
                 logic.imports.append(stripped)
 
             # Struct
-            if 'type ' in stripped and ' struct' in stripped:
-                match = re.match(r'type (\w+) struct', stripped)
+            if "type " in stripped and " struct" in stripped:
+                match = re.match(r"type (\w+) struct", stripped)
                 if match:
-                    logic.elements.append(CodeElement(
-                        type=ElementType.STRUCT,
-                        name=match.group(1),
-                    ))
+                    logic.elements.append(
+                        CodeElement(
+                            type=ElementType.STRUCT,
+                            name=match.group(1),
+                        )
+                    )
 
             # Interface
-            if 'type ' in stripped and ' interface' in stripped:
-                match = re.match(r'type (\w+) interface', stripped)
+            if "type " in stripped and " interface" in stripped:
+                match = re.match(r"type (\w+) interface", stripped)
                 if match:
-                    logic.elements.append(CodeElement(
-                        type=ElementType.INTERFACE,
-                        name=match.group(1),
-                    ))
+                    logic.elements.append(
+                        CodeElement(
+                            type=ElementType.INTERFACE,
+                            name=match.group(1),
+                        )
+                    )
 
             # Function
-            if stripped.startswith('func '):
-                match = re.match(r'func (?:\(\w+ \*?(\w+)\) )?(\w+)\((.*?)\)', stripped)
+            if stripped.startswith("func "):
+                match = re.match(r"func (?:\(\w+ \*?(\w+)\) )?(\w+)\((.*?)\)", stripped)
                 if match:
                     receiver = match.group(1)
                     name = match.group(2)
@@ -722,7 +871,9 @@ class UniversalParser:
         )
 
         # Tables
-        for match in re.finditer(r'CREATE TABLE (\w+)\s*\((.*?)\);', content, re.DOTALL | re.IGNORECASE):
+        for match in re.finditer(
+            r"CREATE TABLE (\w+)\s*\((.*?)\);", content, re.DOTALL | re.IGNORECASE
+        ):
             table_name = match.group(1)
             columns_str = match.group(2)
 
@@ -732,32 +883,44 @@ class UniversalParser:
             )
 
             # Parse columns
-            for col_match in re.finditer(r'(\w+)\s+(\w+(?:\([^)]+\))?)', columns_str):
-                elem.attributes.append({
-                    'name': col_match.group(1),
-                    'type': col_match.group(2),
-                })
+            for col_match in re.finditer(r"(\w+)\s+(\w+(?:\([^)]+\))?)", columns_str):
+                elem.attributes.append(
+                    {
+                        "name": col_match.group(1),
+                        "type": col_match.group(2),
+                    }
+                )
 
             logic.elements.append(elem)
 
         # Views
-        for match in re.finditer(r'CREATE (?:OR REPLACE )?VIEW (\w+)', content, re.IGNORECASE):
-            logic.elements.append(CodeElement(
-                type=ElementType.CLASS,
-                name=match.group(1),
-                modifiers=['view'],
-            ))
+        for match in re.finditer(
+            r"CREATE (?:OR REPLACE )?VIEW (\w+)", content, re.IGNORECASE
+        ):
+            logic.elements.append(
+                CodeElement(
+                    type=ElementType.CLASS,
+                    name=match.group(1),
+                    modifiers=["view"],
+                )
+            )
 
         # Functions
-        for match in re.finditer(r'CREATE (?:OR REPLACE )?FUNCTION (\w+)', content, re.IGNORECASE):
-            logic.elements.append(CodeElement(
-                type=ElementType.FUNCTION,
-                name=match.group(1),
-            ))
+        for match in re.finditer(
+            r"CREATE (?:OR REPLACE )?FUNCTION (\w+)", content, re.IGNORECASE
+        ):
+            logic.elements.append(
+                CodeElement(
+                    type=ElementType.FUNCTION,
+                    name=match.group(1),
+                )
+            )
 
         return logic
 
-    def _parse_generic(self, path: Path, content: str, hash_: str, lang: Language) -> CodeLogic:
+    def _parse_generic(
+        self, path: Path, content: str, hash_: str, lang: Language
+    ) -> CodeLogic:
         """Generic parser for unknown languages."""
         logic = CodeLogic(
             source_file=str(path),
@@ -766,17 +929,23 @@ class UniversalParser:
         )
 
         # Try to find class-like and function-like patterns
-        for match in re.finditer(r'class\s+(\w+)', content, re.IGNORECASE):
-            logic.elements.append(CodeElement(
-                type=ElementType.CLASS,
-                name=match.group(1),
-            ))
+        for match in re.finditer(r"class\s+(\w+)", content, re.IGNORECASE):
+            logic.elements.append(
+                CodeElement(
+                    type=ElementType.CLASS,
+                    name=match.group(1),
+                )
+            )
 
-        for match in re.finditer(r'(?:function|def|func|fn)\s+(\w+)', content, re.IGNORECASE):
-            logic.elements.append(CodeElement(
-                type=ElementType.FUNCTION,
-                name=match.group(1),
-            ))
+        for match in re.finditer(
+            r"(?:function|def|func|fn)\s+(\w+)", content, re.IGNORECASE
+        ):
+            logic.elements.append(
+                CodeElement(
+                    type=ElementType.FUNCTION,
+                    name=match.group(1),
+                )
+            )
 
         return logic
 
@@ -820,11 +989,11 @@ class CodeGenerator:
 
         # Check if dataclasses needed
         has_dataclass = any(
-            '@dataclass' in e.decorators
+            "@dataclass" in e.decorators
             for e in logic.elements
             if e.type == ElementType.CLASS
         )
-        if has_dataclass and 'from dataclasses import' not in '\n'.join(logic.imports):
+        if has_dataclass and "from dataclasses import" not in "\n".join(logic.imports):
             lines.insert(0, "from dataclasses import dataclass, field")
             lines.insert(1, "from typing import Optional, List, Dict, Any")
             lines.insert(2, "")
@@ -834,7 +1003,7 @@ class CodeGenerator:
             lines.extend(self._generate_python_element(elem))
             lines.append("")
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _generate_python_element(self, elem: CodeElement, indent: int = 0) -> List[str]:
         """Generate Python code for element."""
@@ -847,18 +1016,22 @@ class CodeGenerator:
                 lines.append(f"{prefix}{dec}")
 
             # Class definition
-            bases = ', '.join(elem.extends) if elem.extends else ""
-            lines.append(f"{prefix}class {elem.name}({bases}):" if bases else f"{prefix}class {elem.name}:")
+            bases = ", ".join(elem.extends) if elem.extends else ""
+            lines.append(
+                f"{prefix}class {elem.name}({bases}):"
+                if bases
+                else f"{prefix}class {elem.name}:"
+            )
 
             # Docstring
             if elem.docstring:
                 lines.append(f'{prefix}    """{elem.docstring}"""')
 
             # Attributes (for dataclasses)
-            if '@dataclass' in elem.decorators:
+            if "@dataclass" in elem.decorators:
                 for attr in elem.attributes:
-                    type_ = attr.get('type', 'Any')
-                    default = attr.get('default', '')
+                    type_ = attr.get("type", "Any")
+                    default = attr.get("default", "")
                     if default:
                         lines.append(f"{prefix}    {attr['name']}: {type_} = {default}")
                     else:
@@ -882,7 +1055,7 @@ class CodeGenerator:
                     param_str += f" = {p.default}"
                 params.append(param_str)
 
-            params_str = ', '.join(params)
+            params_str = ", ".join(params)
             ret = f" -> {elem.return_type}" if elem.return_type else ""
 
             lines.append(f"{prefix}def {elem.name}({params_str}){ret}:")
@@ -914,10 +1087,9 @@ class CodeGenerator:
                     lines.append(f"    {attr['name']}: {attr.get('type', 'any')};")
 
                 for child in elem.children:
-                    params = ', '.join([
-                        f"{p.name}: {p.type or 'any'}"
-                        for p in child.parameters
-                    ])
+                    params = ", ".join(
+                        [f"{p.name}: {p.type or 'any'}" for p in child.parameters]
+                    )
                     ret = f": {child.return_type}" if child.return_type else ""
                     lines.append(f"    {child.name}({params}){ret} {{ }}")
 
@@ -925,21 +1097,20 @@ class CodeGenerator:
                 lines.append("")
 
             elif elem.type == ElementType.FUNCTION:
-                params = ', '.join([
-                    f"{p.name}: {p.type or 'any'}"
-                    for p in elem.parameters
-                ])
+                params = ", ".join(
+                    [f"{p.name}: {p.type or 'any'}" for p in elem.parameters]
+                )
                 ret = f": {elem.return_type}" if elem.return_type else ""
                 lines.append(f"function {elem.name}({params}){ret} {{ }}")
                 lines.append("")
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _generate_go(self, logic: CodeLogic) -> str:
         """Generate Go code."""
         lines = []
 
-        if logic.metadata.get('package'):
+        if logic.metadata.get("package"):
             lines.append(f"package {logic.metadata['package']}")
             lines.append("")
 
@@ -947,7 +1118,9 @@ class CodeGenerator:
             if elem.type == ElementType.STRUCT:
                 lines.append(f"type {elem.name} struct {{")
                 for attr in elem.attributes:
-                    lines.append(f"    {attr['name']} {attr.get('type', 'interface{}')}")
+                    lines.append(
+                        f"    {attr['name']} {attr.get('type', 'interface{}')}"
+                    )
                 lines.append("}")
                 lines.append("")
 
@@ -956,23 +1129,23 @@ class CodeGenerator:
                 lines.append("}")
                 lines.append("")
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _generate_sql(self, logic: CodeLogic) -> str:
         """Generate SQL code."""
         lines = []
 
         for elem in logic.elements:
-            if elem.type == ElementType.CLASS and 'view' not in elem.modifiers:
+            if elem.type == ElementType.CLASS and "view" not in elem.modifiers:
                 lines.append(f"CREATE TABLE {elem.name} (")
                 cols = []
                 for attr in elem.attributes:
                     cols.append(f"    {attr['name']} {attr.get('type', 'TEXT')}")
-                lines.append(',\n'.join(cols))
+                lines.append(",\n".join(cols))
                 lines.append(";")
                 lines.append("")
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _generate_rust(self, logic: CodeLogic) -> str:
         """Generate Rust code."""
@@ -1116,23 +1289,23 @@ class UniversalReproducer:
         if target == logic.source_language:
             comparison = compare_code(original, generated)
         else:
-            comparison = {'similarity_percent': 0, 'structural_score': 0}
+            comparison = {"similarity_percent": 0, "structural_score": 0}
 
         # Calculate compression
         logic_size = len(logic.to_compact())
         compression = len(original) / max(logic_size, 1)
 
         result = {
-            'source_file': source_path,
-            'source_language': logic.source_language.value,
-            'target_language': target.value,
-            'source_chars': len(original),
-            'logic_chars': logic_size,
-            'generated_chars': len(generated),
-            'compression_ratio': compression,
-            'similarity': comparison.get('similarity_percent', 0),
-            'structural_score': comparison.get('structural_score', 0),
-            'logic': logic.to_dict(),
+            "source_file": source_path,
+            "source_language": logic.source_language.value,
+            "target_language": target.value,
+            "source_chars": len(original),
+            "logic_chars": logic_size,
+            "generated_chars": len(generated),
+            "compression_ratio": compression,
+            "similarity": comparison.get("similarity_percent", 0),
+            "structural_score": comparison.get("structural_score", 0),
+            "logic": logic.to_dict(),
         }
 
         # Save
@@ -1173,7 +1346,7 @@ Output: Return ONLY code in ```{target.value} ... ``` blocks."""
 
 Generate complete, working {target_name} code that implements all elements."""
 
-        response = client.generate(prompt, system=system, max_tokens=8000)
+        response = client.generate(prompt, system=system, max_tokens=MAX_8000)
         return extract_code_block(response, target.value)
 
     def _save_result(
@@ -1187,29 +1360,29 @@ Generate complete, working {target_name} code that implements all elements."""
         """Save reproduction results."""
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        (output_dir / 'original.txt').write_text(original)
-        (output_dir / 'logic.uclr').write_text(logic.to_compact())
-        (output_dir / 'logic.json').write_text(json.dumps(logic.to_dict(), indent=2))
-        (output_dir / 'generated.txt').write_text(generated)
+        (output_dir / "original.txt").write_text(original)
+        (output_dir / "logic.uclr").write_text(logic.to_compact())
+        (output_dir / "logic.json").write_text(json.dumps(logic.to_dict(), indent=2))
+        (output_dir / "generated.txt").write_text(generated)
 
         report = f"""# Universal Reproduction Report
 
 ## Source
-- **File:** {result['source_file']}
-- **Language:** {result['source_language']}
-- **Target:** {result['target_language']}
+- **File:** {result["source_file"]}
+- **Language:** {result["source_language"]}
+- **Target:** {result["target_language"]}
 
 ## Metrics
 | Metric | Value |
 |--------|-------|
-| Source chars | {result['source_chars']} |
-| Logic chars | {result['logic_chars']} |
-| Generated chars | {result['generated_chars']} |
-| Compression | {result['compression_ratio']:.2f}x |
-| Similarity | {result['similarity']:.1f}% |
-| Structural | {result['structural_score']:.1f}% |
+| Source chars | {result["source_chars"]} |
+| Logic chars | {result["logic_chars"]} |
+| Generated chars | {result["generated_chars"]} |
+| Compression | {result["compression_ratio"]:.2f}x |
+| Similarity | {result["similarity"]:.1f}% |
+| Structural | {result["structural_score"]:.1f}% |
 """
-        (output_dir / 'REPORT.md').write_text(report)
+        (output_dir / "REPORT.md").write_text(report)
 
 
 def reproduce_file(

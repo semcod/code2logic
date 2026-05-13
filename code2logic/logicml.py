@@ -40,6 +40,7 @@ from .shared_utils import compact_imports, remove_self_from_params, truncate_doc
 @dataclass
 class LogicMLSpec:
     """LogicML specification output."""
+
     content: str
     token_estimate: int
     file_count: int
@@ -70,17 +71,42 @@ class LogicMLGenerator:
     REPRODUCTION_FIDELITY: float = 0.97
 
     STDLIB_MODULES: Set[str] = {
-        'os', 'sys', 'json', 'typing', 'pathlib', 'dataclasses',
-        're', 'ast', 'abc', 'collections', 'functools', 'itertools',
-        'datetime', 'logging', 'argparse', 'subprocess', 'shutil',
-        'time', 'copy', 'io', 'contextlib', 'enum', 'hashlib',
-        'unittest', 'math', 'random', 'string', 'textwrap',
+        "os",
+        "sys",
+        "json",
+        "typing",
+        "pathlib",
+        "dataclasses",
+        "re",
+        "ast",
+        "abc",
+        "collections",
+        "functools",
+        "itertools",
+        "datetime",
+        "logging",
+        "argparse",
+        "subprocess",
+        "shutil",
+        "time",
+        "copy",
+        "io",
+        "contextlib",
+        "enum",
+        "hashlib",
+        "unittest",
+        "math",
+        "random",
+        "string",
+        "textwrap",
     }
 
     def __init__(self, verbose: bool = False) -> None:
         self.verbose = verbose
 
-    def generate(self, project: ProjectInfo, detail: str = 'standard', level: str = 'typed') -> LogicMLSpec:
+    def generate(
+        self, project: ProjectInfo, detail: str = "standard", level: str = "typed"
+    ) -> LogicMLSpec:
         """Generate LogicML specification for a project.
 
         Args:
@@ -101,7 +127,7 @@ class LogicMLGenerator:
             total_classes += len(module.classes)
             total_functions += len(module.functions)
 
-        content = '\n\n'.join(parts)
+        content = "\n\n".join(parts)
         token_estimate = len(content) // 4
 
         return LogicMLSpec(
@@ -112,13 +138,15 @@ class LogicMLGenerator:
             function_count=total_functions,
         )
 
-    def _generate_module(self, module: ModuleInfo, detail: str, level: str = 'typed') -> str:
+    def _generate_module(
+        self, module: ModuleInfo, detail: str, level: str = "typed"
+    ) -> str:
         """Generate LogicML for a single module."""
         lines: List[str] = []
         path = Path(module.path)
 
         # Header comment
-        class_names = ', '.join(c.name for c in module.classes[:3])
+        class_names = ", ".join(c.name for c in module.classes[:3])
         if len(module.classes) > 3:
             class_names += f" +{len(module.classes) - 3}"
 
@@ -126,7 +154,7 @@ class LogicMLGenerator:
         if class_names:
             header_parts.append(class_names)
         header_parts.append(f"{module.lines_total} lines")
-        lines.append(' | '.join(header_parts))
+        lines.append(" | ".join(header_parts))
 
         # Handle re-export modules (primarily __init__.py or export-like modules)
         # Some parsers may classify import-only files as having "classes" (e.g., Enum)
@@ -148,15 +176,15 @@ class LogicMLGenerator:
                 if export_name.endswith(".*"):
                     export_name = "*"
                 lines.append(f"  - {export_name}")
-            return '\n'.join(lines)
+            return "\n".join(lines)
 
         # Handle empty index files (TypeScript export * pattern)
         if not module.classes and not module.functions and not module.imports:
-            if 'index' in path.name.lower():
+            if "index" in path.name.lower():
                 lines.append("# Index re-export file")
                 lines.append("type: index")
                 lines.append("pattern: 'export * from ./submodules'")
-            return '\n'.join(lines)
+            return "\n".join(lines)
 
         # Imports (compact)
         if module.imports:
@@ -174,7 +202,7 @@ class LogicMLGenerator:
             funcs_yaml = self._generate_functions(module.functions, detail, level)
             lines.append(funcs_yaml)
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _generate_imports(self, imports: List[str]) -> str:
         """Generate compact imports section."""
@@ -183,15 +211,15 @@ class LogicMLGenerator:
         local: Set[str] = set()
 
         for imp in imports:
-            base = imp.split('.')[0]
-            if imp.startswith('.'):
+            base = imp.split(".")[0]
+            if imp.startswith("."):
                 local.add(imp)
             elif base in self.STDLIB_MODULES:
                 stdlib.add(imp)
             else:
                 third_party.add(imp)
 
-        lines = ['\nimports:']
+        lines = ["\nimports:"]
         if stdlib:
             # Use compact_imports for grouped format
             grouped = compact_imports(sorted(stdlib)[:15], max_items=10)
@@ -202,11 +230,11 @@ class LogicMLGenerator:
         if local:
             lines.append(f"  local: [{', '.join(sorted(local)[:5])}]")
 
-        return '\n'.join(lines) if len(lines) > 1 else ''
+        return "\n".join(lines) if len(lines) > 1 else ""
 
-    def _generate_class(self, cls: ClassInfo, detail: str, level: str = 'typed') -> str:
+    def _generate_class(self, cls: ClassInfo, detail: str, level: str = "typed") -> str:
         """Generate LogicML for a class."""
-        lines: List[str] = [f'\n{cls.name}:']
+        lines: List[str] = [f"\n{cls.name}:"]
 
         # Docstring - truncated for efficiency
         if cls.docstring:
@@ -217,136 +245,145 @@ class LogicMLGenerator:
         # Bases - only if non-empty
         if cls.bases:
             bases_str = ", ".join(cls.bases)
-            lines.append(f'  bases: [{bases_str}]')
+            lines.append(f"  bases: [{bases_str}]")
 
         # Type markers
         if cls.is_abstract:
-            lines.append('  abstract: true')
+            lines.append("  abstract: true")
         if cls.is_interface:
-            lines.append('  interface: true')
+            lines.append("  interface: true")
 
         # Attributes/Properties - extract from __init__ if not in properties
         attrs_added = False
         if cls.properties:
-            lines.append('  attrs:')
+            lines.append("  attrs:")
             attrs_added = True
             for prop in cls.properties[:10]:
-                if ':' in prop:
-                    name, type_hint = prop.split(':', 1)
-                    lines.append(f'    {name.strip()}: {type_hint.strip()}')
+                if ":" in prop:
+                    name, type_hint = prop.split(":", 1)
+                    lines.append(f"    {name.strip()}: {type_hint.strip()}")
                 else:
-                    lines.append(f'    {prop}: Any')
+                    lines.append(f"    {prop}: Any")
 
         # Try to extract attrs from __init__ method params
         if not attrs_added and cls.methods:
-            init_method = next((m for m in cls.methods if m.name == '__init__'), None)
+            init_method = next((m for m in cls.methods if m.name == "__init__"), None)
             if init_method and len(init_method.params) > 1:
-                lines.append('  attrs:')
+                lines.append("  attrs:")
                 for param in init_method.params[1:6]:  # Skip self
-                    if ':' in param:
-                        name, type_hint = param.split(':', 1)
-                        lines.append(f'    {name.strip()}: {type_hint.strip()}')
-                    elif param != 'self':
-                        lines.append(f'    {param}: Any')
+                    if ":" in param:
+                        name, type_hint = param.split(":", 1)
+                        lines.append(f"    {name.strip()}: {type_hint.strip()}")
+                    elif param != "self":
+                        lines.append(f"    {param}: Any")
 
         # Methods
         if cls.methods:
-            lines.append('  methods:')
+            lines.append("  methods:")
             for method in cls.methods[:20]:
                 method_yaml = self._generate_method(method, detail, level, indent=4)
                 lines.append(method_yaml)
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
-    def _generate_method(self, method: FunctionInfo, detail: str, level: str = 'typed', indent: int = 2) -> str:
+    def _generate_method(
+        self, method: FunctionInfo, detail: str, level: str = "typed", indent: int = 2
+    ) -> str:
         """Generate LogicML for a method.
 
         Args:
             level: 'compact' (6 params), 'typed' (10 params, full types), 'full' (typed + calls/raises)
         """
-        prefix = ' ' * indent
-        lines: List[str] = [f'{prefix}{method.name}:']
+        prefix = " " * indent
+        lines: List[str] = [f"{prefix}{method.name}:"]
 
         # Check for property decorator
-        is_property = 'property' in method.decorators
+        is_property = "property" in method.decorators
 
         # Signature - param count depends on level
-        max_params = 6 if level == 'compact' else 10
-        clean_params = remove_self_from_params(method.params[:max_params + 1])
-        params = ', '.join(clean_params[:max_params])
-        ret = method.return_type or 'None'
+        max_params = 6 if level == "compact" else 10
+        clean_params = remove_self_from_params(method.params[: max_params + 1])
+        params = ", ".join(clean_params[:max_params])
+        ret = method.return_type or "None"
 
-        sig = f'({params}) -> {ret}'
+        sig = f"({params}) -> {ret}"
         if method.is_async:
-            sig = f'async {sig}'
+            sig = f"async {sig}"
         if is_property:
-            sig = f'@property {sig}'
+            sig = f"@property {sig}"
 
-        lines.append(f'{prefix}  sig: {sig}')
+        lines.append(f"{prefix}  sig: {sig}")
 
         # Intent/docstring as "does" - longer for typed/full levels
-        does_max = 80 if level in ('typed', 'full') else 60
+        does_max = 80 if level in ("typed", "full") else 60
         if method.docstring:
             does = truncate_docstring(method.docstring, max_length=does_max)
             if does:
                 lines.append(f'{prefix}  does: "{does}"')
         elif method.intent:
-            intent = method.intent[:does_max].replace('\n', ' ').replace('"', "'")
+            intent = method.intent[:does_max].replace("\n", " ").replace('"', "'")
             lines.append(f'{prefix}  does: "{intent}"')
 
         # Edge cases (from raises)
-        if method.raises and detail in ('standard', 'full'):
+        if method.raises and detail in ("standard", "full"):
             for exc in method.raises[:2]:
                 lines.append(f'{prefix}  edge: "error → raise {exc}"')
             # In 'full' level, also emit raises as list for LLM reconstruction
-            if level == 'full':
+            if level == "full":
                 raises_str = ", ".join(method.raises[:5])
-                lines.append(f'{prefix}  raises: [{raises_str}]')
+                lines.append(f"{prefix}  raises: [{raises_str}]")
 
         # Calls (only in 'full' level or detail='full')
-        if level == 'full' and getattr(method, 'calls', None):
+        if level == "full" and getattr(method, "calls", None):
             calls = (method.calls or [])[:10]
             if calls:
                 calls_str = ", ".join(calls)
-                lines.append(f'{prefix}  calls: [{calls_str}]')
+                lines.append(f"{prefix}  calls: [{calls_str}]")
 
         # Side effects
         side_effects = self._detect_side_effects(method)
-        if side_effects and detail in ('standard', 'full'):
+        if side_effects and detail in ("standard", "full"):
             lines.append(f'{prefix}  side: "{side_effects}"')
 
         # Decorators (only important ones)
-        important_decorators = {'staticmethod', 'classmethod', 'property', 'abstractmethod'}
+        important_decorators = {
+            "staticmethod",
+            "classmethod",
+            "property",
+            "abstractmethod",
+        }
         decorators = [d for d in method.decorators if d in important_decorators]
         if decorators:
-            lines.append(f'{prefix}  decorators: [{", ".join(decorators)}]')
+            lines.append(f"{prefix}  decorators: [{', '.join(decorators)}]")
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
-    def _generate_functions(self, functions: List[FunctionInfo], detail: str, level: str = 'typed') -> str:
+    def _generate_functions(
+        self, functions: List[FunctionInfo], detail: str, level: str = "typed"
+    ) -> str:
         """Generate LogicML for top-level functions."""
-        lines: List[str] = ['\nfunctions:']
+        lines: List[str] = ["\nfunctions:"]
 
         for func in functions[:20]:
             func_yaml = self._generate_method(func, detail, level, indent=2)
             lines.append(func_yaml)
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _detect_side_effects(self, method: FunctionInfo) -> Optional[str]:
         """Detect side effects from method calls and name patterns."""
         side_effect_patterns: Dict[str, str] = {
-            'append': 'Modifies list',
-            'add': 'Adds element',
-            'remove': 'Removes element',
-            'clear': 'Clears collection',
-            'pop': 'Removes and returns',
-            'update': 'Updates state',
-            'write': 'Writes data',
-            'save': 'Saves data',
-            'delete': 'Deletes data',
-            'set': 'Sets value',
-            'insert': 'Inserts element',
+            "append": "Modifies list",
+            "add": "Adds element",
+            "remove": "Removes element",
+            "clear": "Clears collection",
+            "pop": "Removes and returns",
+            "update": "Updates state",
+            "write": "Writes data",
+            "save": "Saves data",
+            "delete": "Deletes data",
+            "set": "Sets value",
+            "insert": "Inserts element",
         }
 
         # Check method name
@@ -366,14 +403,14 @@ class LogicMLGenerator:
         return None
 
 
-def generate_logicml(project: ProjectInfo, detail: str = 'standard') -> str:
+def generate_logicml(project: ProjectInfo, detail: str = "standard") -> str:
     """Convenience function to generate LogicML format."""
     generator = LogicMLGenerator()
     spec = generator.generate(project, detail)
     return spec.content
 
 
-LOGICML_EXAMPLE = '''
+LOGICML_EXAMPLE = """
 # sample_class.py | Calculator | 74 lines
 
 imports:
@@ -396,4 +433,4 @@ Calculator:
       sig: (a: float, b: float) -> Optional[float]
       does: "Divide a by b"
       edge: "b == 0 → return None"
-'''
+"""

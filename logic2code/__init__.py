@@ -6,13 +6,13 @@ and produces source code scaffolds with proper structure, type hints, and docstr
 
 Usage:
     from logic2code import CodeGenerator
-    
+
     generator = CodeGenerator('project.c2l.yaml')
     generator.generate('output/')
 """
 
-from .generator import CodeGenerator, GeneratorConfig, GenerationResult
+from .generator import CodeGenerator, GenerationResult, GeneratorConfig
 from .renderers import PythonRenderer
 
-__version__ = '1.0.48'
-__all__ = ['CodeGenerator', 'GeneratorConfig', 'GenerationResult', 'PythonRenderer']
+__version__ = "1.0.48"
+__all__ = ["CodeGenerator", "GeneratorConfig", "GenerationResult", "PythonRenderer"]

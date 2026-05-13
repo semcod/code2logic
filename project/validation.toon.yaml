@@ -1,0 +1,531 @@
+# vallm batch | 441f | 183✓ 28⚠ 76✗ | 2026-03-31
+
+SUMMARY:
+  scanned: 441  passed: 183 (41.5%)  warnings: 28  errors: 76  unsupported: 181
+
+WARNINGS[28]{path,score}:
+  raport/mermaid-init.js,0.67
+    issues[1]{rule,severity,message,line}:
+      js.import.resolvable,warning,Module 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs' not found,1
+  code2logic/file_formats.py,0.90
+    issues[5]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,generate_file_yaml has cyclomatic complexity 22 (max: 15),139
+      complexity.cyclomatic,warning,_parse_file_elements has cyclomatic complexity 45 (max: 15),218
+      complexity.lizard_cc,warning,generate_file_yaml: CC=21 exceeds limit 15,139
+      complexity.lizard_cc,warning,_parse_file_elements: CC=45 exceeds limit 15,218
+      complexity.lizard_length,warning,_parse_file_elements: 102 lines exceeds limit 100,218
+  examples/run_examples.sh,0.90
+    issues[3]{rule,severity,message,line}:
+      complexity.lizard_cc,warning,cmd_refactor: CC=26 exceeds limit 15,311
+      complexity.lizard_length,warning,cmd_refactor: 105 lines exceeds limit 100,311
+      complexity.lizard_cc,warning,cmd_deduplicate: CC=21 exceeds limit 15,445
+  logic2test/parsers.py,0.90
+    issues[6]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,_parse_yaml_simple has cyclomatic complexity 17 (max: 15),97
+      complexity.cyclomatic,warning,_parse_toon has cyclomatic complexity 18 (max: 15),140
+      complexity.cyclomatic,warning,_parse_params_from_sig has cyclomatic complexity 19 (max: 15),288
+      complexity.lizard_cc,warning,_parse_yaml_simple: CC=17 exceeds limit 15,97
+      complexity.lizard_cc,warning,_parse_toon: CC=18 exceeds limit 15,140
+      complexity.lizard_cc,warning,_parse_params_from_sig: CC=19 exceeds limit 15,288
+  examples/14_repeatability_test.py,0.93
+    issues[4]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,run_repeatability_test has cyclomatic complexity 20 (max: 15),195
+      complexity.cyclomatic,warning,print_repeatability_summary has cyclomatic complexity 16 (max: 15),333
+      complexity.lizard_cc,warning,run_repeatability_test: CC=20 exceeds limit 15,195
+      complexity.lizard_length,warning,run_repeatability_test: 102 lines exceeds limit 100,195
+  examples/benchmark_report.py,0.93
+    issues[3]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,main has cyclomatic complexity 18 (max: 15),80
+      complexity.lizard_cc,warning,main: CC=18 exceeds limit 15,80
+      complexity.lizard_length,warning,main: 109 lines exceeds limit 100,80
+  scripts/configure_llm.py,0.93
+    issues[3]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,main has cyclomatic complexity 34 (max: 15),285
+      complexity.lizard_cc,warning,main: CC=34 exceeds limit 15,285
+      complexity.lizard_length,warning,main: 134 lines exceeds limit 100,285
+  lolm/rotation.py,0.96
+    issues[3]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,parse_rate_limit_headers has cyclomatic complexity 16 (max: 15),455
+      complexity.maintainability,warning,Low maintainability index: 18.5 (threshold: 20),
+      complexity.lizard_cc,warning,parse_rate_limit_headers: CC=16 exceeds limit 15,455
+  advanced_yaml_optimizer.py,0.97
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,identify_optimizations has cyclomatic complexity 25 (max: 15),123
+      complexity.lizard_cc,warning,identify_optimizations: CC=25 exceeds limit 15,123
+  code2logic/benchmarks/results.py,0.97
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,calculate_aggregates has cyclomatic complexity 16 (max: 15),146
+      complexity.lizard_cc,warning,calculate_aggregates: CC=16 exceeds limit 15,146
+  code2logic/schemas/logicml_schema.py,0.97
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,validate_logicml has cyclomatic complexity 29 (max: 15),111
+      complexity.lizard_cc,warning,validate_logicml: CC=29 exceeds limit 15,111
+  code2logic/schemas/markdown_schema.py,0.97
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,validate_markdown has cyclomatic complexity 16 (max: 15),89
+      complexity.lizard_cc,warning,validate_markdown: CC=16 exceeds limit 15,89
+  code2logic/schemas/yaml_schema.py,0.97
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,validate_yaml has cyclomatic complexity 17 (max: 15),93
+      complexity.lizard_cc,warning,validate_yaml: CC=17 exceeds limit 15,93
+  examples/12_comprehensive_analysis.py,0.97
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,print_comprehensive_analysis has cyclomatic complexity 18 (max: 15),26
+      complexity.lizard_cc,warning,print_comprehensive_analysis: CC=18 exceeds limit 15,26
+  examples/behavioral_benchmark.py,0.97
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,main has cyclomatic complexity 19 (max: 15),172
+      complexity.lizard_cc,warning,main: CC=19 exceeds limit 15,172
+  examples/benchmark_summary.py,0.97
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,main has cyclomatic complexity 19 (max: 15),28
+      complexity.lizard_cc,warning,main: CC=19 exceeds limit 15,28
+  fast_analysis.py,0.97
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,analyze_file has cyclomatic complexity 19 (max: 15),22
+      complexity.lizard_cc,warning,analyze_file: CC=19 exceeds limit 15,22
+  generate_index_html.py,0.97
+    issues[1]{rule,severity,message,line}:
+      complexity.lizard_length,warning,generate_index_html: 712 lines exceeds limit 100,11
+  logic2test/templates.py,0.97
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,render_function_test has cyclomatic complexity 32 (max: 15),45
+      complexity.lizard_cc,warning,render_function_test: CC=32 exceeds limit 15,45
+  mermaid_to_png.py,0.97
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,main has cyclomatic complexity 16 (max: 15),200
+      complexity.lizard_cc,warning,main: CC=16 exceeds limit 15,200
+  test_graph_viewer.py,0.97
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,test_graph_viewer has cyclomatic complexity 21 (max: 15),10
+      complexity.lizard_cc,warning,test_graph_viewer: CC=21 exceeds limit 15,10
+  advanced_data_analyzer.py,0.98
+    issues[1]{rule,severity,message,line}:
+      complexity.maintainability,warning,Low maintainability index: 0.0 (threshold: 20),
+  final_advanced_data_analyzer.py,0.98
+    issues[1]{rule,severity,message,line}:
+      complexity.maintainability,warning,Low maintainability index: 0.0 (threshold: 20),
+  fixed_advanced_data_analyzer.py,0.98
+    issues[1]{rule,severity,message,line}:
+      complexity.maintainability,warning,Low maintainability index: 0.0 (threshold: 20),
+  flow.py,0.98
+    issues[1]{rule,severity,message,line}:
+      complexity.maintainability,warning,Low maintainability index: 8.1 (threshold: 20),
+  tests/test_llm_profiler.py,0.98
+    issues[1]{rule,severity,message,line}:
+      complexity.maintainability,warning,Low maintainability index: 16.4 (threshold: 20),
+  tests/test_shared_utils.py,0.98
+    issues[1]{rule,severity,message,line}:
+      complexity.maintainability,warning,Low maintainability index: 18.2 (threshold: 20),
+  ultimate_advanced_data_analyzer.py,0.98
+    issues[1]{rule,severity,message,line}:
+      complexity.maintainability,warning,Low maintainability index: 0.0 (threshold: 20),
+
+ERRORS[76]{path,score}:
+  examples/functional_refactoring_example.py,0.00
+    issues[1]{rule,severity,message,line}:
+      syntax.parse,error,SyntaxError: invalid syntax,15
+  refactoring_implementation_executor.py,0.00
+    issues[1]{rule,severity,message,line}:
+      syntax.parse,error,SyntaxError: f-string: valid expression required before '}',339
+  code2logic/benchmarks/__init__.py,0.57
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'common' not found,1
+      python.import.resolvable,error,Module 'results' not found,9
+      python.import.resolvable,error,Module 'runner' not found,16
+  code2logic/core/__init__.py,0.57
+    issues[4]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'analyzer' not found,5
+      python.import.resolvable,error,Module 'dependency' not found,6
+      python.import.resolvable,error,Module 'errors' not found,7
+      python.import.resolvable,error,Module 'models' not found,15
+  code2logic/formats/__init__.py,0.57
+    issues[6]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'file_formats' not found,5
+      python.import.resolvable,error,Module 'generators' not found,6
+      python.import.resolvable,error,Module 'gherkin' not found,13
+      python.import.resolvable,error,Module 'logicml' not found,20
+      python.import.resolvable,error,Module 'markdown_format' not found,21
+      python.import.resolvable,error,Module 'toon_format' not found,22
+  code2logic/integrations/__init__.py,0.57
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'mcp_server' not found,5
+  code2logic/schemas/__init__.py,0.57
+    issues[4]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'json_schema' not found,14
+      python.import.resolvable,error,Module 'logicml_schema' not found,15
+      python.import.resolvable,error,Module 'markdown_schema' not found,16
+      python.import.resolvable,error,Module 'yaml_schema' not found,17
+  code2logic/tools/__init__.py,0.57
+    issues[4]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'adaptive' not found,5
+      python.import.resolvable,error,Module 'benchmark' not found,6
+      python.import.resolvable,error,Module 'code_review' not found,7
+      python.import.resolvable,error,Module 'refactor' not found,13
+  generated_code/__init__.py,0.57
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'analyzer' not found,7
+      python.import.resolvable,error,Module 'analyzer' not found,8
+      python.import.resolvable,error,Module 'analyzer' not found,9
+  logic2code/__init__.py,0.57
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'generator' not found,14
+      python.import.resolvable,error,Module 'renderers' not found,15
+  logic2code/__main__.py,0.57
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'cli' not found,8
+  logic2test/__init__.py,0.57
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'generator' not found,14
+      python.import.resolvable,error,Module 'parsers' not found,15
+      python.import.resolvable,error,Module 'templates' not found,16
+  logic2test/__main__.py,0.57
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'cli' not found,8
+  lolm/__init__.py,0.57
+    issues[6]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'config' not found,36
+      python.import.resolvable,error,Module 'provider' not found,47
+      python.import.resolvable,error,Module 'clients' not found,55
+      python.import.resolvable,error,Module 'manager' not found,60
+      python.import.resolvable,error,Module 'rotation' not found,66
+      python.import.resolvable,error,Module 'clients' not found,77
+  lolm/__main__.py,0.57
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'cli' not found,10
+  lolm/examples/01_quickstart.py,0.57
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'lolm' not found,8
+  lolm/examples/03_code_generation.py,0.57
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'lolm' not found,8
+  tests/samples/sample_reexport/__init__.py,0.57
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'models' not found,7
+      python.import.resolvable,error,Module 'utils' not found,8
+      python.import.resolvable,error,Module 'exceptions' not found,9
+  code2logic/__init__.py,0.58
+    issues[37]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'adaptive' not found,26
+      python.import.resolvable,error,Module 'analyzer' not found,32
+      python.import.resolvable,error,Module 'base' not found,36
+      python.import.resolvable,error,Module 'benchmark' not found,41
+      python.import.resolvable,error,Module 'chunked_reproduction' not found,47
+      python.import.resolvable,error,Module 'code_review' not found,56
+      python.import.resolvable,error,Module 'config' not found,62
+      python.import.resolvable,error,Module 'dependency' not found,63
+      python.import.resolvable,error,Module 'errors' not found,64
+      python.import.resolvable,error,Module 'file_formats' not found,72
+      python.import.resolvable,error,Module 'function_logic' not found,77
+      python.import.resolvable,error,Module 'generators' not found,80
+      python.import.resolvable,error,Module 'gherkin' not found,87
+      python.import.resolvable,error,Module 'intent' not found,94
+      python.import.resolvable,error,Module 'llm_profiler' not found,127
+      python.import.resolvable,error,Module 'logicml' not found,138
+      python.import.resolvable,error,Module 'markdown_format' not found,143
+      python.import.resolvable,error,Module 'metrics' not found,148
+      python.import.resolvable,error,Module 'models' not found,158
+      python.import.resolvable,error,Module 'parsers' not found,166
+      python.import.resolvable,error,Module 'project_reproducer' not found,167
+      python.import.resolvable,error,Module 'project_reproducer' not found,172
+      python.import.resolvable,error,Module 'prompts' not found,175
+      python.import.resolvable,error,Module 'quality' not found,181
+      python.import.resolvable,error,Module 'quality' not found,187
+      python.import.resolvable,error,Module 'refactor' not found,190
+      python.import.resolvable,error,Module 'refactor' not found,198
+      python.import.resolvable,error,Module 'reproducer' not found,201
+      python.import.resolvable,error,Module 'reproducer' not found,207
+      python.import.resolvable,error,Module 'reproducer' not found,210
+      python.import.resolvable,error,Module 'reproduction' not found,213
+      python.import.resolvable,error,Module 'schemas' not found,219
+      python.import.resolvable,error,Module 'similarity' not found,229
+      python.import.resolvable,error,Module 'terminal' not found,230
+      python.import.resolvable,error,Module 'toon_format' not found,236
+      python.import.resolvable,error,Module 'universal' not found,242
+      python.import.resolvable,error,Module 'llm_clients' not found,96
+  tests/test_nlp_pipeline.py,0.62
+    issues[7]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'code2flow.nlp' not found,4
+      python.import.resolvable,error,Module 'code2flow.nlp.normalization' not found,8
+      python.import.resolvable,error,Module 'code2flow.nlp.intent_matching' not found,9
+      python.import.resolvable,error,Module 'code2flow.nlp.entity_resolution' not found,10
+      python.import.resolvable,error,Module 'code2flow.nlp.config' not found,50
+      python.import.resolvable,error,Module 'code2flow.nlp.config' not found,105
+      python.import.resolvable,error,Module 'code2flow.nlp.config' not found,150
+  lolm/tests/test_basic.py,0.63
+    issues[6]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'lolm' not found,8
+      python.import.resolvable,error,Module 'lolm' not found,16
+      python.import.resolvable,error,Module 'lolm' not found,30
+      python.import.resolvable,error,Module 'lolm' not found,43
+      python.import.resolvable,error,Module 'lolm' not found,53
+      python.import.resolvable,error,Module 'lolm' not found,63
+  logic2code/tests/test_basic.py,0.64
+    issues[5]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'logic2code' not found,8
+      python.import.resolvable,error,Module 'logic2code' not found,15
+      python.import.resolvable,error,Module 'logic2code' not found,22
+      python.import.resolvable,error,Module 'logic2code' not found,33
+      python.import.resolvable,error,Module 'logic2code' not found,47
+  logic2test/tests/test_basic.py,0.66
+    issues[4]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'logic2test' not found,8
+      python.import.resolvable,error,Module 'logic2test' not found,15
+      python.import.resolvable,error,Module 'logic2test' not found,22
+      python.import.resolvable,error,Module 'logic2test' not found,33
+  lolm/manager.py,0.71
+    issues[4]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'config' not found,10
+      python.import.resolvable,error,Module 'provider' not found,19
+      python.import.resolvable,error,Module 'clients' not found,20
+      python.import.resolvable,error,Module 'rotation' not found,28
+  code2logic/benchmarks/common.py,0.73
+    issues[7]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'generators' not found,7
+      python.import.resolvable,error,Module 'function_logic' not found,8
+      python.import.resolvable,error,Module 'gherkin' not found,9
+      python.import.resolvable,error,Module 'logicml' not found,10
+      python.import.resolvable,error,Module 'markdown_format' not found,11
+      python.import.resolvable,error,Module 'models' not found,12
+      python.import.resolvable,error,Module 'toon_format' not found,13
+  code2logic/markdown_format.py,0.76
+    issues[4]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'generators' not found,19
+      python.import.resolvable,error,Module 'gherkin' not found,20
+      python.import.resolvable,error,Module 'models' not found,21
+      python.import.resolvable,error,Module 'analyzer' not found,352
+  tests/test_analyzer.py,0.76
+    issues[5]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'code2flow' not found,7
+      python.import.resolvable,error,Module 'code2flow.core.config' not found,8
+      python.import.resolvable,error,Module 'code2flow.core.models' not found,161
+      python.import.resolvable,error,Module 'code2flow.exporters.base' not found,185
+      python.import.resolvable,error,Module 'code2flow.exporters.base' not found,198
+  code2logic/cli.py,0.78
+    issues[13]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'analyzer' not found,736
+      python.import.resolvable,error,Module 'config' not found,737
+      python.import.resolvable,error,Module 'function_logic' not found,738
+      python.import.resolvable,error,Module 'generators' not found,739
+      python.import.resolvable,error,Module 'logicml' not found,746
+      python.import.resolvable,error,Module 'toon_format' not found,747
+      python.import.resolvable,error,Module 'config' not found,453
+      python.import.resolvable,error,Module 'llm_clients' not found,454
+      python.import.resolvable,error,Module 'llm_profiler' not found,763
+      python.import.resolvable,error,Module 'llm_clients' not found,784
+      python.import.resolvable,error,Module 'llm_profiler' not found,785
+      python.import.resolvable,error,Module 'llm_clients' not found,480
+      python.import.resolvable,error,Module 'gherkin' not found,908
+  code2logic/__main__.py,0.79
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'cli' not found,10
+  code2logic/base_generator.py,0.79
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'models' not found,2
+  code2logic/llm/__init__.py,0.79
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'intent' not found,10
+      python.import.resolvable,error,Module 'llm_clients' not found,11
+  code2logic/refactor.py,0.79
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'analyzer' not found,22
+      python.import.resolvable,error,Module 'code_review' not found,23
+      python.import.resolvable,error,Module 'llm_clients' not found,27
+  code2logic/toon_format.py,0.79
+    issues[4]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'models' not found,14
+      python.import.resolvable,error,Module 'shared_utils' not found,15
+      python.import.resolvable,error,Module 'function_logic' not found,158
+      python.import.resolvable,error,Module 'shared_utils' not found,159
+  logic2test/examples/02_custom_templates.py,0.79
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'logic2test.templates' not found,13
+      python.import.resolvable,error,Module 'logic2test.parsers' not found,14
+  setup.py,0.79
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'setuptools' not found,3
+  code2logic/benchmark.py,0.80
+    issues[6]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'analyzer' not found,32
+      python.import.resolvable,error,Module 'file_formats' not found,33
+      python.import.resolvable,error,Module 'generators' not found,34
+      python.import.resolvable,error,Module 'gherkin' not found,40
+      python.import.resolvable,error,Module 'llm_clients' not found,41
+      python.import.resolvable,error,Module 'reproduction' not found,42
+  tests/test_e2e_projects.py,0.81
+    issues[4]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'logic2code.generator' not found,8
+      python.import.resolvable,error,Module 'logic2code.generator' not found,9
+      python.import.resolvable,error,Module 'logic2test.generator' not found,10
+      python.import.resolvable,error,Module 'logic2test.generator' not found,11
+  code2logic/benchmarks/runner.py,0.82
+    issues[9]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'analyzer' not found,27
+      python.import.resolvable,error,Module 'llm_clients' not found,28
+      python.import.resolvable,error,Module 'metrics' not found,29
+      python.import.resolvable,error,Module 'terminal' not found,30
+      python.import.resolvable,error,Module 'utils' not found,31
+      python.import.resolvable,error,Module 'common' not found,32
+      python.import.resolvable,error,Module 'results' not found,33
+      python.import.resolvable,error,Module 'parsers' not found,692
+      python.import.resolvable,error,Module 'models' not found,999
+  code2logic/intent.py,0.82
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'nltk' not found,38
+      python.import.resolvable,error,Module 'nltk.stem' not found,39
+      python.import.resolvable,error,Module 'spacy' not found,45
+  code2logic/llm_clients.py,0.82
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'lolm' not found,19
+      python.import.resolvable,error,Module 'lolm' not found,32
+      python.import.resolvable,error,Module 'lolm' not found,35
+  lolm/cli.py,0.82
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'config' not found,19
+      python.import.resolvable,error,Module 'manager' not found,32
+      python.import.resolvable,error,Module 'provider' not found,33
+  code2logic/chunked_reproduction.py,0.83
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'utils' not found,18
+      python.import.resolvable,error,Module 'llm_profiler' not found,467
+  code2logic/logicml.py,0.83
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'models' not found,36
+      python.import.resolvable,error,Module 'shared_utils' not found,37
+  code2logic/adaptive.py,0.84
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'file_formats' not found,27
+      python.import.resolvable,error,Module 'llm_clients' not found,28
+      python.import.resolvable,error,Module 'reproduction' not found,29
+  code2logic/function_logic.py,0.84
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'models' not found,5
+      python.import.resolvable,error,Module 'shared_utils' not found,6
+      python.import.resolvable,error,Module 'toon_format' not found,7
+  logic2code/generator.py,0.84
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'logic2test.parsers' not found,14
+      python.import.resolvable,error,Module 'renderers' not found,15
+      python.import.resolvable,error,Module 'lolm' not found,75
+  code2logic/analyzer.py,0.85
+    issues[5]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'dependency' not found,17
+      python.import.resolvable,error,Module 'intent' not found,18
+      python.import.resolvable,error,Module 'models' not found,19
+      python.import.resolvable,error,Module 'parsers' not found,20
+      python.import.resolvable,error,Module 'similarity' not found,21
+  code2logic/quality.py,0.86
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'models' not found,10
+  code2logic/similarity.py,0.86
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'models' not found,12
+      python.import.resolvable,error,Module 'rapidfuzz' not found,19
+  logic2code/examples/01_quickstart.py,0.86
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'logic2code' not found,14
+  logic2code/examples/02_llm_enhanced.py,0.86
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'logic2code' not found,13
+  logic2test/examples/01_quickstart.py,0.86
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'logic2test' not found,14
+  logic2test/generator.py,0.86
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'parsers' not found,10
+      python.import.resolvable,error,Module 'templates' not found,11
+  lolm/config.py,0.86
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'getv' not found,18
+      python.import.resolvable,error,Module 'getv' not found,148
+      python.import.resolvable,error,Module 'getv.integrations.pydantic_env' not found,149
+  lolm/examples/02_configuration.py,0.86
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'lolm' not found,11
+  code2logic/parsers.py,0.87
+    issues[4]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'intent' not found,14
+      python.import.resolvable,error,Module 'models' not found,15
+      python.import.resolvable,error,Module 'tree_sitter_javascript' not found,28
+      python.import.resolvable,error,Module 'tree_sitter_typescript' not found,254
+  refactoring_validator.py,0.87
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pipeline_runner_utils_improved' not found,173
+      python.import.resolvable,error,Module 'complexity_reduction_examples' not found,210
+      python.import.resolvable,error,Module 'general_refactoring_template' not found,262
+  tests/test_edge_cases.py,0.87
+    issues[4]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'code2flow' not found,7
+      python.import.resolvable,error,Module 'code2flow.core.analyzer' not found,8
+      python.import.resolvable,error,Module 'code2flow.core.config' not found,9
+      python.import.resolvable,error,Module 'code2flow.nlp' not found,295
+  code2logic/llm.py,0.88
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'llm_clients' not found,23
+      python.import.resolvable,error,Module 'generators' not found,125
+  lolm/clients.py,0.88
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'config' not found,11
+      python.import.resolvable,error,Module 'provider' not found,12
+  benchmarks/benchmark_performance.py,0.89
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'code2flow' not found,18
+      python.import.resolvable,error,Module 'code2flow.core.streaming_analyzer' not found,19
+  code2logic/dependency.py,0.89
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'models' not found,11
+  code2logic/mcp_server.py,0.89
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'analyzer' not found,178
+      python.import.resolvable,error,Module 'generators' not found,179
+  logic2code/cli.py,0.89
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'generator' not found,14
+  logic2test/cli.py,0.89
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'generator' not found,14
+  code2logic/project_reproducer.py,0.90
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'llm_clients' not found,31
+      python.import.resolvable,error,Module 'universal' not found,32
+  benchmarks/test_performance.py,0.91
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'code2flow' not found,11
+      python.import.resolvable,error,Module 'code2flow.core.config' not found,12
+  code2logic/universal.py,0.91
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'llm_clients' not found,36
+      python.import.resolvable,error,Module 'reproduction' not found,37
+  code2logic/reproduction.py,0.93
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'llm_clients' not found,23
+  hybrid_export.py,0.93
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'code2flow' not found,246
+  ultimate_yaml_optimizer.py,0.93
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'msgpack' not found,13
+  code2logic/generators.py,0.94
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'models' not found,15
+      python.import.resolvable,error,Module 'shared_utils' not found,16
+  code2logic/gherkin.py,0.94
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'models' not found,36
+  logic2code/renderers.py,0.94
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'logic2test.parsers' not found,15
+  code2logic/llm_profiler.py,0.95
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'utils' not found,33
+  test_analyzer.py,0.97
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'flow' not found,15
+
+UNSUPPORTED[6]{bucket,count}:
+  *.md,87
+  Dockerfile*,5
+  *.txt,50
+  *.yml,4
+  *.example,1
+  other,34

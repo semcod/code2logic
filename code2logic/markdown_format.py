@@ -24,6 +24,7 @@ from .models import ProjectInfo
 @dataclass
 class MarkdownSpec:
     """Markdown specification for a project."""
+
     content: str
     file_count: int
     total_chars: int
@@ -46,7 +47,7 @@ class MarkdownHybridGenerator:
         self.gherkin_gen = GherkinGenerator()
         self.yaml_gen = YAMLGenerator()
 
-    def generate(self, project: ProjectInfo, detail: str = 'full') -> MarkdownSpec:
+    def generate(self, project: ProjectInfo, detail: str = "full") -> MarkdownSpec:
         """Generate Markdown hybrid specification."""
         sections = {}
         parts = []
@@ -54,34 +55,34 @@ class MarkdownHybridGenerator:
         # Header
         header = self._generate_header(project)
         parts.append(header)
-        sections['header'] = len(header)
+        sections["header"] = len(header)
 
         # File tree
         tree = self._generate_tree(project)
         parts.append(tree)
-        sections['tree'] = len(tree)
+        sections["tree"] = len(tree)
 
         # Imports summary
         imports = self._generate_imports(project)
         parts.append(imports)
-        sections['imports'] = len(imports)
+        sections["imports"] = len(imports)
 
         # Classes as YAML
         classes_yaml = self._generate_classes_yaml(project)
         parts.append(classes_yaml)
-        sections['classes'] = len(classes_yaml)
+        sections["classes"] = len(classes_yaml)
 
         # Functions as Gherkin
         functions_gherkin = self._generate_functions_gherkin(project)
         parts.append(functions_gherkin)
-        sections['functions'] = len(functions_gherkin)
+        sections["functions"] = len(functions_gherkin)
 
         # Dependencies
         deps = self._generate_dependencies(project)
         parts.append(deps)
-        sections['dependencies'] = len(deps)
+        sections["dependencies"] = len(deps)
 
-        content = '\n'.join(parts)
+        content = "\n".join(parts)
 
         return MarkdownSpec(
             content=content,
@@ -107,20 +108,20 @@ class MarkdownHybridGenerator:
         dirs: Dict[str, List[str]] = {}
         for module in project.modules:
             path = Path(module.path)
-            dir_name = str(path.parent) if path.parent != Path('.') else '.'
+            dir_name = str(path.parent) if path.parent != Path(".") else "."
             if dir_name not in dirs:
                 dirs[dir_name] = []
             dirs[dir_name].append(path.name)
 
         for dir_name, files in sorted(dirs.items()):
-            if dir_name != '.':
+            if dir_name != ".":
                 lines.append(f"{dir_name}/")
             for f in sorted(files):
-                prefix = "  " if dir_name != '.' else ""
+                prefix = "  " if dir_name != "." else ""
                 lines.append(f"{prefix}├── {f}")
 
         lines.append("```\n")
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _generate_imports(self, project: ProjectInfo) -> str:
         """Generate imports as YAML for precise reproduction."""
@@ -134,10 +135,29 @@ class MarkdownHybridGenerator:
 
                 # Categorize
                 stdlib_modules = {
-                    'os', 'sys', 'json', 'typing', 'pathlib', 'dataclasses',
-                    're', 'ast', 'abc', 'collections', 'functools', 'itertools',
-                    'datetime', 'logging', 'argparse', 'subprocess', 'shutil',
-                    'time', 'copy', 'io', 'contextlib', 'enum', 'hashlib',
+                    "os",
+                    "sys",
+                    "json",
+                    "typing",
+                    "pathlib",
+                    "dataclasses",
+                    "re",
+                    "ast",
+                    "abc",
+                    "collections",
+                    "functools",
+                    "itertools",
+                    "datetime",
+                    "logging",
+                    "argparse",
+                    "subprocess",
+                    "shutil",
+                    "time",
+                    "copy",
+                    "io",
+                    "contextlib",
+                    "enum",
+                    "hashlib",
                 }
 
                 stdlib = []
@@ -145,10 +165,10 @@ class MarkdownHybridGenerator:
                 local = []
 
                 for imp in module.imports:
-                    base = imp.split('.')[0]
+                    base = imp.split(".")[0]
                     if base in stdlib_modules:
                         stdlib.append(imp)
-                    elif imp.startswith('.'):
+                    elif imp.startswith("."):
                         local.append(imp)
                     else:
                         third_party.append(imp)
@@ -156,12 +176,14 @@ class MarkdownHybridGenerator:
                 if stdlib:
                     lines.append(f"  stdlib: [{', '.join(sorted(set(stdlib))[:10])}]")
                 if third_party:
-                    lines.append(f"  third_party: [{', '.join(sorted(set(third_party))[:10])}]")
+                    lines.append(
+                        f"  third_party: [{', '.join(sorted(set(third_party))[:10])}]"
+                    )
                 if local:
                     lines.append(f"  local: [{', '.join(sorted(set(local))[:5])}]")
 
         lines.append("```\n")
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _generate_classes_yaml(self, project: ProjectInfo) -> str:
         """Generate classes as detailed YAML codeblock.
@@ -181,8 +203,16 @@ class MarkdownHybridGenerator:
 
                 for cls in module.classes:
                     # Check if dataclass
-                    is_dataclass = any('dataclass' in d for d in cls.methods[0].decorators if cls.methods) if cls.methods else False
-                    is_dataclass = is_dataclass or 'dataclass' in str(cls.bases)
+                    is_dataclass = (
+                        any(
+                            "dataclass" in d
+                            for d in cls.methods[0].decorators
+                            if cls.methods
+                        )
+                        if cls.methods
+                        else False
+                    )
+                    is_dataclass = is_dataclass or "dataclass" in str(cls.bases)
 
                     lines.append(f"\n{cls.name}:")
 
@@ -198,8 +228,8 @@ class MarkdownHybridGenerator:
 
                     # Docstring
                     if cls.docstring:
-                        doc = cls.docstring.split('\n')[0][:80]
-                        lines.append(f"  doc: \"{doc}\"")
+                        doc = cls.docstring.split("\n")[0][:80]
+                        lines.append(f'  doc: "{doc}"')
 
                     # Inheritance
                     if cls.bases:
@@ -210,8 +240,8 @@ class MarkdownHybridGenerator:
                         lines.append("  fields:")
                         for prop in cls.properties[:15]:
                             # Try to extract type from property string
-                            if ':' in prop:
-                                name, type_hint = prop.split(':', 1)
+                            if ":" in prop:
+                                name, type_hint = prop.split(":", 1)
                                 lines.append(f"    {name.strip()}: {type_hint.strip()}")
                             else:
                                 lines.append(f"    {prop}: Any")
@@ -221,9 +251,13 @@ class MarkdownHybridGenerator:
                         lines.append("  methods:")
                         for method in cls.methods[:15]:
                             # Build full signature
-                            params = ', '.join(method.params[:5])
-                            ret = method.return_type or 'None'
-                            decorators = ', '.join(method.decorators[:2]) if method.decorators else ''
+                            params = ", ".join(method.params[:5])
+                            ret = method.return_type or "None"
+                            decorators = (
+                                ", ".join(method.decorators[:2])
+                                if method.decorators
+                                else ""
+                            )
 
                             method_info = f"{method.name}({params}) -> {ret}"
                             if decorators:
@@ -237,7 +271,7 @@ class MarkdownHybridGenerator:
             lines.append("# No classes defined")
 
         lines.append("```\n")
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _generate_functions_gherkin(self, project: ProjectInfo) -> str:
         """Generate functions as detailed Gherkin codeblock.
@@ -275,15 +309,17 @@ class MarkdownHybridGenerator:
 
                     # Docstring as description
                     if func.docstring:
-                        doc = func.docstring.split('\n')[0][:70]
-                        lines.append(f"    \"\"\"{doc}\"\"\"")
+                        doc = func.docstring.split("\n")[0][:70]
+                        lines.append(f'    """{doc}"""')
 
                     # Parameters with types
                     if func.params:
                         for param in func.params[:6]:
-                            if ':' in param:
-                                name, ptype = param.split(':', 1)
-                                lines.append(f"    Given parameter {name.strip()}: {ptype.strip()}")
+                            if ":" in param:
+                                name, ptype = param.split(":", 1)
+                                lines.append(
+                                    f"    Given parameter {name.strip()}: {ptype.strip()}"
+                                )
                             else:
                                 lines.append(f"    Given parameter {param}")
                     else:
@@ -300,7 +336,7 @@ class MarkdownHybridGenerator:
                             lines.append(f"    And may raise {exc}")
 
                     # Return type
-                    if func.return_type and func.return_type != 'None':
+                    if func.return_type and func.return_type != "None":
                         lines.append(f"    Then returns {func.return_type}")
                     else:
                         lines.append("    Then returns None")
@@ -309,7 +345,7 @@ class MarkdownHybridGenerator:
             lines.append("# No top-level functions defined")
 
         lines.append("```\n")
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _generate_dependencies(self, project: ProjectInfo) -> str:
         """Generate module dependencies section."""
@@ -320,11 +356,10 @@ class MarkdownHybridGenerator:
         for module in project.modules:
             name = Path(module.path).stem
             local_deps = [
-                imp for imp in module.imports
-                if imp.startswith('.') or any(
-                    imp.startswith(Path(m.path).stem)
-                    for m in project.modules
-                )
+                imp
+                for imp in module.imports
+                if imp.startswith(".")
+                or any(imp.startswith(Path(m.path).stem) for m in project.modules)
             ]
             if local_deps:
                 deps[name] = local_deps[:5]
@@ -337,10 +372,10 @@ class MarkdownHybridGenerator:
         else:
             lines.append("*No internal dependencies*\n")
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
 
-def generate_markdown_hybrid(project: ProjectInfo, detail: str = 'full') -> str:
+def generate_markdown_hybrid(project: ProjectInfo, detail: str = "full") -> str:
     """Convenience function to generate Markdown hybrid format."""
     generator = MarkdownHybridGenerator()
     spec = generator.generate(project, detail)

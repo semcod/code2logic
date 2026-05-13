@@ -9,52 +9,23 @@ This repository contains multiple independently publishable Python packages:
 
 You can work with each package independently (inside its folder), or manage everything from the repository root.
 
-## Quick Commands (Root)
-
-### Install
-
-```bash
-# Install code2logic (dev)
-make install-dev
-
 # Install all subpackages (dev)
 make install-subpackages
 ```
-
-### Test
-
-```bash
-# Test only code2logic
-make test
-
-# Test all packages (code2logic + lolm + logic2test + logic2code)
-make test-all
 
 # Test only subpackages
 make test-subpackages
 ```
 
-### Build
-
-```bash
-# Build code2logic
-make build
-
 # Build all subpackages
 make build-subpackages
 ```
 
-### Publish
-
-```bash
 # Publish single package
 make publish                 # code2logic
 make publish-lolm
 make publish-logic2test
 make publish-logic2code
-
-# Publish all packages
-make publish-all
 
 # TestPyPI
 make publish-test
@@ -112,9 +83,6 @@ Set these repository secrets:
 - `logic2code` depends on `logic2test` (shared parsers)
 - LLM support in `logic2code` uses `lolm` (optional dependency)
 
-## Typical Workflow (End-to-End)
-
-```bash
 # 1. Analyze source project into a logic file
 code2logic src/ -f hybrid -o out/code2logic/project.c2l.hybrid.yaml
 
@@ -124,6 +92,3 @@ python -m logic2test out/code2logic/project.c2l.hybrid.yaml -o out/logic2test/te
 # 3. Generate code scaffolds (or regenerate)
 python -m logic2code out/code2logic/project.c2l.hybrid.yaml -o out/logic2code/generated_code/
 
-# 4. Run all tests across monorepo
-make test-all
-```

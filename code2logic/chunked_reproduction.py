@@ -19,25 +19,26 @@ from .utils import estimate_tokens
 
 # LLM context limits (approximate)
 LLM_CONTEXT_LIMITS = {
-    'gpt-4': 8000,
-    'gpt-4-turbo': 128000,
-    'gpt-3.5-turbo': 4000,
-    'claude-3': 100000,
-    'claude-2': 100000,
-    'llama-7b': 2000,
-    'llama-13b': 4000,
-    'llama-70b': 4000,
-    'mistral-7b': 8000,
-    'mixtral-8x7b': 32000,
-    'codellama': 4000,
-    'deepseek-coder': 16000,
-    'default': 4000,
+    "gpt-4": 8000,
+    "gpt-4-turbo": 128000,
+    "gpt-3.5-turbo": 4000,
+    "claude-3": 100000,
+    "claude-2": 100000,
+    "llama-7b": 2000,
+    "llama-13b": 4000,
+    "llama-70b": 4000,
+    "mistral-7b": 8000,
+    "mixtral-8x7b": 32000,
+    "codellama": 4000,
+    "deepseek-coder": 16000,
+    "default": 4000,
 }
 
 
 @dataclass
 class Chunk:
     """A chunk of specification for reproduction."""
+
     id: int
     content: str
     tokens: int
@@ -48,6 +49,7 @@ class Chunk:
 @dataclass
 class ChunkedSpec:
     """Chunked specification."""
+
     chunks: List[Chunk]
     total_tokens: int
     format: str
@@ -57,6 +59,7 @@ class ChunkedSpec:
 @dataclass
 class ChunkedResult:
     """Result of chunked reproduction."""
+
     file_name: str
     chunks_total: int
     chunks_success: int
@@ -73,7 +76,7 @@ def get_llm_limit(model_name: str) -> int:
         if key in model_lower:
             return limit
 
-    return LLM_CONTEXT_LIMITS['default']
+    return LLM_CONTEXT_LIMITS["default"]
 
 
 def chunk_yaml_spec(spec: str, max_tokens: int = 2000) -> List[Chunk]:
@@ -85,26 +88,28 @@ def chunk_yaml_spec(spec: str, max_tokens: int = 2000) -> List[Chunk]:
     chunk_id = 0
 
     # Split by top-level items
-    lines = spec.split('\n')
+    lines = spec.split("\n")
     current_section = []
 
     for line in lines:
         # Detect new top-level item
-        if line and not line.startswith(' ') and not line.startswith('#'):
+        if line and not line.startswith(" ") and not line.startswith("#"):
             # Save previous section
             if current_section:
-                section_text = '\n'.join(current_section)
+                section_text = "\n".join(current_section)
                 section_tokens = estimate_tokens(section_text)
 
                 if current_tokens + section_tokens > max_tokens and current_chunk:
                     # Start new chunk
-                    chunks.append(Chunk(
-                        id=chunk_id,
-                        content='\n'.join(current_chunk),
-                        tokens=current_tokens,
-                        elements=current_elements.copy(),
-                        dependencies=[],
-                    ))
+                    chunks.append(
+                        Chunk(
+                            id=chunk_id,
+                            content="\n".join(current_chunk),
+                            tokens=current_tokens,
+                            elements=current_elements.copy(),
+                            dependencies=[],
+                        )
+                    )
                     chunk_id += 1
                     current_chunk = []
                     current_tokens = 0
@@ -114,9 +119,9 @@ def chunk_yaml_spec(spec: str, max_tokens: int = 2000) -> List[Chunk]:
                 current_tokens += section_tokens
 
                 # Extract element name
-                if ':' in line:
-                    elem = line.split(':')[0].strip()
-                    if elem and not elem.startswith('-'):
+                if ":" in line:
+                    elem = line.split(":")[0].strip()
+                    if elem and not elem.startswith("-"):
                         current_elements.append(elem)
 
             current_section = [line]
@@ -126,17 +131,19 @@ def chunk_yaml_spec(spec: str, max_tokens: int = 2000) -> List[Chunk]:
     # Add remaining section
     if current_section:
         current_chunk.extend(current_section)
-        current_tokens += estimate_tokens('\n'.join(current_section))
+        current_tokens += estimate_tokens("\n".join(current_section))
 
     # Add final chunk
     if current_chunk:
-        chunks.append(Chunk(
-            id=chunk_id,
-            content='\n'.join(current_chunk),
-            tokens=current_tokens,
-            elements=current_elements,
-            dependencies=[],
-        ))
+        chunks.append(
+            Chunk(
+                id=chunk_id,
+                content="\n".join(current_chunk),
+                tokens=current_tokens,
+                elements=current_elements,
+                dependencies=[],
+            )
+        )
 
     return chunks
 
@@ -147,7 +154,7 @@ def chunk_gherkin_spec(spec: str, max_tokens: int = 2000) -> List[Chunk]:
     chunk_id = 0
 
     # Split by Feature
-    features = re.split(r'(?=Feature:)', spec)
+    features = re.split(r"(?=Feature:)", spec)
 
     current_chunk = []
     current_tokens = 0
@@ -161,7 +168,7 @@ def chunk_gherkin_spec(spec: str, max_tokens: int = 2000) -> List[Chunk]:
 
         if feature_tokens > max_tokens:
             # Split feature by scenarios
-            scenarios = re.split(r'(?=\s+Scenario)', feature)
+            scenarios = re.split(r"(?=\s+Scenario)", feature)
             header = scenarios[0] if scenarios else ""
 
             for scenario in scenarios[1:]:
@@ -169,13 +176,15 @@ def chunk_gherkin_spec(spec: str, max_tokens: int = 2000) -> List[Chunk]:
                 scenario_tokens = estimate_tokens(scenario_full)
 
                 if current_tokens + scenario_tokens > max_tokens and current_chunk:
-                    chunks.append(Chunk(
-                        id=chunk_id,
-                        content='\n'.join(current_chunk),
-                        tokens=current_tokens,
-                        elements=current_elements.copy(),
-                        dependencies=[],
-                    ))
+                    chunks.append(
+                        Chunk(
+                            id=chunk_id,
+                            content="\n".join(current_chunk),
+                            tokens=current_tokens,
+                            elements=current_elements.copy(),
+                            dependencies=[],
+                        )
+                    )
                     chunk_id += 1
                     current_chunk = []
                     current_tokens = 0
@@ -185,18 +194,20 @@ def chunk_gherkin_spec(spec: str, max_tokens: int = 2000) -> List[Chunk]:
                 current_tokens += scenario_tokens
 
                 # Extract scenario name
-                match = re.search(r'Scenario[:\s]+(\w+)', scenario)
+                match = re.search(r"Scenario[:\s]+(\w+)", scenario)
                 if match:
                     current_elements.append(match.group(1))
         else:
             if current_tokens + feature_tokens > max_tokens and current_chunk:
-                chunks.append(Chunk(
-                    id=chunk_id,
-                    content='\n'.join(current_chunk),
-                    tokens=current_tokens,
-                    elements=current_elements.copy(),
-                    dependencies=[],
-                ))
+                chunks.append(
+                    Chunk(
+                        id=chunk_id,
+                        content="\n".join(current_chunk),
+                        tokens=current_tokens,
+                        elements=current_elements.copy(),
+                        dependencies=[],
+                    )
+                )
                 chunk_id += 1
                 current_chunk = []
                 current_tokens = 0
@@ -206,18 +217,20 @@ def chunk_gherkin_spec(spec: str, max_tokens: int = 2000) -> List[Chunk]:
             current_tokens += feature_tokens
 
             # Extract feature name
-            match = re.search(r'Feature:\s*(.+)', feature)
+            match = re.search(r"Feature:\s*(.+)", feature)
             if match:
                 current_elements.append(match.group(1).split()[0])
 
     if current_chunk:
-        chunks.append(Chunk(
-            id=chunk_id,
-            content='\n'.join(current_chunk),
-            tokens=current_tokens,
-            elements=current_elements,
-            dependencies=[],
-        ))
+        chunks.append(
+            Chunk(
+                id=chunk_id,
+                content="\n".join(current_chunk),
+                tokens=current_tokens,
+                elements=current_elements,
+                dependencies=[],
+            )
+        )
 
     return chunks
 
@@ -228,7 +241,7 @@ def chunk_markdown_spec(spec: str, max_tokens: int = 2000) -> List[Chunk]:
     chunk_id = 0
 
     # Split by ## headers
-    sections = re.split(r'(?=##\s)', spec)
+    sections = re.split(r"(?=##\s)", spec)
 
     current_chunk = []
     current_tokens = 0
@@ -241,13 +254,15 @@ def chunk_markdown_spec(spec: str, max_tokens: int = 2000) -> List[Chunk]:
         section_tokens = estimate_tokens(section)
 
         if current_tokens + section_tokens > max_tokens and current_chunk:
-            chunks.append(Chunk(
-                id=chunk_id,
-                content='\n'.join(current_chunk),
-                tokens=current_tokens,
-                elements=current_elements.copy(),
-                dependencies=[],
-            ))
+            chunks.append(
+                Chunk(
+                    id=chunk_id,
+                    content="\n".join(current_chunk),
+                    tokens=current_tokens,
+                    elements=current_elements.copy(),
+                    dependencies=[],
+                )
+            )
             chunk_id += 1
             current_chunk = []
             current_tokens = 0
@@ -257,29 +272,31 @@ def chunk_markdown_spec(spec: str, max_tokens: int = 2000) -> List[Chunk]:
         current_tokens += section_tokens
 
         # Extract section name
-        match = re.search(r'##\s+(.+)', section)
+        match = re.search(r"##\s+(.+)", section)
         if match:
             current_elements.append(match.group(1).strip())
 
     if current_chunk:
-        chunks.append(Chunk(
-            id=chunk_id,
-            content='\n'.join(current_chunk),
-            tokens=current_tokens,
-            elements=current_elements,
-            dependencies=[],
-        ))
+        chunks.append(
+            Chunk(
+                id=chunk_id,
+                content="\n".join(current_chunk),
+                tokens=current_tokens,
+                elements=current_elements,
+                dependencies=[],
+            )
+        )
 
     return chunks
 
 
 def chunk_spec(spec: str, fmt: str, max_tokens: int = 2000) -> ChunkedSpec:
     """Chunk specification based on format."""
-    if fmt == 'yaml':
+    if fmt == "yaml":
         chunks = chunk_yaml_spec(spec, max_tokens)
-    elif fmt == 'gherkin':
+    elif fmt == "gherkin":
         chunks = chunk_gherkin_spec(spec, max_tokens)
-    elif fmt == 'markdown':
+    elif fmt == "markdown":
         chunks = chunk_markdown_spec(spec, max_tokens)
     else:
         # Simple chunking by lines
@@ -291,11 +308,13 @@ def chunk_spec(spec: str, fmt: str, max_tokens: int = 2000) -> ChunkedSpec:
         chunks=chunks,
         total_tokens=total_tokens,
         format=fmt,
-        file_name='',
+        file_name="",
     )
 
 
-def get_chunk_prompt(chunk: Chunk, fmt: str, file_name: str, chunk_num: int, total_chunks: int) -> str:
+def get_chunk_prompt(
+    chunk: Chunk, fmt: str, file_name: str, chunk_num: int, total_chunks: int
+) -> str:
     """Generate prompt for a single chunk."""
 
     context = f"Part {chunk_num + 1}/{total_chunks}" if total_chunks > 1 else ""
@@ -309,7 +328,7 @@ Requirements:
 - Generate complete Python code for the elements in this chunk
 - Include necessary imports
 - Use type hints
-- Elements to implement: {', '.join(chunk.elements[:10])}
+- Elements to implement: {", ".join(chunk.elements[:10])}
 
 ```python
 """
@@ -324,23 +343,23 @@ def merge_chunk_codes(codes: List[str], file_name: str) -> str:
     code_sections = []
 
     for code in codes:
-        lines = code.split('\n')
+        lines = code.split("\n")
         current_section = []
 
         for line in lines:
             # Collect imports
-            if line.startswith('import ') or line.startswith('from '):
+            if line.startswith("import ") or line.startswith("from "):
                 imports.add(line)
-            elif line.strip() and not line.startswith('#'):
+            elif line.strip() and not line.startswith("#"):
                 current_section.append(line)
 
         if current_section:
-            code_sections.append('\n'.join(current_section))
+            code_sections.append("\n".join(current_section))
 
     # Build merged code
     merged = f'"""{file_name}\nAuto-generated from chunked specification.\n"""\n\n'
-    merged += '\n'.join(sorted(imports)) + '\n\n'
-    merged += '\n\n'.join(code_sections)
+    merged += "\n".join(sorted(imports)) + "\n\n"
+    merged += "\n\n".join(code_sections)
 
     return merged
 
@@ -348,7 +367,9 @@ def merge_chunk_codes(codes: List[str], file_name: str) -> str:
 class ChunkedReproducer:
     """Reproduce code from chunked specifications."""
 
-    def __init__(self, client, model_name: str = 'default', max_tokens: Optional[int] = None):
+    def __init__(
+        self, client, model_name: str = "default", max_tokens: Optional[int] = None
+    ):
         self.client = client
         self.model_name = model_name
         if max_tokens is None:
@@ -365,8 +386,7 @@ class ChunkedReproducer:
         if spec_tokens <= self.max_tokens:
             # No chunking needed
             prompt = get_chunk_prompt(
-                Chunk(0, spec, spec_tokens, [], []),
-                fmt, file_name, 0, 1
+                Chunk(0, spec, spec_tokens, [], []), fmt, file_name, 0, 1
             )
 
             try:
@@ -421,8 +441,8 @@ class ChunkedReproducer:
 
     def _extract_code(self, response: str) -> str:
         """Extract code from LLM response."""
-        if '```' in response:
-            match = re.search(r'```(?:python)?\n(.*?)```', response, re.DOTALL)
+        if "```" in response:
+            match = re.search(r"```(?:python)?\n(.*?)```", response, re.DOTALL)
             if match:
                 return match.group(1).strip()
         return response.strip()
@@ -433,7 +453,7 @@ def auto_chunk_reproduce(
     fmt: str,
     file_name: str,
     client,
-    model_name: str = 'default',
+    model_name: str = "default",
 ) -> ChunkedResult:
     """Auto-chunking reproduction with LLM adaptation."""
     reproducer = ChunkedReproducer(client, model_name)
@@ -445,8 +465,8 @@ def adaptive_chunk_reproduce(
     fmt: str,
     file_name: str,
     client,
-    provider: str = 'unknown',
-    model: str = 'unknown',
+    provider: str = "unknown",
+    model: str = "unknown",
 ) -> ChunkedResult:
     """
     Adaptive chunking reproduction using LLM profile.
@@ -472,7 +492,7 @@ def adaptive_chunk_reproduce(
 
     # Get optimal settings
     settings = chunker.get_optimal_settings()
-    max_tokens = settings['max_chunk_tokens']
+    max_tokens = settings["max_chunk_tokens"]
 
     # Use adaptive reproducer
     reproducer = ChunkedReproducer(client, model, max_tokens=max_tokens)

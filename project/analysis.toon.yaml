@@ -1,0 +1,216 @@
+# code2llm | 98f 41318L | python:92,shell:3,javascript:1 | 2026-03-31
+# CC̄=5.6 | critical:89/1371 | dups:1 | cycles:0
+
+HEALTH[20]:
+  🔴 DUP   1 classes duplicated
+  🔴 GOD   code2logic/llm_profiler.py = 648L, 4 classes, 23m, max CC=11
+  🔴 GOD   code2logic/reproducer.py = 710L, 5 classes, 25m, max CC=11
+  🔴 GOD   flow.py = 1144L, 9 classes, 51m, max CC=10
+  🔴 GOD   code2logic/metrics.py = 639L, 6 classes, 15m, max CC=12
+  🔴 GOD   code2logic/intent.py = 561L, 4 classes, 18m, max CC=12
+  🔴 GOD   code2logic/universal.py = 1233L, 8 classes, 31m, max CC=49
+  🔴 GOD   code2logic/generators.py = 2178L, 5 classes, 59m, max CC=83
+  🔴 GOD   code2logic/gherkin.py = 978L, 6 classes, 29m, max CC=19
+  🔴 GOD   lolm/rotation.py = 717L, 6 classes, 37m, max CC=16
+  🟡 CC    analyze_file CC=19 (limit:15)
+  🟡 CC    identify_optimizations CC=25 (limit:15)
+  🟡 CC    identify_unused_data_structures CC=15 (limit:15)
+  🟡 CC    _extract_data_types CC=15 (limit:15)
+  🟡 CC    identify_unused_data_structures CC=15 (limit:15)
+  🟡 CC    _extract_data_types CC=15 (limit:15)
+  🟡 CC    identify_unused_data_structures CC=15 (limit:15)
+  🟡 CC    _extract_data_types CC=15 (limit:15)
+  🟡 CC    main CC=16 (limit:15)
+  🟡 CC    identify_unused_data_structures CC=15 (limit:15)
+
+REFACTOR[11]:
+  1. rm duplicates  (-1 dup classes)
+  2. split code2logic/llm_profiler.py  (god module)
+  3. split code2logic/reproducer.py  (god module)
+  4. split flow.py  (god module)
+  5. split code2logic/metrics.py  (god module)
+  6. split code2logic/intent.py  (god module)
+  7. split code2logic/universal.py  (god module)
+  8. split code2logic/generators.py  (god module)
+  9. split code2logic/gherkin.py  (god module)
+  10. split lolm/rotation.py  (god module)
+  11. split 10 high-CC methods  (CC>15)
+
+PIPELINES[1051]:
+  [1] Src [__init__]: __init__
+      PURITY: 100% pure
+  [2] Src [analyze_file]: analyze_file → print
+      PURITY: 100% pure
+  [3] Src [analyze_directory]: analyze_directory → print
+      PURITY: 100% pure
+  [4] Src [generate_mermaid]: generate_mermaid
+      PURITY: 100% pure
+  [5] Src [generate_report]: generate_report
+      PURITY: 100% pure
+
+LAYERS:
+  logic2code/                     CC̄=7.3    ←in:0  →out:27  !! split
+  │ !! renderers                  416L  3C   15m  CC=25     ←0
+  │ generator                  302L  3C   10m  CC=11     ←0
+  │ !! cli                        203L  0C    1m  CC=17     ←0
+  │ __init__                    18L  0C    0m  CC=0.0    ←0
+  │ __main__                    11L  0C    0m  CC=0.0    ←0
+  │
+  scripts/                        CC̄=6.9    ←in:10  →out:35  !! split
+  │ !! configure_llm              466L  0C   11m  CC=34     ←3
+  │
+  code2logic/                     CC̄=6.7    ←in:4  →out:133  !! split  ×DUP
+  │ !! parsers                   2678L  3C   78m  CC=52     ←0
+  │ !! generators                2178L  5C   59m  CC=83     ←0
+  │ !! universal                 1233L  8C   31m  CC=49     ←0
+  │ !! cli                       1099L  2C   27m  CC=94     ←0
+  │ !! runner                    1095L  1C   18m  CC=43     ←0
+  │ !! gherkin                    978L  6C   29m  CC=19     ←0
+  │ !! toon_format                858L  2C   21m  CC=25     ←0
+  │ !! reproducer                 710L  5C   25m  CC=11     ←1
+  │ !! terminal                   664L  2C   52m  CC=15     ←1
+  │ !! llm_profiler               648L  4C   23m  CC=11     ←3
+  │ !! metrics                    639L  6C   15m  CC=12     ←0
+  │ !! adaptive                   613L  3C   15m  CC=21     ←0
+  │ !! intent                     561L  4C   18m  CC=12     ←0
+  │ !! analyzer                   493L  1C   10m  CC=49     ←0  ×DUP
+  │ chunked_reproduction       479L  4C   12m  CC=13     ←0
+  │ benchmark                  447L  3C    9m  CC=8      ←0
+  │ !! reproduction               440L  1C    8m  CC=63     ←5
+  │ __init__                   439L  0C    2m  CC=2      ←0
+  │ errors                     436L  5C   13m  CC=14     ←0
+  │ shared_utils               413L  0C   12m  CC=12     ←4
+  │ !! function_logic             400L  1C   13m  CC=44     ←0
+  │ !! logicml                    399L  2C    9m  CC=26     ←0
+  │ !! project_reproducer         396L  3C    8m  CC=17     ←2
+  │ common                     388L  0C    8m  CC=12     ←1
+  │ refactor                   383L  3C    7m  CC=10     ←3
+  │ llm                        373L  2C    8m  CC=11     ←1
+  │ !! markdown_format            364L  2C   10m  CC=23     ←0
+  │ !! mcp_server                 360L  0C    3m  CC=27     ←0
+  │ !! file_formats               351L  0C    4m  CC=45     ←2
+  │ models                     338L  11C    0m  CC=0.0    ←0
+  │ llm_clients                273L  0C   12m  CC=10     ←1
+  │ !! code_review                271L  1C    6m  CC=15     ←1
+  │ quality                    265L  3C   10m  CC=12     ←1
+  │ !! similarity                 264L  1C    6m  CC=19     ←0
+  │ json_schema                257L  5C    4m  CC=8      ←0
+  │ config                     248L  1C   16m  CC=9      ←1
+  │ dependency                 246L  1C   11m  CC=10     ←0
+  │ !! results                    245L  5C   10m  CC=16     ←0
+  │ !! logicml_schema             242L  4C    3m  CC=29     ←0
+  │ !! yaml_schema                218L  5C    3m  CC=17     ←0
+  │ !! markdown_schema            171L  4C    2m  CC=16     ←0
+  │ prompts                    156L  0C    3m  CC=2      ←0
+  │ base                        68L  3C   11m  CC=2      ←0
+  │ __init__                    52L  0C    0m  CC=0.0    ←0
+  │ __init__                    39L  0C    0m  CC=0.0    ←0
+  │ __init__                    35L  0C    0m  CC=0.0    ←0
+  │ __init__                    30L  0C    0m  CC=0.0    ←0
+  │ __init__                    29L  0C    0m  CC=0.0    ←0
+  │ utils                       24L  0C    3m  CC=5      ←3
+  │ __init__                    23L  0C    0m  CC=0.0    ←0
+  │ __main__                    15L  0C    0m  CC=0.0    ←0
+  │ __init__                     7L  0C    0m  CC=0.0    ←0
+  │ base_generator               6L  1C    1m  CC=1      ←0
+  │
+  ./                              CC̄=4.6    ←in:0  →out:0
+  │ !! final_advanced_data_analyzer  1485L  1C   61m  CC=15     ←0
+  │ !! advanced_data_analyzer    1485L  1C   61m  CC=15     ←0
+  │ !! ultimate_advanced_data_analyzer  1485L  1C   61m  CC=15     ←0
+  │ !! fixed_advanced_data_analyzer  1482L  1C   61m  CC=15     ←0
+  │ !! flow                      1144L  9C   51m  CC=10     ←0
+  │ !! generate_graph_viewer     1037L  1C   12m  CC=8      ←0
+  │ !! generate_index_html        738L  0C    1m  CC=1      ←0
+  │ fixed_refactoring_implementation_executor   486L  1C   13m  CC=6      ←0
+  │ refactoring_validator      486L  1C   17m  CC=12     ←0
+  │ llm_refactoring_executor   461L  1C   18m  CC=13     ←0
+  │ !! advanced_yaml_optimizer    316L  0C    7m  CC=25     ←0
+  │ project_summary_generator   304L  1C   13m  CC=4      ←0
+  │ !! mermaid_to_png             289L  5C    8m  CC=16     ←0
+  │ hybrid_export              287L  0C    7m  CC=9      ←0
+  │ ultimate_yaml_optimizer    260L  0C    7m  CC=6      ←0
+  │ !! fast_analysis              238L  1C    6m  CC=19     ←0
+  │ performance_optimizations   237L  0C    3m  CC=12     ←0
+  │ optimize_llm_prompt_fixed   208L  0C    6m  CC=7      ←0
+  │ optimize_llm_prompt        179L  0C    5m  CC=10     ←0
+  │ complexity_reduction_examples    89L  3C    9m  CC=2      ←0
+  │ general_refactoring_template    69L  1C    7m  CC=2      ←1
+  │ setup                       66L  0C    1m  CC=2      ←0
+  │ split_yaml                  64L  0C    1m  CC=7      ←0
+  │ fast_analysis.sh            50L  0C    0m  CC=0.0    ←0
+  │ pipeline_runner_utils_improved    44L  1C    7m  CC=2      ←55
+  │ project.sh                   8L  0C    0m  CC=0.0    ←0
+  │
+  benchmarks/                     CC̄=3.7    ←in:0  →out:52  !! split
+  │ benchmark_performance      257L  0C    6m  CC=6      ←0
+  │
+  lolm/                           CC̄=3.4    ←in:14  →out:53  !! split
+  │ !! rotation                   717L  6C   37m  CC=16     ←0
+  │ !! manager                    515L  2C   22m  CC=13     ←16
+  │ clients                    341L  6C   20m  CC=9      ←0
+  │ !! config                     334L  1C   14m  CC=20     ←5
+  │ cli                        316L  0C   11m  CC=7      ←0
+  │ provider                   151L  6C   12m  CC=4      ←0
+  │ __init__                   118L  0C    0m  CC=0.0    ←0
+  │ __main__                    13L  0C    0m  CC=0.0    ←0
+  │ project.sh                   2L  0C    0m  CC=0.0    ←0
+  │
+  raport/                         CC̄=2.2    ←in:0  →out:0
+  │ mermaid-init.js             37L  0C    5m  CC=4      ←0
+  │
+  generated_code/                 CC̄=1.0    ←in:13  →out:0  ×DUP
+  │ analyzer                    56L  1C    8m  CC=1      ←8  ×DUP
+  │ __init__                    11L  0C    0m  CC=0.0    ←0
+  │
+
+COUPLING:
+                                                        pipeline_runner_utils_improved                                 code2logic                                       lolm                                 benchmarks                      refactoring_validator                                    scripts                    advanced_yaml_optimizer                  project_summary_generator  fixed_refactoring_implementation_executor                              hybrid_export                                 logic2code                                       flow                   llm_refactoring_executor                    ultimate_yaml_optimizer                  performance_optimizations
+             pipeline_runner_utils_improved                                         ──                                       ←114                                        ←42                                        ←51                                        ←45                                        ←35                                        ←44                                        ←35                                        ←33                                        ←31                                        ←26                                        ←24                                        ←24                                        ←24                                        ←19  hub
+                                 code2logic                                        114                                         ──                                         12                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      !! fan-out
+                                       lolm                                         42                                          1                                         ──                                                                                                                               10                                                                                                                                                                                                                     ←1                                                                                                                                                                              hub
+                                 benchmarks                                         51                                                                                                                               ──                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           !! fan-out
+                      refactoring_validator                                         45                                                                                                                                                                          ──                                                                                                                                                                                                                                                                                                                                                                                                                                                !! fan-out
+                                    scripts                                         35                                                                                   ←10                                                                                                                               ──                                                                                                                                                                                                                                                                                                                                                                                                     hub
+                    advanced_yaml_optimizer                                         44                                                                                                                                                                                                                                                                ──                                                                                                                                                                                                                                                                                                                                                          !! fan-out
+                  project_summary_generator                                         35                                                                                                                                                                                                                                                                                                           ──                                                                                                                                                                                                                                                                                                               !! fan-out
+  fixed_refactoring_implementation_executor                                         33                                                                                                                                                                                                                                                                                                                                                      ──                                                                                                                                                                                                                                                                    !! fan-out
+                              hybrid_export                                         31                                                                                                                                                                                                                                                                                                                                                                                                 ──                                                                                                                                                                                                                         !! fan-out
+                                 logic2code                                         26                                                                                     1                                                                                                                                                                                                                                                                                                                                                      ──                                                                                                                                                                              !! fan-out
+                                       flow                                         24                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       ──                                                                                                                                   !! fan-out
+                   llm_refactoring_executor                                         24                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ──                                                                                        !! fan-out
+                    ultimate_yaml_optimizer                                         24                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ──                                             !! fan-out
+                  performance_optimizations                                         19                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ──  !! fan-out
+  CYCLES: none
+  HUB: pipeline_runner_utils_improved/ (fan-in=699)
+  HUB: scripts/ (fan-in=10)
+  HUB: lolm/ (fan-in=14)
+  HUB: generated_code/ (fan-in=13)
+  SMELL: project_summary_generator/ fan-out=35 → split needed
+  SMELL: ultimate_yaml_optimizer/ fan-out=24 → split needed
+  SMELL: ultimate_advanced_data_analyzer/ fan-out=18 → split needed
+  SMELL: performance_optimizations/ fan-out=19 → split needed
+  SMELL: mermaid_to_png/ fan-out=18 → split needed
+  SMELL: scripts/ fan-out=35 → split needed
+  SMELL: generate_graph_viewer/ fan-out=11 → split needed
+  SMELL: logic2code/ fan-out=27 → split needed
+  SMELL: optimize_llm_prompt/ fan-out=9 → split needed
+  SMELL: fixed_refactoring_implementation_executor/ fan-out=33 → split needed
+  SMELL: fast_analysis/ fan-out=14 → split needed
+  SMELL: benchmarks/ fan-out=52 → split needed
+  SMELL: lolm/ fan-out=53 → split needed
+  SMELL: hybrid_export/ fan-out=32 → split needed
+  SMELL: llm_refactoring_executor/ fan-out=24 → split needed
+  SMELL: flow/ fan-out=25 → split needed
+  SMELL: advanced_yaml_optimizer/ fan-out=44 → split needed
+  SMELL: fixed_advanced_data_analyzer/ fan-out=17 → split needed
+  SMELL: refactoring_validator/ fan-out=46 → split needed
+  SMELL: code2logic.benchmarks/ fan-out=16 → split needed
+  SMELL: final_advanced_data_analyzer/ fan-out=18 → split needed
+  SMELL: code2logic/ fan-out=133 → split needed
+  SMELL: advanced_data_analyzer/ fan-out=17 → split needed
+  SMELL: optimize_llm_prompt_fixed/ fan-out=9 → split needed
+
+EXTERNAL:
+  validation: run `vallm batch .` → validation.toon
+  duplication: run `redup scan .` → duplication.toon

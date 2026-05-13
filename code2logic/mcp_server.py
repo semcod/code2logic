@@ -43,14 +43,9 @@ def handle_request(request: dict) -> dict:
             "id": request_id,
             "result": {
                 "protocolVersion": "0.1.0",
-                "serverInfo": {
-                    "name": "code2logic",
-                    "version": __version__
-                },
-                "capabilities": {
-                    "tools": {}
-                }
-            }
+                "serverInfo": {"name": "code2logic", "version": __version__},
+                "capabilities": {"tools": {}},
+            },
         }
 
     elif method == "tools/list":
@@ -67,23 +62,29 @@ def handle_request(request: dict) -> dict:
                             "properties": {
                                 "path": {
                                     "type": "string",
-                                    "description": "Path to the project directory"
+                                    "description": "Path to the project directory",
                                 },
                                 "format": {
                                     "type": "string",
-                                    "enum": ["csv", "json", "yaml", "compact", "markdown"],
+                                    "enum": [
+                                        "csv",
+                                        "json",
+                                        "yaml",
+                                        "compact",
+                                        "markdown",
+                                    ],
                                     "default": "csv",
-                                    "description": "Output format"
+                                    "description": "Output format",
                                 },
                                 "detail": {
                                     "type": "string",
                                     "enum": ["minimal", "standard", "full"],
                                     "default": "standard",
-                                    "description": "Detail level"
-                                }
+                                    "description": "Detail level",
+                                },
                             },
-                            "required": ["path"]
-                        }
+                            "required": ["path"],
+                        },
                     },
                     {
                         "name": "find_duplicates",
@@ -93,11 +94,11 @@ def handle_request(request: dict) -> dict:
                             "properties": {
                                 "path": {
                                     "type": "string",
-                                    "description": "Path to the project directory"
+                                    "description": "Path to the project directory",
                                 }
                             },
-                            "required": ["path"]
-                        }
+                            "required": ["path"],
+                        },
                     },
                     {
                         "name": "compare_projects",
@@ -107,15 +108,15 @@ def handle_request(request: dict) -> dict:
                             "properties": {
                                 "path1": {
                                     "type": "string",
-                                    "description": "Path to first project"
+                                    "description": "Path to first project",
                                 },
                                 "path2": {
                                     "type": "string",
-                                    "description": "Path to second project"
-                                }
+                                    "description": "Path to second project",
+                                },
                             },
-                            "required": ["path1", "path2"]
-                        }
+                            "required": ["path1", "path2"],
+                        },
                     },
                     {
                         "name": "suggest_refactoring",
@@ -125,14 +126,14 @@ def handle_request(request: dict) -> dict:
                             "properties": {
                                 "path": {
                                     "type": "string",
-                                    "description": "Path to the project directory"
+                                    "description": "Path to the project directory",
                                 }
                             },
-                            "required": ["path"]
-                        }
-                    }
+                            "required": ["path"],
+                        },
+                    },
                 ]
-            }
+            },
         }
 
     elif method == "tools/call":
@@ -144,32 +145,19 @@ def handle_request(request: dict) -> dict:
             return {
                 "jsonrpc": "2.0",
                 "id": request_id,
-                "result": {
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": result
-                        }
-                    ]
-                }
+                "result": {"content": [{"type": "text", "text": result}]},
             }
         except Exception as e:
             return {
                 "jsonrpc": "2.0",
                 "id": request_id,
-                "error": {
-                    "code": -32000,
-                    "message": str(e)
-                }
+                "error": {"code": -32000, "message": str(e)},
             }
 
     return {
         "jsonrpc": "2.0",
         "id": request_id,
-        "error": {
-            "code": -32601,
-            "message": f"Method not found: {method}"
-        }
+        "error": {"code": -32601, "message": f"Method not found: {method}"},
     }
 
 
@@ -219,12 +207,14 @@ def call_tool(tool_name: str, arguments: dict) -> str:
 
         # Find duplicates by hash
         from collections import defaultdict
+
         hash_groups = defaultdict(list)
 
         for m in project.modules:
             for f in m.functions:
                 sig = f"({','.join(f.params)})->{f.return_type or ''}"
                 import hashlib
+
                 h = hashlib.md5(f"{f.name}:{sig}".encode()).hexdigest()[:8]
                 hash_groups[h].append(f"{m.path}::{f.name}")
 
@@ -232,6 +222,7 @@ def call_tool(tool_name: str, arguments: dict) -> str:
                 for method in c.methods:
                     sig = f"({','.join(method.params)})->{method.return_type or ''}"
                     import hashlib
+
                     h = hashlib.md5(f"{method.name}:{sig}".encode()).hexdigest()[:8]
                     hash_groups[h].append(f"{m.path}::{c.name}.{method.name}")
 
@@ -246,7 +237,7 @@ def call_tool(tool_name: str, arguments: dict) -> str:
             for p in paths:
                 result.append(f"  - {p}")
 
-        return '\n'.join(result)
+        return "\n".join(result)
 
     elif tool_name == "compare_projects":
         path1 = arguments.get("path1")
@@ -265,6 +256,7 @@ def call_tool(tool_name: str, arguments: dict) -> str:
                 for f in m.functions:
                     sig = f"({','.join(f.params)})->{f.return_type or ''}"
                     import hashlib
+
                     h = hashlib.md5(f"{f.name}:{sig}".encode()).hexdigest()[:8]
                     hashes[h] = f"{m.path}::{f.name}"
             return hashes
@@ -288,7 +280,7 @@ def call_tool(tool_name: str, arguments: dict) -> str:
             for h in list(common)[:10]:
                 result.append(f"  - {h1[h]} <-> {h2[h]}")
 
-        return '\n'.join(result)
+        return "\n".join(result)
 
     elif tool_name == "suggest_refactoring":
         path = arguments.get("path")
@@ -302,34 +294,38 @@ def call_tool(tool_name: str, arguments: dict) -> str:
         for m in project.modules:
             for f in m.functions:
                 if f.lines > 50:
-                    issues.append({
-                        'type': 'long_function',
-                        'path': m.path,
-                        'name': f.name,
-                        'lines': f.lines,
-                        'suggestion': 'Consider breaking into smaller functions'
-                    })
+                    issues.append(
+                        {
+                            "type": "long_function",
+                            "path": m.path,
+                            "name": f.name,
+                            "lines": f.lines,
+                            "suggestion": "Consider breaking into smaller functions",
+                        }
+                    )
 
             if m.lines_code > 500:
-                issues.append({
-                    'type': 'long_file',
-                    'path': m.path,
-                    'lines': m.lines_code,
-                    'suggestion': 'Consider splitting into multiple modules'
-                })
+                issues.append(
+                    {
+                        "type": "long_file",
+                        "path": m.path,
+                        "lines": m.lines_code,
+                        "suggestion": "Consider splitting into multiple modules",
+                    }
+                )
 
         result = ["# Refactoring Suggestions\n"]
         result.append(f"Issues found: {len(issues)}\n")
 
         for issue in issues[:20]:
             result.append(f"\n## [{issue['type'].upper()}] {issue.get('path', '')}")
-            if 'name' in issue:
+            if "name" in issue:
                 result.append(f"Function: {issue['name']}")
-            if 'lines' in issue:
+            if "lines" in issue:
                 result.append(f"Lines: {issue['lines']}")
             result.append(f"Suggestion: {issue['suggestion']}")
 
-        return '\n'.join(result)
+        return "\n".join(result)
 
     raise ValueError(f"Unknown tool: {tool_name}")
 

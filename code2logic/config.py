@@ -26,31 +26,31 @@ class Config:
 
     # Default models for each provider (optimized for code tasks, <32B)
     DEFAULT_MODELS = {
-        'openrouter': 'qwen/qwen-2.5-coder-32b-instruct',
-        'openai': 'gpt-4-turbo',
-        'anthropic': 'claude-3-sonnet-20240229',
-        'groq': 'llama-3.1-70b-versatile',
-        'together': 'Qwen/Qwen2.5-Coder-32B-Instruct',
-        'ollama': 'qwen2.5-coder:14b',
+        "openrouter": "qwen/qwen-2.5-coder-32b-instruct",
+        "openai": "gpt-4-turbo",
+        "anthropic": "claude-3-sonnet-20240229",
+        "groq": "llama-3.1-70b-versatile",
+        "together": "Qwen/Qwen2.5-Coder-32B-Instruct",
+        "ollama": "qwen2.5-coder:14b",
     }
 
     # API key environment variable names
     API_KEY_VARS = {
-        'openrouter': 'OPENROUTER_API_KEY',
-        'openai': 'OPENAI_API_KEY',
-        'anthropic': 'ANTHROPIC_API_KEY',
-        'groq': 'GROQ_API_KEY',
-        'together': 'TOGETHER_API_KEY',
+        "openrouter": "OPENROUTER_API_KEY",
+        "openai": "OPENAI_API_KEY",
+        "anthropic": "ANTHROPIC_API_KEY",
+        "groq": "GROQ_API_KEY",
+        "together": "TOGETHER_API_KEY",
     }
 
     # Model environment variable names
     MODEL_VARS = {
-        'openrouter': 'OPENROUTER_MODEL',
-        'openai': 'OPENAI_MODEL',
-        'anthropic': 'ANTHROPIC_MODEL',
-        'groq': 'GROQ_MODEL',
-        'together': 'TOGETHER_MODEL',
-        'ollama': 'OLLAMA_MODEL',
+        "openrouter": "OPENROUTER_MODEL",
+        "openai": "OPENAI_MODEL",
+        "anthropic": "ANTHROPIC_MODEL",
+        "groq": "GROQ_MODEL",
+        "together": "TOGETHER_MODEL",
+        "ollama": "OLLAMA_MODEL",
     }
 
     def __init__(self, env_file: str = None):
@@ -68,9 +68,9 @@ class Config:
         # Try multiple locations
         env_paths = [
             env_file,
-            Path.cwd() / '.env',
-            Path(__file__).parent.parent / '.env',
-            Path.home() / '.code2logic' / '.env',
+            Path.cwd() / ".env",
+            Path(__file__).parent.parent / ".env",
+            Path.home() / ".code2logic" / ".env",
         ]
 
         for env_path in env_paths:
@@ -84,8 +84,8 @@ class Config:
             with open(path) as f:
                 for line in f:
                     line = line.strip()
-                    if line and not line.startswith('#') and '=' in line:
-                        key, value = line.split('=', 1)
+                    if line and not line.startswith("#") and "=" in line:
+                        key, value = line.split("=", 1)
                         key = key.strip()
                         value = value.strip().strip('"').strip("'")
                         if key and value and not os.environ.get(key):
@@ -95,7 +95,7 @@ class Config:
 
     def _load_config_file(self):
         """Load configuration from JSON file."""
-        config_path = Path.home() / '.code2logic' / 'llm_config.json'
+        config_path = Path.home() / ".code2logic" / "llm_config.json"
         if config_path.exists():
             try:
                 with open(config_path) as f:
@@ -134,24 +134,24 @@ class Config:
                 return env_model
 
         # Check config file
-        recommendations = self._config.get('recommendations', {})
-        if provider == 'ollama' and recommendations.get('code_analysis'):
-            return recommendations['code_analysis'].replace('ollama/', '')
+        recommendations = self._config.get("recommendations", {})
+        if provider == "ollama" and recommendations.get("code_analysis"):
+            return recommendations["code_analysis"].replace("ollama/", "")
 
         # Return default
-        return self.DEFAULT_MODELS.get(provider, 'gpt-4')
+        return self.DEFAULT_MODELS.get(provider, "gpt-4")
 
     def get_ollama_host(self) -> str:
         """Get Ollama host URL."""
-        return os.environ.get('OLLAMA_HOST', 'http://localhost:11434')
+        return os.environ.get("OLLAMA_HOST", "http://localhost:11434")
 
     def get_default_provider(self) -> str:
         """Get default LLM provider."""
-        return os.environ.get('CODE2LOGIC_DEFAULT_PROVIDER', 'ollama')
+        return os.environ.get("CODE2LOGIC_DEFAULT_PROVIDER", "ollama")
 
     def is_verbose(self) -> bool:
         """Check if verbose mode is enabled."""
-        return os.environ.get('CODE2LOGIC_VERBOSE', '').lower() in ('true', '1', 'yes')
+        return os.environ.get("CODE2LOGIC_VERBOSE", "").lower() in ("true", "1", "yes")
 
     def get_project_name(self) -> str:
         """Get default project name for output files.
@@ -159,11 +159,11 @@ class Config:
         Returns:
             Project name (default: 'project')
         """
-        return os.environ.get('CODE2LOGIC_PROJECT_NAME', 'project')
+        return os.environ.get("CODE2LOGIC_PROJECT_NAME", "project")
 
     def get_cache_dir(self) -> Path:
         """Get cache directory path."""
-        cache_dir = os.environ.get('CODE2LOGIC_CACHE_DIR', '~/.code2logic/cache')
+        cache_dir = os.environ.get("CODE2LOGIC_CACHE_DIR", "~/.code2logic/cache")
         return Path(cache_dir).expanduser()
 
     def list_configured_providers(self) -> Dict[str, bool]:
@@ -173,19 +173,19 @@ class Config:
             result[provider] = bool(self.get_api_key(provider))
 
         # Check Ollama separately (no API key needed)
-        result['ollama'] = self._config.get('ollama', {}).get('available', False)
+        result["ollama"] = self._config.get("ollama", {}).get("available", False)
 
         return result
 
     def to_dict(self) -> Dict[str, Any]:
         """Export configuration as dictionary."""
         return {
-            'providers': self.list_configured_providers(),
-            'default_provider': self.get_default_provider(),
-            'models': {p: self.get_model(p) for p in self.DEFAULT_MODELS},
-            'ollama_host': self.get_ollama_host(),
-            'verbose': self.is_verbose(),
-            'cache_dir': str(self.get_cache_dir()),
+            "providers": self.list_configured_providers(),
+            "default_provider": self.get_default_provider(),
+            "models": {p: self.get_model(p) for p in self.DEFAULT_MODELS},
+            "ollama_host": self.get_ollama_host(),
+            "verbose": self.is_verbose(),
+            "cache_dir": str(self.get_cache_dir()),
         }
 
 
@@ -240,9 +240,10 @@ export OPENROUTER_MODEL="qwen/qwen-2.5-coder-32b-instruct"
 """
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(SHELL_COMMANDS)
     print("\nCurrent configuration:")
     config = Config()
     import json
+
     print(json.dumps(config.to_dict(), indent=2))

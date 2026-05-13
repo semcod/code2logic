@@ -20,6 +20,7 @@ from typing import Dict, List, Optional, Set
 # Import Handling
 # ============================================================================
 
+
 def compact_imports(imports: List[str], max_items: int = 10) -> List[str]:
     """
     Compact imports by grouping submodules.
@@ -40,9 +41,9 @@ def compact_imports(imports: List[str], max_items: int = 10) -> List[str]:
     groups: Dict[str, Set[str]] = {}
     standalone: List[str] = []
 
-    for imp in imports[:max_items * 2]:  # Process more to allow grouping
-        if '.' in imp:
-            base, sub = imp.rsplit('.', 1)
+    for imp in imports[: max_items * 2]:  # Process more to allow grouping
+        if "." in imp:
+            base, sub = imp.rsplit(".", 1)
             # Skip duplicates like module.module
             if base != sub:
                 if base not in groups:
@@ -85,10 +86,10 @@ def deduplicate_imports(imports: List[str]) -> List[str]:
     result: List[str] = []
 
     # Sort by specificity (more dots = more specific)
-    sorted_imports = sorted(imports, key=lambda x: -x.count('.'))
+    sorted_imports = sorted(imports, key=lambda x: -x.count("."))
 
     for imp in sorted_imports:
-        base = imp.split('.')[0]
+        base = imp.split(".")[0]
         # If we have a more specific import, skip the base
         if imp == base and base in seen_bases:
             continue
@@ -105,22 +106,22 @@ def deduplicate_imports(imports: List[str]) -> List[str]:
 # Mapping: full type -> abbreviated type
 # Used to reduce token count in specifications
 TYPE_ABBREVIATIONS = {
-    'str': 's',
-    'int': 'i',
-    'bool': 'b',
-    'float': 'f',
-    'None': 'N',
-    'Any': 'A',
-    'List': 'L',
-    'Dict': 'D',
-    'Set': 'S',
-    'Tuple': 'T',
-    'Optional': '?',
-    'Callable': 'Fn',
-    'Union': 'U',
-    'Sequence': 'Seq',
-    'Mapping': 'Map',
-    'Iterable': 'Iter',
+    "str": "s",
+    "int": "i",
+    "bool": "b",
+    "float": "f",
+    "None": "N",
+    "Any": "A",
+    "List": "L",
+    "Dict": "D",
+    "Set": "S",
+    "Tuple": "T",
+    "Optional": "?",
+    "Callable": "Fn",
+    "Union": "U",
+    "Sequence": "Seq",
+    "Mapping": "Map",
+    "Iterable": "Iter",
 }
 
 
@@ -139,15 +140,15 @@ def abbreviate_type(type_str: str) -> str:
         Abbreviated type string
     """
     if not type_str:
-        return ''
+        return ""
 
     result = type_str
     for full, short in TYPE_ABBREVIATIONS.items():
         result = result.replace(full, short)
     # Remove spaces around brackets
-    result = re.sub(r'\s*\[\s*', '[', result)
-    result = re.sub(r'\s*\]\s*', ']', result)
-    result = re.sub(r'\s*,\s*', ',', result)
+    result = re.sub(r"\s*\[\s*", "[", result)
+    result = re.sub(r"\s*\]\s*", "]", result)
+    result = re.sub(r"\s*,\s*", ",", result)
     return result
 
 
@@ -162,12 +163,11 @@ def expand_type(abbrev: str) -> str:
         Full type annotation string
     """
     if not abbrev:
-        return ''
+        return ""
 
     result = abbrev
     # Reverse mapping (process longer abbreviations first)
-    for full, short in sorted(TYPE_ABBREVIATIONS.items(),
-                               key=lambda x: -len(x[1])):
+    for full, short in sorted(TYPE_ABBREVIATIONS.items(), key=lambda x: -len(x[1])):
         result = result.replace(short, full)
     return result
 
@@ -175,6 +175,7 @@ def expand_type(abbrev: str) -> str:
 # ============================================================================
 # Signature Handling
 # ============================================================================
+
 
 def build_signature(
     params: List[str],
@@ -197,18 +198,18 @@ def build_signature(
         Signature string like "(param1,param2)->ReturnType"
     """
     clean_params = []
-    for p in params[:max_params + 1]:  # +1 to account for self
-        p_clean = p.replace('\n', ' ').replace('  ', ' ').strip()
+    for p in params[: max_params + 1]:  # +1 to account for self
+        p_clean = p.replace("\n", " ").replace("  ", " ").strip()
 
         # Skip self/cls unless requested
-        if p_clean in ('self', 'cls') and not include_self:
+        if p_clean in ("self", "cls") and not include_self:
             continue
-        if p_clean.startswith('self:') and not include_self:
+        if p_clean.startswith("self:") and not include_self:
             continue
 
         # Abbreviate types if requested
-        if abbreviate and ':' in p_clean:
-            name, typ = p_clean.split(':', 1)
+        if abbreviate and ":" in p_clean:
+            name, typ = p_clean.split(":", 1)
             typ = abbreviate_type(typ.strip())
             p_clean = f"{name.strip()}:{typ}"
 
@@ -219,11 +220,11 @@ def build_signature(
     if len(clean_params) > max_params:
         overflow = len(params) - max_params - 1  # -1 for self
         clean_params = clean_params[:max_params]
-        clean_params.append(f'...+{overflow}')
+        clean_params.append(f"...+{overflow}")
 
-    params_str = ','.join(clean_params)
+    params_str = ",".join(clean_params)
 
-    ret = ''
+    ret = ""
     if return_type:
         ret_type = abbreviate_type(return_type) if abbreviate else return_type
         ret = f"->{ret_type}"
@@ -241,9 +242,11 @@ def remove_self_from_params(params: List[str]) -> List[str]:
     Returns:
         Filtered parameter list
     """
-    return [p for p in params
-            if p.strip() not in ('self', 'cls')
-            and not p.strip().startswith('self:')]
+    return [
+        p
+        for p in params
+        if p.strip() not in ("self", "cls") and not p.strip().startswith("self:")
+    ]
 
 
 # ============================================================================
@@ -253,14 +256,14 @@ def remove_self_from_params(params: List[str]) -> List[str]:
 # Patterns for categorizing functions by name
 # Used to help LLMs understand function purpose
 CATEGORY_PATTERNS = {
-    'read': ('get', 'fetch', 'find', 'load', 'read', 'query', 'retrieve', 'list'),
-    'create': ('create', 'add', 'insert', 'new', 'make', 'build', 'generate'),
-    'update': ('update', 'set', 'modify', 'edit', 'patch', 'change'),
-    'delete': ('delete', 'remove', 'clear', 'destroy', 'drop'),
-    'validate': ('validate', 'check', 'verify', 'is_', 'has_', 'can_', 'ensure'),
-    'transform': ('convert', 'transform', 'parse', 'format', 'to_', 'from_'),
-    'lifecycle': ('init', 'setup', 'configure', 'start', 'stop', 'close', 'dispose'),
-    'communicate': ('send', 'emit', 'notify', 'publish', 'broadcast'),
+    "read": ("get", "fetch", "find", "load", "read", "query", "retrieve", "list"),
+    "create": ("create", "add", "insert", "new", "make", "build", "generate"),
+    "update": ("update", "set", "modify", "edit", "patch", "change"),
+    "delete": ("delete", "remove", "clear", "destroy", "drop"),
+    "validate": ("validate", "check", "verify", "is_", "has_", "can_", "ensure"),
+    "transform": ("convert", "transform", "parse", "format", "to_", "from_"),
+    "lifecycle": ("init", "setup", "configure", "start", "stop", "close", "dispose"),
+    "communicate": ("send", "emit", "notify", "publish", "broadcast"),
 }
 
 
@@ -275,21 +278,40 @@ def categorize_function(name: str) -> str:
         Category string: 'read', 'create', 'update', 'delete',
                         'validate', 'transform', 'lifecycle', 'communicate', 'other'
     """
-    name_lower = name.lower().split('.')[-1]  # Handle method names
+    name_lower = name.lower().split(".")[-1]  # Handle method names
 
     for category, patterns in CATEGORY_PATTERNS.items():
         if any(p in name_lower for p in patterns):
             return category
 
-    return 'other'
+    return "other"
 
 
 # Domain keywords for extracting domain from file paths
 DOMAIN_KEYWORDS = [
-    'auth', 'user', 'order', 'payment', 'product', 'cart',
-    'config', 'util', 'api', 'service', 'model', 'controller',
-    'validation', 'test', 'generator', 'parser', 'llm', 'db',
-    'cache', 'queue', 'worker', 'handler', 'middleware',
+    "auth",
+    "user",
+    "order",
+    "payment",
+    "product",
+    "cart",
+    "config",
+    "util",
+    "api",
+    "service",
+    "model",
+    "controller",
+    "validation",
+    "test",
+    "generator",
+    "parser",
+    "llm",
+    "db",
+    "cache",
+    "queue",
+    "worker",
+    "handler",
+    "middleware",
 ]
 
 
@@ -303,7 +325,7 @@ def extract_domain(path: str) -> str:
     Returns:
         Domain string (e.g., 'auth', 'user', 'config')
     """
-    parts = path.lower().replace('\\', '/').split('/')
+    parts = path.lower().replace("\\", "/").split("/")
 
     for part in parts:
         for domain in DOMAIN_KEYWORDS:
@@ -311,12 +333,13 @@ def extract_domain(path: str) -> str:
                 return domain
 
     # Return parent folder name
-    return parts[-2] if len(parts) > 1 else 'root'
+    return parts[-2] if len(parts) > 1 else "root"
 
 
 # ============================================================================
 # Hashing
 # ============================================================================
+
 
 def compute_hash(name: str, signature: str, length: int = 8) -> str:
     """
@@ -338,6 +361,7 @@ def compute_hash(name: str, signature: str, length: int = 8) -> str:
 # Text Processing
 # ============================================================================
 
+
 def truncate_docstring(docstring: Optional[str], max_length: int = 60) -> str:
     """
     Truncate docstring to first sentence or max_length.
@@ -350,24 +374,24 @@ def truncate_docstring(docstring: Optional[str], max_length: int = 60) -> str:
         Truncated docstring
     """
     if not docstring:
-        return ''
+        return ""
 
     # Get first line
-    first_line = docstring.split('\n')[0].strip()
+    first_line = docstring.split("\n")[0].strip()
 
     # Remove docstring markers
     first_line = first_line.strip('"""').strip("'''").strip()
 
     # Find first sentence end
-    for end in ['. ', '.\n', '.\t']:
+    for end in [". ", ".\n", ".\t"]:
         idx = first_line.find(end)
         if 0 < idx < max_length:
-            first_line = first_line[:idx + 1].strip()
+            first_line = first_line[: idx + 1].strip()
             break
 
     # Truncate if still too long
     if len(first_line) > max_length:
-        first_line = first_line[:max_length-3].rstrip() + '...'
+        first_line = first_line[: max_length - 3].rstrip() + "..."
 
     # Escape quotes
     first_line = first_line.replace('"', "'")
@@ -386,13 +410,13 @@ def escape_for_yaml(text: str) -> str:
         YAML-safe text string
     """
     if not text:
-        return ''
+        return ""
 
-    text = text.replace('\n', ' ').replace('\r', '').replace('\t', ' ')
-    text = re.sub(r'\s+', ' ', text)  # Collapse whitespace
+    text = text.replace("\n", " ").replace("\r", "").replace("\t", " ")
+    text = re.sub(r"\s+", " ", text)  # Collapse whitespace
 
     # Quote if contains special chars
-    if any(c in text for c in ':#[]{}|>'):
+    if any(c in text for c in ":#[]{}|>"):
         text = f'"{text.replace(chr(34), chr(39))}"'
 
     return text.strip()
@@ -409,5 +433,5 @@ def clean_identifier(name: str) -> str:
         Cleaned identifier
     """
     if not name:
-        return ''
-    return name.replace('\n', '').replace('\r', '').replace('\t', '').strip()
+        return ""
+    return name.replace("\n", "").replace("\r", "").replace("\t", "").strip()

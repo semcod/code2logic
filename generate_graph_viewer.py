@@ -6,251 +6,255 @@ Generate interactive graph viewer with zoom/pan functionality from YAML files.
 import yaml
 import json
 from pathlib import Path
-import networkx as nx
 from typing import Dict, List, Any, Tuple
 import math
 
 
 class GraphGenerator:
     """Generate interactive graph visualization from YAML data."""
-    
+
     def __init__(self, hybrid_path: str):
         self.hybrid_path = Path(hybrid_path)
         self.graph_data = {}
-        
+
     def generate_graph_viewer(self):
         """Generate complete interactive graph viewer."""
-        
+
         print("🔄 Generating interactive graph viewer...")
-        
+
         # Load data from hybrid export
         self.load_hybrid_data()
-        
+
         # Build graph structure
         graph_structure = self.build_graph_structure()
-        
+
         # Generate HTML with embedded graph
         html_content = self.generate_graph_html(graph_structure)
-        
+
         # Save graph viewer
-        output_path = self.hybrid_path / 'graph_viewer.html'
-        with open(output_path, 'w', encoding='utf-8') as f:
+        output_path = self.hybrid_path / "graph_viewer.html"
+        with open(output_path, "w", encoding="utf-8") as f:
             f.write(html_content)
-        
+
         print(f"✓ Graph viewer generated: {output_path}")
         print(f"  • Size: {output_path.stat().st_size / 1024:.1f}K")
         print(f"  • Nodes: {len(graph_structure['nodes'])}")
         print(f"  • Edges: {len(graph_structure['edges'])}")
-        print(f"  • Features: Zoom, Pan, Search, Filter")
-        
+        print("  • Features: Zoom, Pan, Search, Filter")
+
         return output_path
-    
+
     def load_hybrid_data(self):
         """Load data from hybrid export files."""
-        
+
         # Load index
-        index_path = self.hybrid_path / 'index.yaml'
-        with open(index_path, 'r') as f:
-            self.graph_data['index'] = yaml.safe_load(f)
-        
+        index_path = self.hybrid_path / "index.yaml"
+        with open(index_path, "r") as f:
+            self.graph_data["index"] = yaml.safe_load(f)
+
         # Load consolidated summary
-        consolidated_summary = self.hybrid_path / 'consolidated' / 'summary.yaml'
+        consolidated_summary = self.hybrid_path / "consolidated" / "summary.yaml"
         if consolidated_summary.exists():
-            with open(consolidated_summary, 'r') as f:
-                self.graph_data['consolidated'] = yaml.safe_load(f)
-        
+            with open(consolidated_summary, "r") as f:
+                self.graph_data["consolidated"] = yaml.safe_load(f)
+
         # Load orphans summary
-        orphans_summary = self.hybrid_path / 'orphans' / 'summary.yaml'
+        orphans_summary = self.hybrid_path / "orphans" / "summary.yaml"
         if orphans_summary.exists():
-            with open(orphans_summary, 'r') as f:
-                self.graph_data['orphans'] = yaml.safe_load(f)
-        
+            with open(orphans_summary, "r") as f:
+                self.graph_data["orphans"] = yaml.safe_load(f)
+
         # Load sample function files for graph building
         self.load_sample_files()
-    
+
     def load_sample_files(self):
         """Load sample files to build graph connections."""
-        
-        self.graph_data['functions'] = {}
-        self.graph_data['connections'] = []
-        
+
+        self.graph_data["functions"] = {}
+        self.graph_data["connections"] = []
+
         # Load consolidated functions (sample)
-        consolidated_dir = self.hybrid_path / 'consolidated'
+        consolidated_dir = self.hybrid_path / "consolidated"
         if consolidated_dir.exists():
-            consolidated_files = list(consolidated_dir.glob('functions_*.yaml'))[:20]  # Limit to 20 files
+            consolidated_files = list(consolidated_dir.glob("functions_*.yaml"))[
+                :20
+            ]  # Limit to 20 files
             for file_path in consolidated_files:
                 try:
-                    with open(file_path, 'r') as f:
+                    with open(file_path, "r") as f:
                         data = yaml.safe_load(f)
-                        if 'functions' in data:
-                            self.graph_data['functions'].update(data['functions'])
+                        if "functions" in data:
+                            self.graph_data["functions"].update(data["functions"])
                 except Exception as e:
                     print(f"Warning: Could not load {file_path}: {e}")
-        
+
         # Build connections from function data
         self.build_connections()
-    
+
     def build_connections(self):
         """Build graph connections from function data."""
-        
-        functions = self.graph_data.get('functions', {})
-        
+
+        functions = self.graph_data.get("functions", {})
+
         for func_name, func_data in functions.items():
             if isinstance(func_data, dict):
                 # Extract calls information
-                calls = func_data.get('calls', [])
-                called_by = func_data.get('called_by', [])
-                
+                calls = func_data.get("calls", [])
+                called_by = func_data.get("called_by", [])
+
                 # Add outgoing edges
                 for called in calls[:10]:  # Limit connections
-                    self.graph_data['connections'].append({
-                        'from': func_name,
-                        'to': called,
-                        'type': 'call',
-                        'weight': 1
-                    })
-                
+                    self.graph_data["connections"].append(
+                        {"from": func_name, "to": called, "type": "call", "weight": 1}
+                    )
+
                 # Add incoming edges
                 for caller in called_by[:10]:
-                    self.graph_data['connections'].append({
-                        'from': caller,
-                        'to': func_name,
-                        'type': 'called_by',
-                        'weight': 1
-                    })
-    
+                    self.graph_data["connections"].append(
+                        {
+                            "from": caller,
+                            "to": func_name,
+                            "type": "called_by",
+                            "weight": 1,
+                        }
+                    )
+
     def build_graph_structure(self) -> Dict[str, Any]:
         """Build graph structure for visualization."""
-        
+
         nodes = []
         edges = []
         node_map = {}
-        
+
         # Process connections to build nodes and edges
-        processed_connections = self.graph_data.get('connections', [])
-        
+        processed_connections = self.graph_data.get("connections", [])
+
         # Create nodes
         for conn in processed_connections:
-            for node_name in [conn['from'], conn['to']]:
+            for node_name in [conn["from"], conn["to"]]:
                 if node_name not in node_map:
                     node_id = len(nodes)
                     node_map[node_name] = node_id
-                    
+
                     # Determine node category
                     category = self.get_node_category(node_name)
-                    
+
                     # Calculate position (force-directed layout simulation)
                     x, y = self.calculate_position(node_name, len(nodes))
-                    
-                    nodes.append({
-                        'id': node_id,
-                        'name': node_name.split('.')[-1],  # Short name
-                        'full_name': node_name,
-                        'category': category,
-                        'x': x,
-                        'y': y,
-                        'vx': 0,
-                        'vy': 0,
-                        'connections': 0,
-                        'radius': self.calculate_radius(node_name)
-                    })
-        
+
+                    nodes.append(
+                        {
+                            "id": node_id,
+                            "name": node_name.split(".")[-1],  # Short name
+                            "full_name": node_name,
+                            "category": category,
+                            "x": x,
+                            "y": y,
+                            "vx": 0,
+                            "vy": 0,
+                            "connections": 0,
+                            "radius": self.calculate_radius(node_name),
+                        }
+                    )
+
         # Create edges
         edge_map = {}
         for conn in processed_connections:
-            from_node = node_map.get(conn['from'])
-            to_node = node_map.get(conn['to'])
-            
+            from_node = node_map.get(conn["from"])
+            to_node = node_map.get(conn["to"])
+
             if from_node is not None and to_node is not None:
                 edge_key = f"{min(from_node, to_node)}-{max(from_node, to_node)}"
                 if edge_key not in edge_map:
                     edge_map[edge_key] = {
-                        'source': from_node,
-                        'target': to_node,
-                        'weight': 0,
-                        'type': conn['type']
+                        "source": from_node,
+                        "target": to_node,
+                        "weight": 0,
+                        "type": conn["type"],
                     }
-                edge_map[edge_key]['weight'] += 1
-                
+                edge_map[edge_key]["weight"] += 1
+
                 # Update node connection counts
-                nodes[from_node]['connections'] += 1
-                nodes[to_node]['connections'] += 1
-        
+                nodes[from_node]["connections"] += 1
+                nodes[to_node]["connections"] += 1
+
         edges = list(edge_map.values())
-        
+
         return {
-            'nodes': nodes,
-            'edges': edges,
-            'stats': {
-                'total_nodes': len(nodes),
-                'total_edges': len(edges),
-                'categories': self.get_category_stats(nodes)
-            }
+            "nodes": nodes,
+            "edges": edges,
+            "stats": {
+                "total_nodes": len(nodes),
+                "total_edges": len(edges),
+                "categories": self.get_category_stats(nodes),
+            },
         }
-    
+
     def get_node_category(self, node_name: str) -> str:
         """Determine node category based on name."""
-        
+
         name_lower = node_name.lower()
-        
-        if 'automation' in name_lower:
-            return 'automation'
-        elif 'pipeline' in name_lower:
-            return 'pipeline'
-        elif 'generation' in name_lower:
-            return 'generation'
-        elif 'llm' in name_lower:
-            return 'llm'
-        elif 'validator' in name_lower:
-            return 'validator'
-        elif 'adapter' in name_lower:
-            return 'adapter'
-        elif 'executor' in name_lower:
-            return 'executor'
+
+        if "automation" in name_lower:
+            return "automation"
+        elif "pipeline" in name_lower:
+            return "pipeline"
+        elif "generation" in name_lower:
+            return "generation"
+        elif "llm" in name_lower:
+            return "llm"
+        elif "validator" in name_lower:
+            return "validator"
+        elif "adapter" in name_lower:
+            return "adapter"
+        elif "executor" in name_lower:
+            return "executor"
         else:
-            return 'other'
-    
+            return "other"
+
     def calculate_position(self, node_name: str, index: int) -> Tuple[float, float]:
         """Calculate initial position for node."""
-        
+
         # Simple circular layout with some randomness
         angle = (index * 137.5) * math.pi / 180  # Golden angle
         radius = 200 + (index % 5) * 50
-        
+
         x = 400 + radius * math.cos(angle)
         y = 300 + radius * math.sin(angle)
-        
+
         return x, y
-    
+
     def calculate_radius(self, node_name: str) -> float:
         """Calculate node radius based on importance."""
-        
+
         name_lower = node_name.lower()
-        
-        if any(keyword in name_lower for keyword in ['runner', 'main', 'init']):
+
+        if any(keyword in name_lower for keyword in ["runner", "main", "init"]):
             return 12
-        elif any(keyword in name_lower for keyword in ['planner', 'executor', 'generator']):
+        elif any(
+            keyword in name_lower for keyword in ["planner", "executor", "generator"]
+        ):
             return 10
         else:
             return 8
-    
+
     def get_category_stats(self, nodes: List[Dict]) -> Dict[str, int]:
         """Get statistics by category."""
-        
+
         stats = {}
         for node in nodes:
-            category = node['category']
+            category = node["category"]
             stats[category] = stats.get(category, 0) + 1
-        
+
         return stats
-    
+
     def generate_graph_html(self, graph_structure: Dict[str, Any]) -> str:
         """Generate complete HTML with interactive graph."""
-        
+
         # Convert to JSON for embedding
         graph_json = json.dumps(graph_structure, indent=2)
-        
-        html_template = f'''<!DOCTYPE html>
+
+        html_template = f"""<!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
@@ -1012,26 +1016,26 @@ class GraphGenerator:
         }});
     </script>
 </body>
-</html>'''
-        
+</html>"""
+
         return html_template
 
 
 def main():
     """Main function to generate graph viewer."""
-    
-    hybrid_path = Path('output_hybrid')
+
+    hybrid_path = Path("output_hybrid")
     if not hybrid_path.exists():
         print("❌ Hybrid export not found. Run hybrid export first.")
         return
-    
+
     generator = GraphGenerator(hybrid_path)
     output_path = generator.generate_graph_viewer()
-    
-    print(f"\n🎉 Graph viewer ready!")
+
+    print("\n🎉 Graph viewer ready!")
     print(f"Open {output_path} in your browser")
-    print(f"Features: Zoom, Pan, Search, Filter, Export")
+    print("Features: Zoom, Pan, Search, Filter, Export")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

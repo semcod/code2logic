@@ -1,7 +1,3 @@
-# code2flow: Podsumowanie Prac i Analiza nlp2cmd
-
-## Wykonane Prace
-
 ### 1. Zoptymalizowany System Skanowania ✅
 
 **Implementacja:**
@@ -62,10 +58,6 @@ Różnica:           ~370x mniej, 20x szybciej
 
 ---
 
-## Analiza nlp2cmd - Problemy i Rekomendacje
-
-### Problemy Zidentyfikowane
-
 #### 1. **Duże Pliki (Code Smell)**
 
 ```
@@ -81,9 +73,6 @@ generation/fuzzy_schema_matcher.py:     560 linii           ⚠️
 - Wysokie sprzężenie
 - Konflikty przy mergowaniu
 
-#### 2. **Duplikaty Nazw Funkcji**
-
-```python
 # analysis pokazało:
 repair_command          występuje w: auto_repair.py, pipeline.py
 _attempt_repair         występuje w: auto_repair.py, pipeline.py
@@ -114,8 +103,6 @@ generation/          # "wszystko związane z generowaniem"
 - Trudna refaktoryzacja
 
 ---
-
-## Proponowane Usprawnienia dla nlp2cmd
 
 ### 1. Refaktoryzacja do Funkcjonalnych Domen
 
@@ -204,24 +191,10 @@ entities = pipeline.prepare(intent, raw_entities, context)
 
 ---
 
-## Testy i Weryfikacja
-
-### Test 1: Szybkość Generacji Kontekstu
-
-```bash
 # Standard code2flow
 time code2flow ../src/nlp2cmd -v -o ./output
-# real    0m58.234s
-# Output: 13MB (za duże dla LLM)
-
 # llm-context (nasza implementacja)
 time code2flow llm-context ../src/nlp2cmd -o ./context.md
-# real    0m2.891s  
-# Output: 35KB (idealne dla LLM)
-
-# Wniosek: llm-context 20x szybsze i 370x mniejsze
-```
-
 ### Test 2: Użyteczność dla LLM
 
 **Zapytanie:** "Explain the architecture"
@@ -235,9 +208,6 @@ time code2flow llm-context ../src/nlp2cmd -o ./context.md
 - ✅ LLM poprawnie opisuje architekturę
 - ✅ Pokazuje procesy i flow
 
-### Test 3: Streaming vs Batch
-
-```python
 # Batch (stary) - ładuje wszystko do pamięci
 analyzer = ProjectAnalyzer(config)
 result = analyzer.analyze_project(path)  # OOM dla dużych projektów
@@ -250,8 +220,6 @@ for update in analyzer.analyze_streaming(path):
 ```
 
 ---
-
-## Pliki Wygenerowane w Projekcie
 
 ### Kod:
 1. `code2flow/core/streaming_analyzer.py` - 610 linii
@@ -273,8 +241,6 @@ for update in analyzer.analyze_streaming(path):
 
 ---
 
-## Jak Używać code2flow dla nlp2cmd
-
 ### 1. Szybka Analiza Architektury
 
 ```bash
@@ -285,20 +251,9 @@ code2flow llm-context ../src/nlp2cmd -o ./nlp2cmd_context.md
 head -30 ./nlp2cmd_context.md
 ```
 
-### 2. Analiza z LLM
-
-```bash
 # Skopiuj do schowka
 cat ./nlp2cmd_context.md | xclip -selection clipboard
 
-# Wklej do ChatGPT/Claude z zapytaniem:
-# "Based on this architecture, what are the main process flows?
-#  Which modules have too many responsibilities?"
-```
-
-### 3. Znajdowanie Procesów
-
-```bash
 # Zobacz process flows:
 grep -A 10 "## Process Flows" ./nlp2cmd_context.md
 
@@ -306,16 +261,11 @@ grep -A 10 "## Process Flows" ./nlp2cmd_context.md
 grep -A 5 "## Key Classes" ./nlp2cmd_context.md
 ```
 
-### 4. Analiza API
-
-```bash
 # Zobacz public API:
 grep -A 20 "## Public API Surface" ./nlp2cmd_context.md
 ```
 
 ---
-
-## Podsumowanie i Następne Kroki
 
 ### Co Zostało Osiągnięte
 
@@ -357,9 +307,6 @@ grep -A 20 "## Public API Surface" ./nlp2cmd_context.md
 
 ---
 
-## Komendy Podręczne
-
-```bash
 # Generuj kontekst dla nlp2cmd
 code2flow llm-context ../src/nlp2cmd -o ./context.md -v
 

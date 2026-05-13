@@ -194,9 +194,6 @@ Configure Claude Desktop:
 }
 ```
 
-## Running Examples
-
-```bash
 # Quick start
 python examples/01_quick_start.py
 

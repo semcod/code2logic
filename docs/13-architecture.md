@@ -74,8 +74,6 @@
    └───────────┘    └─────────────┘   └───────────┘
 ```
 
-## Core Components
-
 ### ProjectAnalyzer (`analyzer.py`)
 
 Main orchestrator that coordinates parsing and analysis.
@@ -210,8 +208,6 @@ code2logic/
 ├── parsers.py        # Code parsers
 └── similarity.py     # Duplicate detection
 ```
-
-## Extension Points
 
 ### Adding New Generator
 

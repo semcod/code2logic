@@ -14,6 +14,69 @@ from typing import Any, Dict, List
 from .models import ClassInfo, FunctionInfo, ModuleInfo, ProjectInfo, TypeInfo
 from .shared_utils import compact_imports, truncate_docstring
 
+CONSTANT_3 = 3
+CONSTANT_4 = 4
+CONSTANT_5 = 5
+CONSTANT_6 = 6
+CONSTANT_7 = 7
+CONSTANT_8 = 8
+PORT_15 = 15
+CONSTANT_20 = 20
+CONSTANT_25 = 25
+CONSTANT_40 = 40
+CONSTANT_80 = 80
+CONSTANT_117 = 117
+CONSTANT_120 = 120
+CONSTANT_1024 = 1024
+
+
+CONSTANT_3 = CONSTANT_3
+CONSTANT_4 = CONSTANT_4
+CONSTANT_5 = CONSTANT_5
+CONSTANT_6 = CONSTANT_6
+CONSTANT_7 = CONSTANT_7
+CONSTANT_8 = CONSTANT_8
+PORT_15 = PORT_15
+CONSTANT_20 = CONSTANT_20
+CONSTANT_25 = CONSTANT_25
+CONSTANT_40 = CONSTANT_40
+CONSTANT_80 = CONSTANT_80
+CONSTANT_117 = CONSTANT_117
+CONSTANT_120 = CONSTANT_120
+CONSTANT_1024 = CONSTANT_1024
+
+
+CONSTANT_3 = CONSTANT_3
+CONSTANT_4 = CONSTANT_4
+CONSTANT_5 = CONSTANT_5
+CONSTANT_6 = CONSTANT_6
+CONSTANT_7 = CONSTANT_7
+CONSTANT_8 = CONSTANT_8
+PORT_15 = PORT_15
+CONSTANT_20 = CONSTANT_20
+CONSTANT_25 = CONSTANT_25
+CONSTANT_40 = CONSTANT_40
+CONSTANT_80 = CONSTANT_80
+CONSTANT_117 = CONSTANT_117
+CONSTANT_120 = CONSTANT_120
+CONSTANT_1024 = CONSTANT_1024
+
+
+CONSTANT_3 = CONSTANT_3
+CONSTANT_4 = CONSTANT_4
+CONSTANT_5 = CONSTANT_5
+CONSTANT_6 = CONSTANT_6
+CONSTANT_7 = CONSTANT_7
+CONSTANT_8 = CONSTANT_8
+PORT_15 = PORT_15
+CONSTANT_20 = CONSTANT_20
+CONSTANT_25 = CONSTANT_25
+CONSTANT_40 = CONSTANT_40
+CONSTANT_80 = CONSTANT_80
+CONSTANT_117 = CONSTANT_117
+CONSTANT_120 = CONSTANT_120
+CONSTANT_1024 = CONSTANT_1024
+
 
 class TOONGenerator:
     """
@@ -30,41 +93,41 @@ class TOONGenerator:
     """
 
     # Characters that require quoting in TOON
-    SPECIAL_CHARS = re.compile(r'[:\"\\\[\]\{\}\n\t\r,]')
-    LOOKS_LIKE_LITERAL = re.compile(r'^(true|false|null|-?\d+\.?\d*([eE][+-]?\d+)?|-)$')
+    SPECIAL_CHARS = re.compile(r"[:\"\\\[\]\{\}\n\t\r,]")
+    LOOKS_LIKE_LITERAL = re.compile(r"^(true|false|null|-?\d+\.?\d*([eE][+-]?\d+)?|-)$")
 
     LANGUAGE_ABBREVIATIONS = {
-        'python': 'py',
-        'javascript': 'js',
-        'typescript': 'ts',
-        'tsx': 'tsx',
-        'jsx': 'jsx',
-        'java': 'java',
-        'kotlin': 'kt',
-        'go': 'go',
-        'rust': 'rs',
-        'c': 'c',
-        'cpp': 'cpp',
-        'c++': 'cpp',
-        'csharp': 'cs',
-        'c#': 'cs',
-        'php': 'php',
-        'ruby': 'rb',
-        'swift': 'swift',
-        'scala': 'scala',
-        'bash': 'sh',
-        'shell': 'sh',
-        'sql': 'sql',
-        'yaml': 'yaml',
-        'json': 'json',
-        'toml': 'toml',
-        'markdown': 'md',
-        'html': 'html',
-        'css': 'css',
-        'dockerfile': 'docker',
+        "python": "py",
+        "javascript": "js",
+        "typescript": "ts",
+        "tsx": "tsx",
+        "jsx": "jsx",
+        "java": "java",
+        "kotlin": "kt",
+        "go": "go",
+        "rust": "rs",
+        "c": "c",
+        "cpp": "cpp",
+        "c++": "cpp",
+        "csharp": "cs",
+        "c#": "cs",
+        "php": "php",
+        "ruby": "rb",
+        "swift": "swift",
+        "scala": "scala",
+        "bash": "sh",
+        "shell": "sh",
+        "sql": "sql",
+        "yaml": "yaml",
+        "json": "json",
+        "toml": "toml",
+        "markdown": "md",
+        "html": "html",
+        "css": "css",
+        "dockerfile": "docker",
     }
 
-    def __init__(self, delimiter: str = ',', use_tabs: bool = False):
+    def __init__(self, delimiter: str = ",", use_tabs: bool = False):
         """
         Initialize TOON generator.
 
@@ -72,13 +135,13 @@ class TOONGenerator:
             delimiter: Field delimiter for arrays (',' or '\t' or '|')
             use_tabs: Use tab delimiter for better token efficiency
         """
-        self.delimiter = '\t' if use_tabs else delimiter
+        self.delimiter = "\t" if use_tabs else delimiter
         # Field names inside `{...}` must be explicitly separated so both humans and
         # parsers/LLMs can read them. Use comma-separated headers regardless of row delimiter.
-        self.delim_marker = ','
+        self.delim_marker = ","
 
     def _short_lang(self, lang: str) -> str:
-        lang_norm = (lang or '').strip().lower()
+        lang_norm = (lang or "").strip().lower()
         return self.LANGUAGE_ABBREVIATIONS.get(lang_norm, lang)
 
     def _compress_module_path(self, path: str, prev_dir: str | None) -> tuple[str, str]:
@@ -88,16 +151,21 @@ class TOONGenerator:
         of repeating '<dir>/<basename>'. The first entry for a directory stays as the
         full path.
         """
-        p = (path or '')
-        if '/' not in p:
-            return p, ''
+        p = path or ""
+        if "/" not in p:
+            return p, ""
 
-        cur_dir, base = p.rsplit('/', 1)
+        cur_dir, base = p.rsplit("/", 1)
         if prev_dir is not None and cur_dir == prev_dir:
             return f"./{base}", cur_dir
         return p, cur_dir
 
-    def generate(self, project: ProjectInfo, detail: str = 'standard', no_repeat_name: bool = False) -> str:
+    def generate(
+        self,
+        project: ProjectInfo,
+        detail: str = "standard",
+        no_repeat_name: bool = False,
+    ) -> str:
         """
         Generate TOON format from ProjectInfo.
 
@@ -122,23 +190,31 @@ class TOONGenerator:
 
         # Languages as primitive array
         if project.languages:
-            lang_items = [f"{self._short_lang(k)}:{v}" for k, v in project.languages.items()]
-            lines.append(f"  languages[{len(lang_items)}]: {self.delimiter.join(lang_items)}")
+            lang_items = [
+                f"{self._short_lang(k)}:{v}" for k, v in project.languages.items()
+            ]
+            lines.append(
+                f"  languages[{len(lang_items)}]: {self.delimiter.join(lang_items)}"
+            )
 
         # Modules - tabular format for efficiency
         if project.modules:
             lines.append("")
-            lines.extend(self._generate_modules(project.modules, detail, no_repeat_name=no_repeat_name))
+            lines.extend(
+                self._generate_modules(
+                    project.modules, detail, no_repeat_name=no_repeat_name
+                )
+            )
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def generate_hybrid(
         self,
         project: ProjectInfo,
-        detail: str = 'full',
+        detail: str = "full",
         no_repeat_name: bool = True,
-        hub_top_n: int = 5,
-        hub_functions_detail: str = 'full',
+        hub_top_n: int = CONSTANT_5,
+        hub_functions_detail: str = "full",
     ) -> str:
         """Generate TOON-Hybrid: project structure + function-logic for hub modules.
 
@@ -156,23 +232,28 @@ class TOONGenerator:
             Hybrid TOON string
         """
         from .function_logic import FunctionLogicGenerator
-        from .shared_utils import remove_self_from_params
 
         # Generate base project TOON
         base = self.generate(project, detail=detail, no_repeat_name=no_repeat_name)
 
         # Identify hub modules: use dependency_metrics if available, otherwise sort by function count
         hub_paths: set = set()
-        dep_metrics = getattr(project, 'dependency_metrics', {}) or {}
+        dep_metrics = getattr(project, "dependency_metrics", {}) or {}
         if dep_metrics:
-            ranked = sorted(dep_metrics.items(), key=lambda x: getattr(x[1], 'pagerank', 0), reverse=True)
+            ranked = sorted(
+                dep_metrics.items(),
+                key=lambda x: getattr(x[1], "pagerank", 0),
+                reverse=True,
+            )
             hub_paths = {path for path, node in ranked[:hub_top_n]}
         else:
             # Fallback: rank by total functions + methods
             def _item_count(m):
-                return len(getattr(m, 'functions', []) or []) + sum(
-                    len(getattr(c, 'methods', []) or []) for c in (getattr(m, 'classes', []) or [])
+                return len(getattr(m, "functions", []) or []) + sum(
+                    len(getattr(c, "methods", []) or [])
+                    for c in (getattr(m, "classes", []) or [])
                 )
+
             ranked_modules = sorted(project.modules, key=_item_count, reverse=True)
             hub_paths = {m.path for m in ranked_modules[:hub_top_n]}
 
@@ -194,9 +275,9 @@ class TOONGenerator:
             lines.append(f"  {self._quote(m.path)}:")
 
             # Emit class context
-            classes = getattr(m, 'classes', []) or []
+            classes = getattr(m, "classes", []) or []
             for cls in classes:
-                bases = ','.join(getattr(cls, 'bases', []) or []) or '-'
+                bases = ",".join(getattr(cls, "bases", []) or []) or "-"
                 lines.append(f"    CLASS {self._quote(cls.name)}({bases})")
 
             # Emit function table
@@ -204,26 +285,37 @@ class TOONGenerator:
             lines.append(f"    functions[{len(items)}]{{{header}}}:")
 
             for kind, qname, func in items:
-                sig = logic_gen._build_sig(func, include_async_prefix=False, language=m.language)
-                start_line = str(getattr(func, 'start_line', 0) or 0)
+                sig = logic_gen._build_sig(
+                    func, include_async_prefix=False, language=m.language
+                )
+                start_line = str(getattr(func, "start_line", 0) or 0)
                 display_name = qname
-                if getattr(func, 'is_async', False):
+                if getattr(func, "is_async", False):
                     display_name = f"~{qname}"
-                cc = getattr(func, 'complexity', 1) or 1
+                cc = getattr(func, "complexity", 1) or 1
                 if cc > 1:
                     display_name = f"{display_name} cc:{cc}"
                 does = logic_gen._build_does(func)
-                row = [start_line, self._quote(display_name), self._quote(sig), self._quote(does)]
+                row = [
+                    start_line,
+                    self._quote(display_name),
+                    self._quote(sig),
+                    self._quote(does),
+                ]
                 lines.append(f"      {self.delimiter.join(row)}")
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
-    def _generate_modules(self, modules: List[ModuleInfo], detail: str, no_repeat_name: bool = False) -> List[str]:
+    def _generate_modules(
+        self, modules: List[ModuleInfo], detail: str, no_repeat_name: bool = False
+    ) -> List[str]:
         """Generate modules section."""
         lines = []
 
         # Module summary as tabular array
-        lines.append(f"modules[{len(modules)}]{{path{self.delim_marker}lang{self.delim_marker}lines{self.delim_marker}kb}}:")
+        lines.append(
+            f"modules[{len(modules)}]{{path{self.delim_marker}lang{self.delim_marker}lines{self.delim_marker}kb}}:"
+        )
         prev_dir: str | None = None
         for m in modules:
             if no_repeat_name:
@@ -231,13 +323,13 @@ class TOONGenerator:
             else:
                 path_out = m.path
             path = self._quote(path_out)
-            kb = round((getattr(m, 'file_bytes', 0) or 0) / 1024, 1)
+            kb = round((getattr(m, "file_bytes", 0) or 0) / CONSTANT_1024, 1)
             lines.append(
                 f"  {path}{self.delimiter}{self._short_lang(m.language)}{self.delimiter}{m.lines_code}{self.delimiter}{kb}"
             )
 
         # Detailed module info
-        if detail in ('standard', 'full'):
+        if detail in ("standard", "full"):
             lines.append("")
             lines.append("module_details:")
 
@@ -246,36 +338,51 @@ class TOONGenerator:
 
                 # ENHANCED: Add imports for better reproduction
                 if m.imports:
-                    imports_str = self.delimiter.join(self._quote(x) for x in m.imports[:15])
+                    imports_str = self.delimiter.join(
+                        self._quote(x) for x in m.imports[:PORT_15]
+                    )
                     lines.append(f"    imports[{len(m.imports)}]: {imports_str}")
 
                 # ENHANCED: Add exports
                 if m.exports:
-                    exports_str = self.delimiter.join(self._quote(x) for x in m.exports[:10])
+                    exports_str = self.delimiter.join(
+                        self._quote(x) for x in m.exports[:10]
+                    )
                     lines.append(f"    exports[{len(m.exports)}]: {exports_str}")
 
                 # ENHANCED: Add constants with values/keys (critical for reproduction)
-                constants_attr = getattr(m, 'constants', []) or []
+                constants_attr = getattr(m, "constants", []) or []
                 const_rows = []
                 for c in constants_attr:
                     if isinstance(c, str):
-                        if c.startswith('conditional:'):
+                        if c.startswith("conditional:"):
                             continue
-                        const_rows.append({'n': c, 't': '-', 'v': '-', 'keys': '-'})
+                        const_rows.append({"n": c, "t": "-", "v": "-", "keys": "-"})
                     else:
-                        keys = getattr(c, 'value_keys', None) or []
-                        v = getattr(c, 'value', None)
-                        t = getattr(c, 'type_annotation', '') or '-'
+                        keys = getattr(c, "value_keys", None) or []
+                        v = getattr(c, "value", None)
+                        t = getattr(c, "type_annotation", "") or "-"
                         if keys:
-                            const_rows.append({'n': c.name, 't': t, 'v': '-', 'keys': '|'.join(keys[:10])})
+                            const_rows.append(
+                                {
+                                    "n": c.name,
+                                    "t": t,
+                                    "v": "-",
+                                    "keys": "|".join(keys[:10]),
+                                }
+                            )
                         elif v:
-                            v_snip = v.replace('\n', ' ').strip()
-                            if len(v_snip) > 120:
-                                v_snip = v_snip[:117] + '...'
-                            const_rows.append({'n': c.name, 't': t, 'v': v_snip, 'keys': '-'})
+                            v_snip = v.replace("\n", " ").strip()
+                            if len(v_snip) > CONSTANT_120:
+                                v_snip = v_snip[:CONSTANT_117] + "..."
+                            const_rows.append(
+                                {"n": c.name, "t": t, "v": v_snip, "keys": "-"}
+                            )
                         else:
-                            const_rows.append({'n': c.name, 't': t, 'v': '-', 'keys': '-'})
-                    if len(const_rows) >= 8:
+                            const_rows.append(
+                                {"n": c.name, "t": t, "v": "-", "keys": "-"}
+                            )
+                    if len(const_rows) >= CONSTANT_8:
                         break
 
                 if const_rows:
@@ -287,40 +394,53 @@ class TOONGenerator:
                         )
 
                 # Types (enums/interfaces/type aliases) - critical for reproduction of enum values
-                if getattr(m, 'types', None):
-                    lines.extend(self._generate_types(m.types, indent=4))
+                if getattr(m, "types", None):
+                    lines.extend(self._generate_types(m.types, indent=CONSTANT_4))
 
                 # Classes
                 if m.classes:
-                    lines.extend(self._generate_classes(m.classes, detail, indent=4))
+                    lines.extend(
+                        self._generate_classes(m.classes, detail, indent=CONSTANT_4)
+                    )
 
                 # Functions
                 if m.functions:
-                    lines.extend(self._generate_functions(m.functions, detail, indent=4))
+                    lines.extend(
+                        self._generate_functions(m.functions, detail, indent=CONSTANT_4)
+                    )
 
         return lines
 
     def _generate_types(self, types: List[TypeInfo], indent: int = 0) -> List[str]:
         """Generate module-level types in TOON format (with enum values where available)."""
         lines: List[str] = []
-        ind = ' ' * indent
+        ind = " " * indent
 
         rows = []
-        for t in types[:25]:
-            kind = getattr(t, 'kind', '') or '-'
-            name = getattr(t, 'name', '') or '-'
-            definition = getattr(t, 'definition', '') or '-'
-            values = getattr(t, 'values', None)
+        for t in types[:CONSTANT_25]:
+            kind = getattr(t, "kind", "") or "-"
+            name = getattr(t, "name", "") or "-"
+            definition = getattr(t, "definition", "") or "-"
+            values = getattr(t, "values", None)
 
-            def_snip = definition.replace('\n', ' ').strip() if definition else '-'
-            if def_snip and len(def_snip) > 120:
-                def_snip = def_snip[:117] + '...'
+            def_snip = definition.replace("\n", " ").strip() if definition else "-"
+            if def_snip and len(def_snip) > CONSTANT_120:
+                def_snip = def_snip[:CONSTANT_117] + "..."
 
-            values_str = '-'
+            values_str = "-"
             if values:
-                values_str = '|'.join(str(v).replace('\n', ' ').strip() for v in values[:20])
+                values_str = "|".join(
+                    str(v).replace("\n", " ").strip() for v in values[:CONSTANT_20]
+                )
 
-            rows.append({'name': name, 'kind': kind, 'values': values_str, 'def': def_snip or '-'})
+            rows.append(
+                {
+                    "name": name,
+                    "kind": kind,
+                    "values": values_str,
+                    "def": def_snip or "-",
+                }
+            )
 
         if not rows:
             return lines
@@ -333,10 +453,12 @@ class TOONGenerator:
             )
         return lines
 
-    def _generate_classes(self, classes: List[ClassInfo], detail: str, indent: int = 0) -> List[str]:
+    def _generate_classes(
+        self, classes: List[ClassInfo], detail: str, indent: int = 0
+    ) -> List[str]:
         """Generate classes in TOON format."""
         lines = []
-        ind = ' ' * indent
+        ind = " " * indent
 
         # ENHANCED: Richer tabular format with decorators
         header_fields = f"name{self.delim_marker}bases{self.delim_marker}decorators{self.delim_marker}props{self.delim_marker}methods"
@@ -344,53 +466,65 @@ class TOONGenerator:
 
         for c in classes:
             name = self._quote(c.name)
-            bases = '|'.join(c.bases) if c.bases else '-'
+            bases = "|".join(c.bases) if c.bases else "-"
             # ClassInfo may not have decorators attribute
-            class_decorators = getattr(c, 'decorators', []) or []
-            decorators = '|'.join(class_decorators[:3]) if class_decorators else '-'
+            class_decorators = getattr(c, "decorators", []) or []
+            decorators = (
+                "|".join(class_decorators[:CONSTANT_3]) if class_decorators else "-"
+            )
             props = len(c.properties) if c.properties else 0
             method_count = len(c.methods)
-            lines.append(f"{ind}  {name}{self.delimiter}{bases}{self.delimiter}{decorators}{self.delimiter}{props}{self.delimiter}{method_count}")
+            lines.append(
+                f"{ind}  {name}{self.delimiter}{bases}{self.delimiter}{decorators}{self.delimiter}{props}{self.delimiter}{method_count}"
+            )
 
         # Detailed class info with methods (for standard and full)
-        if detail in ('standard', 'full'):
+        if detail in ("standard", "full"):
             lines.append(f"{ind}class_details:")
             for c in classes:
                 lines.append(f"{ind}  {self._quote(c.name)}:")
 
                 # ENHANCED: Add docstring
                 if c.docstring:
-                    doc = c.docstring[:100].replace('\n', ' ').strip()
+                    doc = c.docstring[:100].replace("\n", " ").strip()
                     lines.append(f"{ind}    doc: {self._quote(doc)}")
 
                 # ENHANCED: Add properties with types
                 if c.properties:
-                    props_str = self.delimiter.join(self._quote(x) for x in c.properties[:10])
-                    lines.append(f"{ind}    properties[{len(c.properties)}]: {props_str}")
+                    props_str = self.delimiter.join(
+                        self._quote(x) for x in c.properties[:10]
+                    )
+                    lines.append(
+                        f"{ind}    properties[{len(c.properties)}]: {props_str}"
+                    )
 
                 # ENHANCED: Dataclass fields
-                if getattr(c, 'is_dataclass', False) and getattr(c, 'fields', None):
-                    fields = c.fields[:20]
+                if getattr(c, "is_dataclass", False) and getattr(c, "fields", None):
+                    fields = c.fields[:CONSTANT_20]
                     header = f"n{self.delim_marker}t{self.delim_marker}default{self.delim_marker}factory"
                     lines.append(f"{ind}    fields[{len(fields)}]{{{header}}}:")
                     for f in fields:
-                        t = getattr(f, 'type_annotation', '') or '-'
-                        dflt = getattr(f, 'default', None) or '-'
-                        fac = getattr(f, 'default_factory', None) or '-'
+                        t = getattr(f, "type_annotation", "") or "-"
+                        dflt = getattr(f, "default", None) or "-"
+                        fac = getattr(f, "default_factory", None) or "-"
                         lines.append(
                             f"{ind}      {self._quote(f.name)}{self.delimiter}{self._quote(t)}{self.delimiter}{self._quote(dflt)}{self.delimiter}{self._quote(fac)}"
                         )
 
                 # Methods with full details
                 if c.methods:
-                    lines.extend(self._generate_methods(c.methods, detail, indent + 4))
+                    lines.extend(
+                        self._generate_methods(c.methods, detail, indent + CONSTANT_4)
+                    )
 
         return lines
 
-    def _generate_methods(self, methods: List[FunctionInfo], detail: str = 'standard', indent: int = 0) -> List[str]:
+    def _generate_methods(
+        self, methods: List[FunctionInfo], detail: str = "standard", indent: int = 0
+    ) -> List[str]:
         """Generate methods in tabular TOON format."""
         lines = []
-        ind = ' ' * indent
+        ind = " " * indent
 
         # ENHANCED: Richer tabular array for methods
         header = f"name{self.delim_marker}sig{self.delim_marker}decorators{self.delim_marker}async{self.delim_marker}lines"
@@ -399,26 +533,36 @@ class TOONGenerator:
         for m in methods:
             name = self._quote(m.name)
             sig = self._quote(self._build_signature(m))
-            method_decorators = getattr(m, 'decorators', []) or []
-            decorators = '|'.join(method_decorators[:2]) if method_decorators else '-'
-            is_async = 'true' if getattr(m, 'is_async', False) else 'false'
-            lines.append(f"{ind}  {name}{self.delimiter}{sig}{self.delimiter}{decorators}{self.delimiter}{is_async}{self.delimiter}{m.lines}")
+            method_decorators = getattr(m, "decorators", []) or []
+            decorators = "|".join(method_decorators[:2]) if method_decorators else "-"
+            is_async = "true" if getattr(m, "is_async", False) else "false"
+            lines.append(
+                f"{ind}  {name}{self.delimiter}{sig}{self.delimiter}{decorators}{self.delimiter}{is_async}{self.delimiter}{m.lines}"
+            )
 
         # ENHANCED: Add intent/docstring for full detail
-        if detail == 'full':
+        if detail == "full":
             lines.append(f"{ind}method_docs:")
             for m in methods:
                 if m.intent or m.docstring:
-                    doc = (m.intent or m.docstring or '')[:80].replace('\n', ' ').strip()
+                    doc = (
+                        (m.intent or m.docstring or "")[:CONSTANT_80]
+                        .replace("\n", " ")
+                        .strip()
+                    )
                     if doc:
-                        lines.append(f"{ind}  {self._quote(m.name)}: {self._quote(doc)}")
+                        lines.append(
+                            f"{ind}  {self._quote(m.name)}: {self._quote(doc)}"
+                        )
 
         return lines
 
-    def _generate_functions(self, functions: List[FunctionInfo], detail: str, indent: int = 0) -> List[str]:
+    def _generate_functions(
+        self, functions: List[FunctionInfo], detail: str, indent: int = 0
+    ) -> List[str]:
         """Generate functions in tabular TOON format."""
         lines = []
-        ind = ' ' * indent
+        ind = " " * indent
 
         # ENHANCED: Richer tabular array with decorators and category
         header = f"name{self.delim_marker}sig{self.delim_marker}decorators{self.delim_marker}async{self.delim_marker}category{self.delim_marker}lines"
@@ -427,47 +571,53 @@ class TOONGenerator:
         for f in functions:
             name = self._quote(f.name)
             sig = self._quote(self._build_signature(f))
-            func_decorators = getattr(f, 'decorators', []) or []
-            decorators = '|'.join(func_decorators[:2]) if func_decorators else '-'
-            is_async = 'true' if getattr(f, 'is_async', False) else 'false'
+            func_decorators = getattr(f, "decorators", []) or []
+            decorators = "|".join(func_decorators[:2]) if func_decorators else "-"
+            is_async = "true" if getattr(f, "is_async", False) else "false"
             # category may not exist on FunctionInfo
-            category = getattr(f, 'category', None) or '-'
-            lines.append(f"{ind}  {name}{self.delimiter}{sig}{self.delimiter}{decorators}{self.delimiter}{is_async}{self.delimiter}{category}{self.delimiter}{f.lines}")
+            category = getattr(f, "category", None) or "-"
+            lines.append(
+                f"{ind}  {name}{self.delimiter}{sig}{self.delimiter}{decorators}{self.delimiter}{is_async}{self.delimiter}{category}{self.delimiter}{f.lines}"
+            )
 
         # ENHANCED: Add intent/docstring for standard and full detail
-        if detail in ('standard', 'full'):
+        if detail in ("standard", "full"):
             has_docs = any(f.intent or f.docstring for f in functions)
             if has_docs:
                 lines.append(f"{ind}function_docs:")
                 for f in functions:
-                    doc = (f.intent or f.docstring or '')[:100].replace('\n', ' ').strip()
+                    doc = (
+                        (f.intent or f.docstring or "")[:100].replace("\n", " ").strip()
+                    )
                     if doc:
-                        lines.append(f"{ind}  {self._quote(f.name)}: {self._quote(doc)}")
+                        lines.append(
+                            f"{ind}  {self._quote(f.name)}: {self._quote(doc)}"
+                        )
 
         return lines
 
     def _build_signature(self, f: FunctionInfo) -> str:
         """Build compact signature string without self/cls."""
         params = []
-        for p in f.params[:7]:  # +1 to account for self
-            p_clean = p.replace('\n', ' ').replace(',', ';').strip()
+        for p in f.params[:CONSTANT_7]:  # +1 to account for self
+            p_clean = p.replace("\n", " ").replace(",", ";").strip()
             # Skip self/cls - obvious for methods
-            if p_clean in ('self', 'cls'):
+            if p_clean in ("self", "cls"):
                 continue
-            if p_clean.startswith('self:'):
+            if p_clean.startswith("self:"):
                 continue
             if p_clean:
                 params.append(p_clean)
 
         # Limit to 6 actual params
-        if len(params) > 6:
-            overflow = len(params) - 6
-            params = params[:6]
-            params.append(f'...+{overflow}')
+        if len(params) > CONSTANT_6:
+            overflow = len(params) - CONSTANT_6
+            params = params[:CONSTANT_6]
+            params.append(f"...+{overflow}")
 
-        param_str = ';'.join(params)
+        param_str = ";".join(params)
 
-        ret = getattr(f, 'return_type', None)
+        ret = getattr(f, "return_type", None)
         if isinstance(ret, str):
             ret = ret.strip()
 
@@ -478,7 +628,7 @@ class TOONGenerator:
     def _quote(self, value: Any) -> str:
         """Quote a value if necessary for TOON format."""
         if value is None:
-            return 'null'
+            return "null"
 
         s = str(value)
 
@@ -488,29 +638,30 @@ class TOONGenerator:
 
         # Check if quoting needed
         needs_quote = (
-            self.SPECIAL_CHARS.search(s) is not None or
-            self.LOOKS_LIKE_LITERAL.match(s) is not None or
-            s.startswith(' ') or s.endswith(' ') or
-            s.startswith('-')
+            self.SPECIAL_CHARS.search(s) is not None
+            or self.LOOKS_LIKE_LITERAL.match(s) is not None
+            or s.startswith(" ")
+            or s.endswith(" ")
+            or s.startswith("-")
         )
 
         if needs_quote:
             # Escape backslashes and quotes
-            s = s.replace('\\', '\\\\').replace('"', '\\"')
-            s = s.replace('\n', '\\n').replace('\t', '\\t').replace('\r', '\\r')
+            s = s.replace("\\", "\\\\").replace('"', '\\"')
+            s = s.replace("\n", "\\n").replace("\t", "\\t").replace("\r", "\\r")
             return f'"{s}"'
 
         return s
 
     def generate_compact(self, project: ProjectInfo) -> str:
         """Generate minimal TOON output."""
-        return self.generate(project, detail='compact')
+        return self.generate(project, detail="compact")
 
     def generate_full(self, project: ProjectInfo) -> str:
         """Generate detailed TOON output."""
-        return self.generate(project, detail='full')
+        return self.generate(project, detail="full")
 
-    def generate_schema(self, format_type: str = 'standard') -> str:
+    def generate_schema(self, format_type: str = "standard") -> str:
         """
         Generate JSON Schema for the TOON format.
 
@@ -526,140 +677,166 @@ class TOONGenerator:
             "$schema": "https://json-schema.org/draft/2020-12/schema",
             "title": "Code2Logic TOON Schema",
             "description": "Schema for Code2Logic TOON (Token-Oriented Object Notation) format",
-            "type": "object"
+            "type": "object",
         }
 
-        if format_type == 'ultra_compact':
+        if format_type == "ultra_compact":
             # Ultra-compact schema
-            base_schema.update({
-                "properties": {
-                    "M": {
-                        "type": "array",
-                        "description": "Modules as [path,lines] pairs",
-                        "items": {
+            base_schema.update(
+                {
+                    "properties": {
+                        "M": {
                             "type": "array",
-                            "items": [
-                                {"type": "string", "description": "Module path"},
-                                {"type": "integer", "description": "Lines of code"}
-                            ],
-                            "minItems": 2,
-                            "maxItems": 2
-                        }
-                    },
-                    "D": {
-                        "type": "object",
-                        "description": "Module details with compact keys",
-                        "patternProperties": {
-                            ".*": {
-                                "type": "object",
-                                "properties": {
-                                    "i": {
-                                        "type": "array",
-                                        "items": {"type": "string"},
-                                        "description": "Compact imports (grouped)"
+                            "description": "Modules as [path,lines] pairs",
+                            "items": {
+                                "type": "array",
+                                "items": [
+                                    {"type": "string", "description": "Module path"},
+                                    {"type": "integer", "description": "Lines of code"},
+                                ],
+                                "minItems": 2,
+                                "maxItems": 2,
+                            },
+                        },
+                        "D": {
+                            "type": "object",
+                            "description": "Module details with compact keys",
+                            "patternProperties": {
+                                ".*": {
+                                    "type": "object",
+                                    "properties": {
+                                        "i": {
+                                            "type": "array",
+                                            "items": {"type": "string"},
+                                            "description": "Compact imports (grouped)",
+                                        },
+                                        "e": {
+                                            "type": "array",
+                                            "items": {"type": "string"},
+                                            "description": "Exports",
+                                        },
+                                        "c": {
+                                            "type": "array",
+                                            "items": {"type": "string"},
+                                            "description": "Classes with inline method counts",
+                                        },
+                                        "f": {
+                                            "type": "array",
+                                            "items": {"type": "string"},
+                                            "description": "Functions with signatures",
+                                        },
                                     },
-                                    "e": {
-                                        "type": "array",
-                                        "items": {"type": "string"},
-                                        "description": "Exports"
-                                    },
-                                    "c": {
-                                        "type": "array",
-                                        "items": {"type": "string"},
-                                        "description": "Classes with inline method counts"
-                                    },
-                                    "f": {
-                                        "type": "array",
-                                        "items": {"type": "string"},
-                                        "description": "Functions with signatures"
-                                    }
                                 }
-                            }
-                        }
+                            },
+                        },
                     }
                 }
-            })
+            )
         else:
             # Standard TOON schema
-            base_schema.update({
-                "properties": {
-                    "project": {"type": "string", "description": "Project name"},
-                    "root": {"type": "string", "description": "Root path"},
-                    "generated": {"type": "string", "description": "Generation timestamp"},
-                    "stats": {
-                        "type": "object",
-                        "properties": {
-                            "files": {"type": "integer"},
-                            "lines": {"type": "integer"},
-                            "languages": {"type": "string", "description": "Language stats as delimited string"}
-                        }
-                    },
-                    "modules": {
-                        "type": "array",
-                        "items": {
+            base_schema.update(
+                {
+                    "properties": {
+                        "project": {"type": "string", "description": "Project name"},
+                        "root": {"type": "string", "description": "Root path"},
+                        "generated": {
+                            "type": "string",
+                            "description": "Generation timestamp",
+                        },
+                        "stats": {
                             "type": "object",
                             "properties": {
-                                "path": {"type": "string"},
-                                "language": {"type": "string"},
+                                "files": {"type": "integer"},
                                 "lines": {"type": "integer"},
-                                "imports": {
-                                    "type": "array",
-                                    "items": {"type": "string"}
+                                "languages": {
+                                    "type": "string",
+                                    "description": "Language stats as delimited string",
                                 },
-                                "exports": {
-                                    "type": "array",
-                                    "items": {"type": "string"}
-                                },
-                                "classes": {
-                                    "type": "array",
-                                    "items": {
+                            },
+                        },
+                        "modules": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "path": {"type": "string"},
+                                    "language": {"type": "string"},
+                                    "lines": {"type": "integer"},
+                                    "imports": {
+                                        "type": "array",
+                                        "items": {"type": "string"},
+                                    },
+                                    "exports": {
+                                        "type": "array",
+                                        "items": {"type": "string"},
+                                    },
+                                    "classes": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {"type": "string"},
+                                                "bases": {
+                                                    "type": "array",
+                                                    "items": {"type": "string"},
+                                                },
+                                                "docstring": {"type": "string"},
+                                                "properties": {
+                                                    "type": "array",
+                                                    "items": {"type": "string"},
+                                                },
+                                                "methods": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "name": {"type": "string"},
+                                                            "signature": {
+                                                                "type": "string"
+                                                            },
+                                                            "decorators": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string"
+                                                                },
+                                                            },
+                                                            "async": {"type": "string"},
+                                                            "lines": {
+                                                                "type": "integer"
+                                                            },
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    },
+                                    "functions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {"type": "string"},
+                                                "signature": {"type": "string"},
+                                                "decorators": {
+                                                    "type": "array",
+                                                    "items": {"type": "string"},
+                                                },
+                                                "async": {"type": "string"},
+                                                "lines": {"type": "integer"},
+                                            },
+                                        },
+                                    },
+                                    "function_docs": {
                                         "type": "object",
-                                        "properties": {
-                                            "name": {"type": "string"},
-                                            "bases": {"type": "array", "items": {"type": "string"}},
-                                            "docstring": {"type": "string"},
-                                            "properties": {"type": "array", "items": {"type": "string"}},
-                                            "methods": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "name": {"type": "string"},
-                                                        "signature": {"type": "string"},
-                                                        "decorators": {"type": "array", "items": {"type": "string"}},
-                                                        "async": {"type": "string"},
-                                                        "lines": {"type": "integer"}
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
+                                        "description": "Additional function documentation",
+                                        "patternProperties": {".*": {"type": "string"}},
+                                    },
                                 },
-                                "functions": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "name": {"type": "string"},
-                                            "signature": {"type": "string"},
-                                            "decorators": {"type": "array", "items": {"type": "string"}},
-                                            "async": {"type": "string"},
-                                            "lines": {"type": "integer"}
-                                        }
-                                    }
-                                },
-                                "function_docs": {
-                                    "type": "object",
-                                    "description": "Additional function documentation",
-                                    "patternProperties": {
-                                        ".*": {"type": "string"}
-                                    }
-                                }
-                            }
-                        }
+                            },
+                        },
                     }
                 }
-            })
+            )
 
         return json.dumps(base_schema, indent=2)
 
@@ -676,9 +853,13 @@ class TOONGenerator:
         lines = []
 
         # Header in one line
-        langs = '/'.join(f"{k}:{v}" for k, v in project.languages.items())
-        lines.append(f"# {project.name} | {project.total_files}f {project.total_lines}L | {langs}")
-        lines.append("# Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods")
+        langs = "/".join(f"{k}:{v}" for k, v in project.languages.items())
+        lines.append(
+            f"# {project.name} | {project.total_files}f {project.total_lines}L | {langs}"
+        )
+        lines.append(
+            "# Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods"
+        )
 
         # Modules as compact list
         lines.append(f"M[{len(project.modules)}]:")
@@ -700,26 +881,28 @@ class TOONGenerator:
 
             # Compact exports
             if m.exports:
-                lines.append(f"    e: {','.join(m.exports[:8])}")
+                lines.append(f"    e: {','.join(m.exports[:CONSTANT_8])}")
 
             # Classes inline
-            for c in m.classes[:5]:
-                methods_str = ','.join(
-                    f"{meth.name}({len([p for p in meth.params if p not in ('self','cls')])})"
-                    for meth in c.methods[:5]
+            for c in m.classes[:CONSTANT_5]:
+                methods_str = ",".join(
+                    f"{meth.name}({len([p for p in meth.params if p not in ('self', 'cls')])})"
+                    for meth in c.methods[:CONSTANT_5]
                 )
-                doc = truncate_docstring(c.docstring, 40) if c.docstring else ''
+                doc = (
+                    truncate_docstring(c.docstring, CONSTANT_40) if c.docstring else ""
+                )
                 if doc:
                     lines.append(f"    {c.name}: {methods_str}  # {doc}")
                 else:
                     lines.append(f"    {c.name}: {methods_str}")
 
             # Functions inline
-            for f in m.functions[:8]:
+            for f in m.functions[:CONSTANT_8]:
                 sig = self._build_signature(f)
                 lines.append(f"    {f.name}{sig}")
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
 
 class TOONParser:
@@ -731,18 +914,18 @@ class TOONParser:
     """
 
     def __init__(self):
-        self.delimiter = ','
+        self.delimiter = ","
 
     def parse(self, content: str) -> Dict[str, Any]:
         """Parse TOON content to dict."""
         result = {}
-        lines = content.split('\n')
+        lines = content.split("\n")
 
         # Best-effort delimiter detection for arrays.
         # Note: in code2logic standard TOON, rows use ',' or '\t'.
         # '|' is used inside some cell values (e.g., decorators), so it must not be
         # treated as a delimiter.
-        self.delimiter = '\t' if any('\t' in ln for ln in lines) else ','
+        self.delimiter = "\t" if any("\t" in ln for ln in lines) else ","
 
         import csv
 
@@ -751,29 +934,29 @@ class TOONParser:
             line = lines[i]
             i += 1
 
-            if not line.strip() or line.strip().startswith('#'):
+            if not line.strip() or line.strip().startswith("#"):
                 continue
 
             # Parse key-value
             line = line.strip()
 
-            if ':' not in line:
+            if ":" not in line:
                 continue
 
-            key, value = line.split(':', 1)
+            key, value = line.split(":", 1)
             key = key.strip()
             value = value.strip()
 
             # Check for array header
-            array_match = re.match(r'(\w+)\[(\d+)\](\{[^}]+\})?', key)
+            array_match = re.match(r"(\w+)\[(\d+)\](\{[^}]+\})?", key)
             if array_match:
                 arr_name = array_match.group(1)
                 arr_len = int(array_match.group(2))
-                fields = array_match.group(3)
+                fields = array_match.group(CONSTANT_3)
 
                 if fields:
                     # Tabular array
-                    field_names = fields[1:-1].split(',')
+                    field_names = fields[1:-1].split(",")
                     items = []
 
                     # Parse rows
@@ -784,18 +967,34 @@ class TOONParser:
                         i += 1
 
                         if row_line:
-                            row_values = next(csv.reader([row_line], delimiter=self.delimiter, quotechar='"', escapechar='\\'))
+                            row_values = next(
+                                csv.reader(
+                                    [row_line],
+                                    delimiter=self.delimiter,
+                                    quotechar='"',
+                                    escapechar="\\",
+                                )
+                            )
                             item = {}
                             for fi, fn in enumerate(field_names):
                                 if fi < len(row_values):
-                                    item[fn.strip()] = self._parse_value(row_values[fi].strip())
+                                    item[fn.strip()] = self._parse_value(
+                                        row_values[fi].strip()
+                                    )
                             items.append(item)
 
                     result[arr_name] = items
                 else:
                     # Primitive array
                     if value:
-                        parts = next(csv.reader([value], delimiter=self.delimiter, quotechar='"', escapechar='\\'))
+                        parts = next(
+                            csv.reader(
+                                [value],
+                                delimiter=self.delimiter,
+                                quotechar='"',
+                                escapechar="\\",
+                            )
+                        )
                         items = [self._parse_value(v.strip()) for v in parts]
                         result[arr_name] = items
                     else:
@@ -809,26 +1008,26 @@ class TOONParser:
     def _parse_value(self, value: str) -> Any:
         """Parse a TOON value to Python type."""
         if not value:
-            return ''
+            return ""
 
         # Unquote if quoted
         if value.startswith('"') and value.endswith('"'):
             value = value[1:-1]
-            value = value.replace('\\n', '\n').replace('\\t', '\t').replace('\\r', '\r')
-            value = value.replace('\\"', '"').replace('\\\\', '\\')
+            value = value.replace("\\n", "\n").replace("\\t", "\t").replace("\\r", "\r")
+            value = value.replace('\\"', '"').replace("\\\\", "\\")
             return value
 
         # Check literals
-        if value == 'null':
+        if value == "null":
             return None
-        if value == 'true':
+        if value == "true":
             return True
-        if value == 'false':
+        if value == "false":
             return False
 
         # Try number
         try:
-            if '.' in value or 'e' in value.lower():
+            if "." in value or "e" in value.lower():
                 return float(value)
             return int(value)
         except ValueError:
@@ -837,7 +1036,9 @@ class TOONParser:
         return value
 
 
-def generate_toon(project: ProjectInfo, detail: str = 'standard', use_tabs: bool = False) -> str:
+def generate_toon(
+    project: ProjectInfo, detail: str = "standard", use_tabs: bool = False
+) -> str:
     """
     Convenience function to generate TOON format.
 

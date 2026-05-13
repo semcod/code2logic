@@ -8,4 +8,4 @@ from .analyzer import ProjectAnalyzer
 from .analyzer import analyze_project
 from .analyzer import get_library_status
 
-__all__ = ['ProjectAnalyzer', 'analyze_project', 'get_library_status']
+__all__ = ["ProjectAnalyzer", "analyze_project", "get_library_status"]

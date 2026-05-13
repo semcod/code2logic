@@ -53,6 +53,7 @@ from typing import Any, Dict, List, Tuple
 @dataclass
 class MarkdownMethod:
     """Schema for Markdown method."""
+
     name: str
     signature: str = ""
     is_async: bool = False
@@ -62,6 +63,7 @@ class MarkdownMethod:
 @dataclass
 class MarkdownClass:
     """Schema for Markdown class."""
+
     name: str
     bases: List[str] = field(default_factory=list)
     attributes: Dict[str, str] = field(default_factory=dict)
@@ -71,6 +73,7 @@ class MarkdownClass:
 @dataclass
 class MarkdownModule:
     """Schema for Markdown module."""
+
     filename: str
     language: str = "python"
     lines: int = 0
@@ -82,6 +85,7 @@ class MarkdownModule:
 @dataclass
 class MarkdownSchema:
     """Complete Markdown specification schema."""
+
     modules: List[MarkdownModule] = field(default_factory=list)
     token_estimate: int = 0
 
@@ -101,12 +105,12 @@ def validate_markdown(spec: str) -> Tuple[bool, List[str]]:
     if not spec or not spec.strip():
         return False, ["Empty specification"]
 
-    lines = spec.split('\n')
+    lines = spec.split("\n")
 
     # Check for module header
     has_module_header = False
     for line in lines[:10]:
-        if line.startswith('# Module:') or line.startswith('# '):
+        if line.startswith("# Module:") or line.startswith("# "):
             has_module_header = True
             break
 
@@ -118,7 +122,7 @@ def validate_markdown(spec: str) -> Tuple[bool, List[str]]:
     code_block_start = 0
 
     for i, line in enumerate(lines):
-        if line.startswith('```'):
+        if line.startswith("```"):
             if not in_code_block:
                 in_code_block = True
                 code_block_start = i
@@ -129,16 +133,17 @@ def validate_markdown(spec: str) -> Tuple[bool, List[str]]:
         errors.append(f"Unclosed code block starting at line {code_block_start + 1}")
 
     # Check for YAML blocks validity
-    yaml_blocks = re.findall(r'```yaml\n(.*?)```', spec, re.DOTALL)
+    yaml_blocks = re.findall(r"```yaml\n(.*?)```", spec, re.DOTALL)
     for i, block in enumerate(yaml_blocks):
         try:
             import yaml
+
             yaml.safe_load(block)
         except Exception as e:
-            errors.append(f"Invalid YAML in block {i+1}: {e}")
+            errors.append(f"Invalid YAML in block {i + 1}: {e}")
 
     # Check for required sections
-    has_classes = '## Classes' in spec or '### ' in spec
+    has_classes = "## Classes" in spec or "### " in spec
     has_content = has_module_header or has_classes
 
     if not has_content:
@@ -149,23 +154,19 @@ def validate_markdown(spec: str) -> Tuple[bool, List[str]]:
 
 def extract_markdown_sections(spec: str) -> Dict[str, Any]:
     """Extract sections from Markdown specification."""
-    sections = {
-        'metadata': {},
-        'classes': [],
-        'functions': []
-    }
+    sections = {"metadata": {}, "classes": [], "functions": []}
 
     # Extract metadata
-    metadata_match = re.search(r'## Metadata\n(.*?)(?=##|\Z)', spec, re.DOTALL)
+    metadata_match = re.search(r"## Metadata\n(.*?)(?=##|\Z)", spec, re.DOTALL)
     if metadata_match:
         metadata_text = metadata_match.group(1)
-        for line in metadata_text.split('\n'):
-            if ':' in line and line.startswith('-'):
-                key, value = line[1:].split(':', 1)
-                sections['metadata'][key.strip()] = value.strip()
+        for line in metadata_text.split("\n"):
+            if ":" in line and line.startswith("-"):
+                key, value = line[1:].split(":", 1)
+                sections["metadata"][key.strip()] = value.strip()
 
     # Extract class names
-    class_matches = re.findall(r'### (\w+)', spec)
-    sections['classes'] = class_matches
+    class_matches = re.findall(r"### (\w+)", spec)
+    sections["classes"] = class_matches
 
     return sections

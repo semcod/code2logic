@@ -15,18 +15,24 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+CONSTANT_50 = 50.0
+CONSTANT_80 = 80
+
 
 def _safe_load_yaml_file(path: str) -> Any:
     try:
         import yaml
     except ImportError as e:
-        raise RuntimeError('pyyaml is required for YAML specs. Install: pip install pyyaml') from e
-    with open(path, encoding='utf-8') as f:
+        raise RuntimeError(
+            "pyyaml is required for YAML specs. Install: pip install pyyaml"
+        ) from e
+    with open(path, encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 
 class ReproductionStatus(Enum):
     """Status of file reproduction."""
+
     SUCCESS = "success"
     PARTIAL = "partial"
     FAILED = "failed"
@@ -36,6 +42,7 @@ class ReproductionStatus(Enum):
 @dataclass
 class FileValidation:
     """Validation result for a single file."""
+
     path: str
     exists: bool = False
     syntax_ok: bool = False
@@ -56,7 +63,7 @@ class FileValidation:
         matched = self.classes_match + self.functions_match
 
         if total == 0:
-            return 100.0 if self.syntax_ok else 50.0
+            return 100.0 if self.syntax_ok else CONSTANT_50
 
         base_score = (matched / total) * 100
         if not self.syntax_ok:
@@ -66,19 +73,20 @@ class FileValidation:
 
     def to_dict(self) -> Dict[str, Any]:
         return {
-            'path': self.path,
-            'exists': self.exists,
-            'syntax_ok': self.syntax_ok,
-            'score': self.score,
-            'classes': f"{self.classes_match}/{self.classes_expected}",
-            'functions': f"{self.functions_match}/{self.functions_expected}",
-            'errors': self.errors,
+            "path": self.path,
+            "exists": self.exists,
+            "syntax_ok": self.syntax_ok,
+            "score": self.score,
+            "classes": f"{self.classes_match}/{self.classes_expected}",
+            "functions": f"{self.functions_match}/{self.functions_expected}",
+            "errors": self.errors,
         }
 
 
 @dataclass
 class ReproductionResult:
     """Result of reproduction process."""
+
     output_dir: str
     total_files: int = 0
     generated_files: int = 0
@@ -154,7 +162,7 @@ class SpecReproducer:
         filter_paths: Optional[List[str]] = None,
     ) -> ReproductionResult:
         """Reproduce files from JSON specification."""
-        with open(spec_path, encoding='utf-8') as f:
+        with open(spec_path, encoding="utf-8") as f:
             spec = json.load(f)
 
         return self._reproduce(spec, output_dir, filter_paths)
@@ -171,11 +179,11 @@ class SpecReproducer:
         output_path = Path(output_dir)
         output_path.mkdir(parents=True, exist_ok=True)
 
-        modules = spec.get('modules', [])
+        modules = spec.get("modules", [])
         result.total_files = len(modules)
 
         for module in modules:
-            path = module.get('path', '')
+            path = module.get("path", "")
 
             # Apply filter if specified
             if filter_paths:
@@ -203,20 +211,20 @@ class SpecReproducer:
 
     def _generate_file(self, module: Dict[str, Any], output_path: Path) -> bool:
         """Generate a single file from module spec."""
-        path = module.get('path', '')
-        language = module.get('language', 'python')
+        path = module.get("path", "")
+        language = module.get("language", "python")
 
         file_path = output_path / path
         file_path.parent.mkdir(parents=True, exist_ok=True)
 
-        if language == 'python':
+        if language == "python":
             content = self._generate_python(module)
-        elif language in ('typescript', 'javascript'):
+        elif language in ("typescript", "javascript"):
             content = self._generate_typescript(module)
         else:
             content = f"// Unsupported language: {language}\n"
 
-        file_path.write_text(content, encoding='utf-8')
+        file_path.write_text(content, encoding="utf-8")
         return True
 
     def _generate_python(self, module: Dict[str, Any]) -> str:
@@ -224,18 +232,18 @@ class SpecReproducer:
         lines = ['"""']
         lines.append(f"Generated from: {module.get('path', 'unknown')}")
         lines.append('"""')
-        lines.append('')
+        lines.append("")
 
         # Imports
-        imports = module.get('imports', [])
+        imports = module.get("imports", [])
         if imports:
             # Group imports
             std_imports = []
             from_imports = {}
 
             for imp in imports:
-                if '.' in imp:
-                    parts = imp.rsplit('.', 1)
+                if "." in imp:
+                    parts = imp.rsplit(".", 1)
                     mod = parts[0]
                     name = parts[1] if len(parts) > 1 else imp
                     if mod not in from_imports:
@@ -250,28 +258,28 @@ class SpecReproducer:
             for mod, names in from_imports.items():
                 lines.append(f"from {mod} import {', '.join(names)}")
 
-            lines.append('')
+            lines.append("")
 
         # Classes
-        classes = module.get('classes', [])
+        classes = module.get("classes", [])
         for cls in classes:
             lines.extend(self._generate_python_class(cls))
-            lines.append('')
+            lines.append("")
 
         # Functions
-        functions = module.get('functions', [])
+        functions = module.get("functions", [])
         for func in functions:
             lines.extend(self._generate_python_function(func))
-            lines.append('')
+            lines.append("")
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _render_docstring(self, text: str, indent: str) -> List[str]:
         """Render a safe Python docstring or fall back to comments."""
         if not text:
             return []
 
-        s = str(text).replace('\r\n', '\n').replace('\r', '\n')
+        s = str(text).replace("\r\n", "\n").replace("\r", "\n")
 
         # Choose delimiter that doesn't appear in content
         if "'''" not in s:
@@ -286,7 +294,7 @@ class SpecReproducer:
             return out
 
         # Multi-line docstring
-        if '\n' in s:
+        if "\n" in s:
             out = [f"{indent}{delim}"]
             out.extend([f"{indent}{line}" for line in s.splitlines()])
             out.append(f"{indent}{delim}")
@@ -298,7 +306,7 @@ class SpecReproducer:
     def _sanitize_python_property(self, prop: str) -> str:
         """Sanitize a Python class property declaration for valid syntax."""
         if not prop:
-            return ''
+            return ""
 
         s = str(prop).strip()
 
@@ -306,13 +314,13 @@ class SpecReproducer:
         # Example: Literal[CASCADE,SET NULL] -> Literal["CASCADE","SET NULL"]
         def _fix_literal(match: re.Match) -> str:
             inner = match.group(1)
-            items = [p.strip() for p in inner.split(',') if p.strip()]
+            items = [p.strip() for p in inner.split(",") if p.strip()]
             fixed = []
             for it in items:
                 if it.startswith(('"', "'")) and it.endswith(('"', "'")):
                     fixed.append(it)
                     continue
-                if it in {'None', 'True', 'False'}:
+                if it in {"None", "True", "False"}:
                     fixed.append(it)
                     continue
                 if re.fullmatch(r"-?\d+(?:\.\d+)?", it):
@@ -329,9 +337,9 @@ class SpecReproducer:
         """Generate Python class."""
         lines = []
 
-        name = cls.get('name', 'UnnamedClass')
-        bases = cls.get('bases', [])
-        docstring = cls.get('docstring', '')
+        name = cls.get("name", "UnnamedClass")
+        bases = cls.get("bases", [])
+        docstring = cls.get("docstring", "")
 
         # Class declaration
         if bases:
@@ -341,30 +349,30 @@ class SpecReproducer:
 
         # Docstring
         if docstring:
-            lines.extend(self._render_docstring(docstring, indent='    '))
+            lines.extend(self._render_docstring(docstring, indent="    "))
 
         # Properties
-        properties = cls.get('properties', [])
+        properties = cls.get("properties", [])
         if properties:
-            lines.append('    ')
+            lines.append("    ")
             for prop in properties:
                 prop_decl = self._sanitize_python_property(prop)
                 if not prop_decl:
                     continue
-                if '=' in prop_decl:
-                    lines.append(f'    {prop_decl}')
+                if "=" in prop_decl:
+                    lines.append(f"    {prop_decl}")
                 else:
-                    lines.append(f'    {prop_decl} = None')
+                    lines.append(f"    {prop_decl} = None")
 
         # Methods
-        methods = cls.get('methods', [])
+        methods = cls.get("methods", [])
         if methods:
             for method in methods:
-                lines.append('')
+                lines.append("")
                 for line in self._generate_python_method(method):
-                    lines.append(f'    {line}')
+                    lines.append(f"    {line}")
         elif not properties:
-            lines.append('    pass')
+            lines.append("    pass")
 
         return lines
 
@@ -372,27 +380,27 @@ class SpecReproducer:
         """Generate Python method."""
         lines = []
 
-        name = method.get('name', 'unnamed')
-        signature = method.get('signature', '(self)')
-        intent = method.get('intent', '')
-        is_async = method.get('is_async', False)
+        name = method.get("name", "unnamed")
+        signature = method.get("signature", "(self)")
+        intent = method.get("intent", "")
+        is_async = method.get("is_async", False)
 
         # Parse signature
         sig = self._parse_signature(signature)
 
         # Method declaration
-        prefix = 'async ' if is_async else ''
+        prefix = "async " if is_async else ""
         lines.append(f"{prefix}def {name}{sig}:")
 
         # Docstring
         if intent:
-            lines.extend(self._render_docstring(intent, indent='    '))
+            lines.extend(self._render_docstring(intent, indent="    "))
 
         # Body placeholder
         if is_async:
-            lines.append('    pass  # TODO: implement')
+            lines.append("    pass  # TODO: implement")
         else:
-            lines.append('    pass  # TODO: implement')
+            lines.append("    pass  # TODO: implement")
 
         return lines
 
@@ -400,89 +408,89 @@ class SpecReproducer:
         """Generate Python function."""
         lines = []
 
-        name = func.get('name', 'unnamed')
-        signature = func.get('signature', '()')
-        intent = func.get('intent', '')
-        is_async = func.get('is_async', False)
+        name = func.get("name", "unnamed")
+        signature = func.get("signature", "()")
+        intent = func.get("intent", "")
+        is_async = func.get("is_async", False)
 
         sig = self._parse_signature(signature)
 
-        prefix = 'async ' if is_async else ''
+        prefix = "async " if is_async else ""
         lines.append(f"{prefix}def {name}{sig}:")
 
         if intent:
-            lines.extend(self._render_docstring(intent, indent='    '))
+            lines.extend(self._render_docstring(intent, indent="    "))
 
-        lines.append('    pass  # TODO: implement')
+        lines.append("    pass  # TODO: implement")
 
         return lines
 
     def _generate_typescript(self, module: Dict[str, Any]) -> str:
         """Generate TypeScript file content."""
-        lines = ['/**']
+        lines = ["/**"]
         lines.append(f" * Generated from: {module.get('path', 'unknown')}")
-        lines.append(' */')
-        lines.append('')
+        lines.append(" */")
+        lines.append("")
 
         # Exports
-        exports = module.get('exports', [])
+        exports = module.get("exports", [])
 
         # Classes
-        classes = module.get('classes', [])
+        classes = module.get("classes", [])
         for cls in classes:
             lines.extend(self._generate_ts_class(cls))
-            lines.append('')
+            lines.append("")
 
         # Functions
-        functions = module.get('functions', [])
+        functions = module.get("functions", [])
         for func in functions:
             lines.extend(self._generate_ts_function(func))
-            lines.append('')
+            lines.append("")
 
         # Export statement if needed
         if exports:
-            export_names = [e for e in exports if e not in ['default']]
+            export_names = [e for e in exports if e not in ["default"]]
             if export_names:
                 lines.append(f"export {{ {', '.join(export_names)} }};")
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _generate_ts_class(self, cls: Dict[str, Any]) -> List[str]:
         """Generate TypeScript class."""
         lines = []
 
-        name = cls.get('name', 'UnnamedClass')
-        bases = cls.get('bases', [])
-        docstring = cls.get('docstring', '')
+        name = cls.get("name", "UnnamedClass")
+        bases = cls.get("bases", [])
+        docstring = cls.get("docstring", "")
 
         if docstring:
-            lines.append(f'/** {docstring} */')
+            lines.append(f"/** {docstring} */")
 
         extends = f" extends {bases[0]}" if bases else ""
         lines.append(f"export class {name}{extends} {{")
 
         # Methods
-        methods = cls.get('methods', [])
+        methods = cls.get("methods", [])
         for method in methods:
-            lines.append('')
+            lines.append("")
             for line in self._generate_ts_method(method):
-                lines.append(f'  {line}')
+                lines.append(f"  {line}")
 
-        lines.append('}')
+        lines.append("}")
         return lines
 
     def _generate_ts_method(self, method: Dict[str, Any]) -> List[str]:
         """Generate TypeScript method."""
         lines = []
 
-        name = method.get('name', 'unnamed')
-        signature = method.get('signature', '()')
-        is_async = method.get('is_async', False)
+        name = method.get("name", "unnamed")
+        signature = method.get("signature", "()")
+        is_async = method.get("is_async", False)
 
-        prefix = 'async ' if is_async else ''
+        prefix = "async " if is_async else ""
         lines.append(f"{prefix}{name}{signature} {{")
-        lines.append('    // TODO: implement')
-        lines.append('}')
+        lines.append("    // TODO: implement")
+        lines.append("}")
 
         return lines
 
@@ -490,33 +498,33 @@ class SpecReproducer:
         """Generate TypeScript function."""
         lines = []
 
-        name = func.get('name', 'unnamed')
-        signature = func.get('signature', '()')
-        is_async = func.get('is_async', False)
+        name = func.get("name", "unnamed")
+        signature = func.get("signature", "()")
+        is_async = func.get("is_async", False)
 
-        prefix = 'async ' if is_async else ''
+        prefix = "async " if is_async else ""
         lines.append(f"export {prefix}function {name}{signature} {{")
-        lines.append('  // TODO: implement')
-        lines.append('}')
+        lines.append("  // TODO: implement")
+        lines.append("}")
 
         return lines
 
     def _parse_signature(self, sig: str) -> str:
         """Parse and clean signature."""
         sig = sig.strip()
-        if not sig.startswith('('):
-            sig = '(' + sig
-        if ')' not in sig:
-            sig = sig + ')'
+        if not sig.startswith("("):
+            sig = "(" + sig
+        if ")" not in sig:
+            sig = sig + ")"
 
         # Extract just params and return
-        if '->' in sig:
-            parts = sig.split('->')
+        if "->" in sig:
+            parts = sig.split("->")
             params = parts[0].strip()
             ret = parts[1].strip()
             return f"{params} -> {ret}"
 
-        return sig.split(')')[0] + ')'
+        return sig.split(")")[0] + ")"
 
 
 class SpecValidator:
@@ -550,7 +558,7 @@ class SpecValidator:
             filter_paths: Optional list of paths to validate (selective)
         """
         # Load spec
-        if spec_path.endswith('.json'):
+        if spec_path.endswith(".json"):
             with open(spec_path) as f:
                 spec = json.load(f)
         else:
@@ -559,8 +567,8 @@ class SpecValidator:
         results = []
         generated_path = Path(generated_dir)
 
-        for module in spec.get('modules', []):
-            path = module.get('path', '')
+        for module in spec.get("modules", []):
+            path = module.get("path", "")
 
             # Apply filter
             if filter_paths:
@@ -574,7 +582,7 @@ class SpecValidator:
 
     def _validate_file(self, module: Dict[str, Any], base_path: Path) -> FileValidation:
         """Validate a single file."""
-        path = module.get('path', '')
+        path = module.get("path", "")
         file_path = base_path / path
 
         validation = FileValidation(path=path)
@@ -588,39 +596,39 @@ class SpecValidator:
 
         # Read content
         try:
-            content = file_path.read_text(encoding='utf-8')
+            content = file_path.read_text(encoding="utf-8")
         except Exception as e:
             validation.errors.append(f"Read error: {e}")
             return validation
 
         # Check syntax
-        language = module.get('language', 'python')
-        if language == 'python':
+        language = module.get("language", "python")
+        if language == "python":
             validation.syntax_ok = self._check_python_syntax(content, validation)
         else:
             validation.syntax_ok = True  # Skip for other languages
 
         # Check structure
-        expected_classes = module.get('classes', [])
-        expected_functions = module.get('functions', [])
+        expected_classes = module.get("classes", [])
+        expected_functions = module.get("functions", [])
 
         validation.classes_expected = len(expected_classes)
         validation.functions_expected = len(expected_functions)
 
         # Count matches
         for cls in expected_classes:
-            cls_name = cls.get('name', '')
+            cls_name = cls.get("name", "")
             if f"class {cls_name}" in content:
                 validation.classes_match += 1
 
         for func in expected_functions:
-            func_name = func.get('name', '')
+            func_name = func.get("name", "")
             if f"def {func_name}" in content or f"function {func_name}" in content:
                 validation.functions_match += 1
 
         validation.structure_match = (
-            validation.classes_match == validation.classes_expected and
-            validation.functions_match == validation.functions_expected
+            validation.classes_match == validation.classes_expected
+            and validation.functions_match == validation.functions_expected
         )
 
         return validation
@@ -628,7 +636,7 @@ class SpecValidator:
     def _check_python_syntax(self, content: str, validation: FileValidation) -> bool:
         """Check Python syntax."""
         try:
-            compile(content, '<string>', 'exec')
+            compile(content, "<string>", "exec")
             return True
         except SyntaxError as e:
             validation.errors.append(f"Syntax error: {e}")
@@ -664,7 +672,7 @@ def reproduce_project(
 
     reproducer = SpecReproducer(verbose=verbose)
 
-    if spec_path.endswith('.json'):
+    if spec_path.endswith(".json"):
         result = reproducer.reproduce_from_json(spec_path, output_dir, filter_paths)
     else:
         result = reproducer.reproduce_from_yaml(spec_path, output_dir, filter_paths)
@@ -680,7 +688,13 @@ def reproduce_project(
 
         if verbose:
             for v in validations:
-                status = "✓" if v.score >= 80 else "○" if v.score >= 50 else "✗"
+                status = (
+                    "✓"
+                    if v.score >= CONSTANT_80
+                    else "○"
+                    if v.score >= CONSTANT_50
+                    else "✗"
+                )
                 print(f"  {status} {v.path}: {v.score}%")
 
     if verbose:

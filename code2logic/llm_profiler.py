@@ -34,12 +34,12 @@ from .utils import estimate_tokens
 
 # Test cases for profiling
 PROFILE_TEST_CASES = {
-    'simple_function': '''
+    "simple_function": '''
 def calculate_sum(numbers: List[int]) -> int:
     """Calculate sum of numbers."""
     return sum(numbers)
 ''',
-    'class_with_methods': '''
+    "class_with_methods": '''
 class DataProcessor:
     """Process data with validation."""
 
@@ -55,7 +55,7 @@ class DataProcessor:
         """Transform single item."""
         return {k: v.strip() if isinstance(v, str) else v for k, v in item.items()}
 ''',
-    'async_function': '''
+    "async_function": '''
 async def fetch_data(url: str, timeout: int = 30) -> Dict[str, Any]:
     """Fetch data from URL with timeout."""
     async with httpx.AsyncClient(timeout=timeout) as client:
@@ -63,7 +63,7 @@ async def fetch_data(url: str, timeout: int = 30) -> Dict[str, Any]:
         response.raise_for_status()
         return response.json()
 ''',
-    'decorator_usage': '''
+    "decorator_usage": '''
 @dataclass
 class User:
     """User model with validation."""
@@ -80,7 +80,7 @@ class User:
     def validate_email(email: str) -> bool:
         return "@" in email and "." in email
 ''',
-    'complex_logic': '''
+    "complex_logic": '''
 def merge_sorted_lists(list1: List[int], list2: List[int]) -> List[int]:
     """Merge two sorted lists into one sorted list."""
     result = []
@@ -155,6 +155,7 @@ class LLMProfile:
 @dataclass
 class ProfileTestResult:
     """Result of a single profile test."""
+
     test_name: str
     original_code: str
     reproduced_code: str
@@ -168,9 +169,9 @@ class ProfileTestResult:
 
 def _get_profiles_path() -> Path:
     """Get path to profiles storage."""
-    config_dir = Path.home() / '.code2logic'
+    config_dir = Path.home() / ".code2logic"
     config_dir.mkdir(exist_ok=True)
-    return config_dir / 'llm_profiles.json'
+    return config_dir / "llm_profiles.json"
 
 
 def load_profiles() -> dict[str, LLMProfile]:
@@ -182,9 +183,7 @@ def load_profiles() -> dict[str, LLMProfile]:
     try:
         with open(path) as f:
             data = json.load(f)
-        return {
-            k: LLMProfile(**v) for k, v in data.items()
-        }
+        return {k: LLMProfile(**v) for k, v in data.items()}
     except (json.JSONDecodeError, TypeError):
         return {}
 
@@ -195,11 +194,8 @@ def save_profile(profile: LLMProfile) -> None:
     profiles[profile.profile_id] = profile
 
     path = _get_profiles_path()
-    with open(path, 'w') as f:
-        json.dump(
-            {k: asdict(v) for k, v in profiles.items()},
-            f, indent=2
-        )
+    with open(path, "w") as f:
+        json.dump({k: asdict(v) for k, v in profiles.items()}, f, indent=2)
 
 
 def get_profile(provider: str, model: str) -> Optional[LLMProfile]:
@@ -229,31 +225,31 @@ def _create_default_profile(provider: str, model: str) -> LLMProfile:
     preferred_format = "yaml"
 
     # Adjust based on model
-    if 'gpt-4' in model_lower:
-        context = 8000 if 'turbo' not in model_lower else 32000
+    if "gpt-4" in model_lower:
+        context = 8000 if "turbo" not in model_lower else 32000
         chunk_size = 3000
         preferred_format = "yaml"
-    elif 'claude' in model_lower:
+    elif "claude" in model_lower:
         context = 32000
         chunk_size = 4000
         preferred_format = "yaml"
-    elif 'qwen' in model_lower and 'coder' in model_lower:
+    elif "qwen" in model_lower and "coder" in model_lower:
         context = 16000
         chunk_size = 3000
         preferred_format = "toon"
-    elif 'deepseek' in model_lower:
+    elif "deepseek" in model_lower:
         context = 16000
         chunk_size = 3000
         preferred_format = "toon"
-    elif 'llama' in model_lower:
-        if '70b' in model_lower:
+    elif "llama" in model_lower:
+        if "70b" in model_lower:
             context = 4000
             chunk_size = 1500
         else:
             context = 2000
             chunk_size = 1000
         preferred_format = "yaml"
-    elif 'mistral' in model_lower or 'mixtral' in model_lower:
+    elif "mistral" in model_lower or "mixtral" in model_lower:
         context = 8000
         chunk_size = 2500
         preferred_format = "yaml"
@@ -288,8 +284,8 @@ class LLMProfiler:
         """
         self.client = client
         self.verbose = verbose
-        self.provider = getattr(client, 'provider', 'unknown')
-        self.model = getattr(client, 'model', 'unknown')
+        self.provider = getattr(client, "provider", "unknown")
+        self.model = getattr(client, "model", "unknown")
 
     def run_profile(self, quick: bool = False) -> LLMProfile:
         """
@@ -400,41 +396,41 @@ Python code:"""
         lines.append("elements:")
 
         # Simple parsing
-        for line in code.strip().split('\n'):
+        for line in code.strip().split("\n"):
             stripped = line.strip()
-            if stripped.startswith('def '):
-                match = stripped[4:].split('(')[0]
+            if stripped.startswith("def "):
+                match = stripped[4:].split("(")[0]
                 lines.append("  - type: function")
                 lines.append(f"    name: {match}")
-            elif stripped.startswith('async def '):
-                match = stripped[10:].split('(')[0]
+            elif stripped.startswith("async def "):
+                match = stripped[10:].split("(")[0]
                 lines.append("  - type: async_function")
                 lines.append(f"    name: {match}")
-            elif stripped.startswith('class '):
-                match = stripped[6:].split('(')[0].split(':')[0]
+            elif stripped.startswith("class "):
+                match = stripped[6:].split("(")[0].split(":")[0]
                 lines.append("  - type: class")
                 lines.append(f"    name: {match}")
-            elif stripped.startswith('@'):
+            elif stripped.startswith("@"):
                 lines.append(f"  - decorator: {stripped}")
 
         lines.append("")
         lines.append("source:")
-        for line in code.strip().split('\n'):
+        for line in code.strip().split("\n"):
             lines.append(f"  {line}")
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _extract_code(self, response: str) -> str:
         """Extract code from LLM response."""
         # Try to find code block
-        if '```python' in response:
-            start = response.find('```python') + 9
-            end = response.find('```', start)
+        if "```python" in response:
+            start = response.find("```python") + 9
+            end = response.find("```", start)
             if end > start:
                 return response[start:end].strip()
-        elif '```' in response:
-            start = response.find('```') + 3
-            end = response.find('```', start)
+        elif "```" in response:
+            start = response.find("```") + 3
+            end = response.find("```", start)
             if end > start:
                 return response[start:end].strip()
 
@@ -444,7 +440,7 @@ Python code:"""
     def _check_syntax(self, code: str) -> bool:
         """Check if code has valid Python syntax."""
         try:
-            compile(code, '<string>', 'exec')
+            compile(code, "<string>", "exec")
             return True
         except SyntaxError:
             return False
@@ -452,12 +448,14 @@ Python code:"""
     def _calculate_similarity(self, original: str, reproduced: str) -> float:
         """Calculate code similarity."""
         # Normalize whitespace
-        orig_norm = ' '.join(original.split())
-        repr_norm = ' '.join(reproduced.split())
+        orig_norm = " ".join(original.split())
+        repr_norm = " ".join(reproduced.split())
 
         return SequenceMatcher(None, orig_norm, repr_norm).ratio()
 
-    def _calculate_metrics(self, profile: LLMProfile, results: list[ProfileTestResult]) -> LLMProfile:
+    def _calculate_metrics(
+        self, profile: LLMProfile, results: list[ProfileTestResult]
+    ) -> LLMProfile:
         """Calculate aggregate metrics from test results."""
         if not results:
             return profile
@@ -487,9 +485,9 @@ Python code:"""
         # Store test results
         profile.test_results = {
             r.test_name: {
-                'syntax_ok': r.syntax_ok,
-                'similarity': r.similarity,
-                'time': r.time_seconds,
+                "syntax_ok": r.syntax_ok,
+                "similarity": r.similarity,
+                "time": r.time_seconds,
             }
             for r in results
         }
@@ -498,16 +496,15 @@ Python code:"""
 
     def _test_consistency(self, profile: LLMProfile) -> LLMProfile:
         """Test output consistency by running same prompt twice."""
-        code = PROFILE_TEST_CASES['simple_function']
+        code = PROFILE_TEST_CASES["simple_function"]
 
-        result1 = self._test_reproduction('consistency_1', code)
-        result2 = self._test_reproduction('consistency_2', code)
+        result1 = self._test_reproduction("consistency_1", code)
+        result2 = self._test_reproduction("consistency_2", code)
 
         # Compare outputs
         if result1.reproduced_code and result2.reproduced_code:
             consistency = self._calculate_similarity(
-                result1.reproduced_code,
-                result2.reproduced_code
+                result1.reproduced_code, result2.reproduced_code
             )
             profile.output_consistency = consistency
 
@@ -537,13 +534,13 @@ class AdaptiveChunker:
     def get_optimal_settings(self) -> dict[str, Any]:
         """Get optimal settings for the profiled model."""
         return {
-            'max_chunk_tokens': self.profile.optimal_chunk_size,
-            'preferred_format': self.profile.preferred_format,
-            'chunk_strategy': self.profile.chunk_strategy,
-            'formats_ranked': self.profile.recommended_formats,
+            "max_chunk_tokens": self.profile.optimal_chunk_size,
+            "preferred_format": self.profile.preferred_format,
+            "chunk_strategy": self.profile.chunk_strategy,
+            "formats_ranked": self.profile.recommended_formats,
         }
 
-    def chunk_spec(self, spec: str, format: str = 'yaml') -> list[dict[str, Any]]:
+    def chunk_spec(self, spec: str, format: str = "yaml") -> list[dict[str, Any]]:
         """
         Chunk specification based on profile.
 
@@ -558,12 +555,12 @@ class AdaptiveChunker:
 
         # Adjust for format verbosity
         format_factors = {
-            'json': 1.2,  # More verbose, smaller chunks
-            'yaml': 1.0,
-            'toon': 0.8,  # More compact, larger chunks
-            'gherkin': 1.1,
-            'markdown': 1.0,
-            'logicml': 0.9,
+            "json": 1.2,  # More verbose, smaller chunks
+            "yaml": 1.0,
+            "toon": 0.8,  # More compact, larger chunks
+            "gherkin": 1.1,
+            "markdown": 1.0,
+            "logicml": 0.9,
         }
         factor = format_factors.get(format, 1.0)
         adjusted_max = int(max_tokens / factor)
@@ -574,18 +571,20 @@ class AdaptiveChunker:
         current_tokens = 0
         chunk_id = 0
 
-        lines = spec.split('\n')
+        lines = spec.split("\n")
 
         for line in lines:
             line_tokens = estimate_tokens(line)
 
             if current_tokens + line_tokens > adjusted_max and current_chunk:
-                chunks.append({
-                    'id': chunk_id,
-                    'content': '\n'.join(current_chunk),
-                    'tokens': current_tokens,
-                    'format': format,
-                })
+                chunks.append(
+                    {
+                        "id": chunk_id,
+                        "content": "\n".join(current_chunk),
+                        "tokens": current_tokens,
+                        "format": format,
+                    }
+                )
                 chunk_id += 1
                 current_chunk = []
                 current_tokens = 0
@@ -594,12 +593,14 @@ class AdaptiveChunker:
             current_tokens += line_tokens
 
         if current_chunk:
-            chunks.append({
-                'id': chunk_id,
-                'content': '\n'.join(current_chunk),
-                'tokens': current_tokens,
-                'format': format,
-            })
+            chunks.append(
+                {
+                    "id": chunk_id,
+                    "content": "\n".join(current_chunk),
+                    "tokens": current_tokens,
+                    "format": format,
+                }
+            )
 
         return chunks
 
@@ -620,13 +621,13 @@ class AdaptiveChunker:
         # For larger specs, prefer more compact formats
         if spec_size_tokens > self.profile.effective_context:
             # Need chunking, use most compact format
-            return 'toon'
+            return "toon"
 
         # Medium size, balance accuracy and size
         if self.profile.semantic_accuracy > 0.7:
             return self.profile.preferred_format
         else:
-            return 'yaml'  # More explicit for lower accuracy models
+            return "yaml"  # More explicit for lower accuracy models
 
     def estimate_chunks_needed(self, spec_size_tokens: int) -> int:
         """Estimate number of chunks needed."""

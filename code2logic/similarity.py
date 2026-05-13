@@ -4,6 +4,7 @@ Similarity detector using Rapidfuzz.
 Detects similar functions across modules to identify
 potential duplicates and refactoring opportunities.
 """
+
 import logging
 import time
 from collections import defaultdict
@@ -17,6 +18,7 @@ log = logging.getLogger(__name__)
 RAPIDFUZZ_AVAILABLE = False
 try:
     from rapidfuzz import fuzz, process
+
     RAPIDFUZZ_AVAILABLE = True
 except ImportError:
     fuzz = None
@@ -70,16 +72,15 @@ class SimilarityDetector:
         all_funcs: List[dict] = []
         for m in modules:
             for f in m.functions:
-                all_funcs.append({
-                    'name': f.name,
-                    'full': f"{m.path}::{f.name}"
-                })
+                all_funcs.append({"name": f.name, "full": f"{m.path}::{f.name}"})
             for c in m.classes:
                 for method in c.methods:
-                    all_funcs.append({
-                        'name': method.name,
-                        'full': f"{m.path}::{c.name}.{method.name}"
-                    })
+                    all_funcs.append(
+                        {
+                            "name": method.name,
+                            "full": f"{m.path}::{c.name}.{method.name}",
+                        }
+                    )
 
         if len(all_funcs) < 2:
             return {}
@@ -94,15 +95,15 @@ class SimilarityDetector:
 
         # Find similar functions
         similar: Dict[str, List[str]] = {}
-        names = [f['name'] for f in all_funcs]
+        names = [f["name"] for f in all_funcs]
 
         name_to_fulls: Dict[str, List[str]] = defaultdict(list)
         for f in all_funcs:
-            name_to_fulls[f['name']].append(f['full'])
+            name_to_fulls[f["name"]].append(f["full"])
 
         for i, func in enumerate(all_funcs):
             # Skip common names that would produce false positives
-            if func['name'] in ('__init__', 'constructor', 'toString', 'valueOf'):
+            if func["name"] in ("__init__", "constructor", "toString", "valueOf"):
                 continue
 
             if i > 0 and (i % self.progress_every) == 0:
@@ -114,25 +115,29 @@ class SimilarityDetector:
                 )
 
             matches = process.extract(
-                func['name'],
-                names[:i] + names[i+1:],
-                scorer=fuzz.ratio,
-                limit=3
+                func["name"], names[:i] + names[i + 1 :], scorer=fuzz.ratio, limit=3
             )
 
             sim_list = []
             for match_name, score, _ in matches:
-                if score >= self.threshold and match_name != func['name']:
+                if score >= self.threshold and match_name != func["name"]:
                     for full in name_to_fulls.get(match_name, [])[:3]:
                         sim_list.append(f"{full} ({score}%)")
 
             if sim_list:
-                similar[func['full']] = sim_list
+                similar[func["full"]] = sim_list
 
-        log.debug("Similarity finished: funcs=%d matches=%d time=%.2fs", len(all_funcs), len(similar), time.time() - start)
+        log.debug(
+            "Similarity finished: funcs=%d matches=%d time=%.2fs",
+            len(all_funcs),
+            len(similar),
+            time.time() - start,
+        )
         return similar
 
-    def find_duplicate_signatures(self, modules: List[ModuleInfo]) -> Dict[str, List[str]]:
+    def find_duplicate_signatures(
+        self, modules: List[ModuleInfo]
+    ) -> Dict[str, List[str]]:
         """
         Find functions with identical signatures.
 
@@ -156,7 +161,9 @@ class SimilarityDetector:
 
             for c in m.classes:
                 for method in c.methods:
-                    sig = self._build_signature(method.name, method.params, method.return_type)
+                    sig = self._build_signature(
+                        method.name, method.params, method.return_type
+                    )
                     full_name = f"{m.path}::{c.name}.{method.name}"
 
                     if sig in signatures:
@@ -167,21 +174,22 @@ class SimilarityDetector:
         # Filter to only duplicates
         return {sig: funcs for sig, funcs in signatures.items() if len(funcs) > 1}
 
-    def _build_signature(self, name: str, params: List[str],
-                         return_type: str = None) -> str:
+    def _build_signature(
+        self, name: str, params: List[str], return_type: str = None
+    ) -> str:
         """Build a normalized signature string."""
         # Normalize parameter names
         normalized_params = []
         for p in params[:4]:
             # Extract just the type if available
-            if ':' in p:
-                _, type_part = p.split(':', 1)
+            if ":" in p:
+                _, type_part = p.split(":", 1)
                 normalized_params.append(type_part.strip())
             else:
-                normalized_params.append('any')
+                normalized_params.append("any")
 
-        params_str = ', '.join(normalized_params)
-        ret = return_type or 'void'
+        params_str = ", ".join(normalized_params)
+        ret = return_type or "void"
 
         return f"{name}({params_str}) -> {ret}"
 
@@ -191,7 +199,9 @@ def is_rapidfuzz_available() -> bool:
     return RAPIDFUZZ_AVAILABLE
 
 
-def get_refactoring_suggestions(similar_functions: Dict[str, List[str]]) -> List[Dict[str, any]]:
+def get_refactoring_suggestions(
+    similar_functions: Dict[str, List[str]],
+) -> List[Dict[str, any]]:
     """
     Generate refactoring suggestions based on similar functions.
 
@@ -207,10 +217,10 @@ def get_refactoring_suggestions(similar_functions: Dict[str, List[str]]) -> List
     name_groups: Dict[str, List[str]] = {}
     for func_full, matches in similar_functions.items():
         # Extract function name
-        if '::' in func_full:
-            _, func_part = func_full.rsplit('::', 1)
-            if '.' in func_part:
-                func_name = func_part.split('.')[-1]
+        if "::" in func_full:
+            _, func_part = func_full.rsplit("::", 1)
+            if "." in func_part:
+                func_name = func_part.split(".")[-1]
             else:
                 func_name = func_part
         else:
@@ -221,7 +231,7 @@ def get_refactoring_suggestions(similar_functions: Dict[str, List[str]]) -> List
         name_groups[func_name].append(func_full)
         for match in matches:
             # Remove score suffix
-            match_clean = match.split(' (')[0] if ' (' in match else match
+            match_clean = match.split(" (")[0] if " (" in match else match
             if match_clean not in name_groups[func_name]:
                 name_groups[func_name].append(match_clean)
 
@@ -233,32 +243,38 @@ def get_refactoring_suggestions(similar_functions: Dict[str, List[str]]) -> List
         classes = set()
         modules = set()
         for loc in locations:
-            if '::' in loc:
-                mod, rest = loc.rsplit('::', 1)
+            if "::" in loc:
+                mod, rest = loc.rsplit("::", 1)
                 modules.add(mod)
-                if '.' in rest:
-                    cls_name = rest.split('.')[0]
+                if "." in rest:
+                    cls_name = rest.split(".")[0]
                     classes.add(cls_name)
 
         suggestion = {
-            'function': func_name,
-            'locations': locations,
-            'count': len(locations),
+            "function": func_name,
+            "locations": locations,
+            "count": len(locations),
         }
 
         if len(classes) > 1:
-            suggestion['type'] = 'extract_to_base_class'
-            suggestion['recommendation'] = f"Extract '{func_name}' to a shared base class or mixin"
+            suggestion["type"] = "extract_to_base_class"
+            suggestion["recommendation"] = (
+                f"Extract '{func_name}' to a shared base class or mixin"
+            )
         elif len(modules) > 1:
-            suggestion['type'] = 'extract_to_utility'
-            suggestion['recommendation'] = f"Extract '{func_name}' to a shared utility module"
+            suggestion["type"] = "extract_to_utility"
+            suggestion["recommendation"] = (
+                f"Extract '{func_name}' to a shared utility module"
+            )
         else:
-            suggestion['type'] = 'consolidate'
-            suggestion['recommendation'] = f"Consider consolidating duplicate '{func_name}' implementations"
+            suggestion["type"] = "consolidate"
+            suggestion["recommendation"] = (
+                f"Consider consolidating duplicate '{func_name}' implementations"
+            )
 
         suggestions.append(suggestion)
 
     # Sort by count (most duplicates first)
-    suggestions.sort(key=lambda x: -x['count'])
+    suggestions.sort(key=lambda x: -x["count"])
 
     return suggestions

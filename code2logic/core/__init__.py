@@ -2,6 +2,7 @@
 
 Re-exports from parent package for backward compatibility.
 """
+
 from ..analyzer import ProjectAnalyzer, analyze_project
 from ..dependency import DependencyAnalyzer
 from ..errors import (
@@ -12,12 +13,29 @@ from ..errors import (
     ErrorType,
     create_error_handler,
 )
-from ..models import ClassInfo, DependencyNode, FunctionInfo, ModuleInfo, ProjectInfo, TypeInfo
+from ..models import (
+    ClassInfo,
+    DependencyNode,
+    FunctionInfo,
+    ModuleInfo,
+    ProjectInfo,
+    TypeInfo,
+)
 
 __all__ = [
-    'FunctionInfo', 'ClassInfo', 'TypeInfo', 'ModuleInfo',
-    'DependencyNode', 'ProjectInfo',
-    'ProjectAnalyzer', 'analyze_project', 'DependencyAnalyzer',
-    'ErrorSeverity', 'ErrorType', 'AnalysisError', 'AnalysisResult',
-    'ErrorHandler', 'create_error_handler',
+    "FunctionInfo",
+    "ClassInfo",
+    "TypeInfo",
+    "ModuleInfo",
+    "DependencyNode",
+    "ProjectInfo",
+    "ProjectAnalyzer",
+    "analyze_project",
+    "DependencyAnalyzer",
+    "ErrorSeverity",
+    "ErrorType",
+    "AnalysisError",
+    "AnalysisResult",
+    "ErrorHandler",
+    "create_error_handler",
 ]

@@ -1,0 +1,1520 @@
+# code2llm | 125f 43962L | py:125 | 2026-03-01
+# CC̄=5.5 | critical:209/1338 | dups:1 | cycles:4
+
+HEALTH[20]:
+  🔴 DUP   1 classes duplicated
+  🔴 GOD   code2logic/llm_profiler.py = 648L, 4 classes, 23m, max CC=11
+  🔴 GOD   code2logic/intent.py = 561L, 4 classes, 18m, max CC=12
+  🔴 GOD   flow.py = 1144L, 9 classes, 51m, max CC=10
+  🔴 GOD   code2logic/reproducer.py = 710L, 5 classes, 25m, max CC=11
+  🔴 GOD   code2logic/metrics.py = 639L, 6 classes, 15m, max CC=12
+  🔴 GOD   code2logic/generators.py = 2178L, 5 classes, 59m, max CC=83
+  🔴 GOD   code2logic/universal.py = 1233L, 8 classes, 31m, max CC=49
+  🔴 GOD   code2logic/gherkin.py = 978L, 6 classes, 29m, max CC=19
+  🔴 GOD   lolm/rotation.py = 717L, 6 classes, 37m, max CC=16
+  🟡 CC    analyze_file CC=19 (limit:15)
+  🟡 CC    identify_optimizations CC=25 (limit:15)
+  🟡 CC    identify_unused_data_structures CC=15 (limit:15)
+  🟡 CC    _extract_data_types CC=15 (limit:15)
+  🟡 CC    identify_unused_data_structures CC=15 (limit:15)
+  🟡 CC    _extract_data_types CC=15 (limit:15)
+  🟡 CC    main CC=16 (limit:15)
+  🟡 CC    identify_unused_data_structures CC=15 (limit:15)
+  🟡 CC    _extract_data_types CC=15 (limit:15)
+  🟡 CC    identify_unused_data_structures CC=15 (limit:15)
+
+REFACTOR[12]:
+  1. rm duplicates  (-1 dup classes)
+  2. split code2logic/llm_profiler.py  (god module)
+  3. split code2logic/intent.py  (god module)
+  4. split flow.py  (god module)
+  5. split code2logic/reproducer.py  (god module)
+  6. split code2logic/metrics.py  (god module)
+  7. split code2logic/generators.py  (god module)
+  8. split code2logic/universal.py  (god module)
+  9. split code2logic/gherkin.py  (god module)
+  10. split lolm/rotation.py  (god module)
+  11. split 10 high-CC methods  (CC>15)
+  12. break 4 circular dependencies
+
+COUPLING:
+                                                        pipeline_runner_utils_improved                                   examples                                 code2logic                                       lolm                                 logic2code                                    scripts                                 benchmarks                      refactoring_validator                    advanced_yaml_optimizer                  project_summary_generator  fixed_refactoring_implementation_executor                              hybrid_export                                       flow                   llm_refactoring_executor                    ultimate_yaml_optimizer
+             pipeline_runner_utils_improved                                         ──                                       ←291                                       ←124                                        ←83                                        ←74                                        ←35                                        ←51                                        ←45                                        ←44                                        ←35                                        ←33                                        ←31                                        ←24                                        ←24                                        ←24  hub
+                                   examples                                        291                                         ──                                         11                                          4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           !! fan-out
+                                 code2logic                                        124                                        ←11                                         ──                                         13                                                                                   ←16                                                                                                                                                                                                                                                                                                                                                                                                     hub
+                                       lolm                                         83                                         ←4                                          1                                         ──                                         ←1                                         15                                                                                                                                                                                                                                                                                                                                                                                                     hub
+                                 logic2code                                         74                                                                                                                                1                                         ──                                                                                                                                                                                                                                                                                                                                                                                                                                                !! fan-out
+                                    scripts                                         35                                                                                    16                                        ←15                                                                                    ──                                                                                                                                                                                                                                                                                                                                                                                                     hub
+                                 benchmarks                                         51                                                                                                                                                                                                                                                                ──                                                                                                                                                                                                                                                                                                                                                          !! fan-out
+                      refactoring_validator                                         45                                                                                                                                                                                                                                                                                                           ──                                                                                                                                                                                                                                                                                                               !! fan-out
+                    advanced_yaml_optimizer                                         44                                                                                                                                                                                                                                                                                                                                                      ──                                                                                                                                                                                                                                                                    !! fan-out
+                  project_summary_generator                                         35                                                                                                                                                                                                                                                                                                                                                                                                 ──                                                                                                                                                                                                                         !! fan-out
+  fixed_refactoring_implementation_executor                                         33                                                                                                                                                                                                                                                                                                                                                                                                                                            ──                                                                                                                                                                              !! fan-out
+                              hybrid_export                                         31                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       ──                                                                                                                                   !! fan-out
+                                       flow                                         24                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ──                                                                                        !! fan-out
+                   llm_refactoring_executor                                         24                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ──                                             !! fan-out
+                    ultimate_yaml_optimizer                                         24                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ──  !! fan-out
+  CYCLES: 4
+  HUB: scripts/ (fan-in=15)
+  HUB: generated_code/ (fan-in=14)
+  HUB: pipeline_runner_utils_improved/ (fan-in=1080)
+  HUB: lolm/ (fan-in=18)
+  HUB: code2logic/ (fan-in=28)
+  SMELL: examples/ fan-out=308 → split needed
+  SMELL: scripts/ fan-out=51 → split needed
+  SMELL: benchmarks/ fan-out=52 → split needed
+  SMELL: advanced_data_analyzer/ fan-out=17 → split needed
+  SMELL: optimize_llm_prompt/ fan-out=12 → split needed
+  SMELL: generate_graph_viewer/ fan-out=11 → split needed
+  SMELL: project_summary_generator/ fan-out=35 → split needed
+  SMELL: final_advanced_data_analyzer/ fan-out=18 → split needed
+  SMELL: refactoring_validator/ fan-out=46 → split needed
+  SMELL: fixed_advanced_data_analyzer/ fan-out=17 → split needed
+  SMELL: fixed_refactoring_implementation_executor/ fan-out=33 → split needed
+  SMELL: flow/ fan-out=25 → split needed
+  SMELL: mermaid_to_png/ fan-out=18 → split needed
+  SMELL: ultimate_yaml_optimizer/ fan-out=24 → split needed
+  SMELL: hybrid_export/ fan-out=32 → split needed
+  SMELL: logic2code/ fan-out=75 → split needed
+  SMELL: performance_optimizations/ fan-out=19 → split needed
+  SMELL: fast_analysis/ fan-out=14 → split needed
+  SMELL: lolm/ fan-out=99 → split needed
+  SMELL: llm_refactoring_executor/ fan-out=24 → split needed
+  SMELL: optimize_llm_prompt_fixed/ fan-out=9 → split needed
+  SMELL: ultimate_advanced_data_analyzer/ fan-out=18 → split needed
+  SMELL: code2logic/ fan-out=147 → split needed
+  SMELL: advanced_yaml_optimizer/ fan-out=44 → split needed
+
+LAYERS:
+  scripts/                        CC̄=6.9    ←in:15  →out:51  !! split
+  │ !! configure_llm              466L  0C   11m  CC=34     ←4
+  │
+  code2logic/                     CC̄=6.7    ←in:28  →out:147  !! split  ×DUP
+  │ !! parsers                   2678L  3C   78m  CC=52     ←0
+  │ !! generators                2178L  5C   59m  CC=83     ←0
+  │ !! universal                 1233L  8C   31m  CC=49     ←0
+  │ !! cli                       1099L  2C   27m  CC=94     ←1
+  │ !! runner                    1095L  1C   18m  CC=43     ←0
+  │ !! gherkin                    978L  6C   29m  CC=19     ←0
+  │ !! toon_format                858L  2C   21m  CC=25     ←0
+  │ !! reproducer                 710L  5C   25m  CC=11     ←1
+  │ !! terminal                   664L  2C   52m  CC=15     ←1
+  │ !! llm_profiler               648L  4C   23m  CC=11     ←3
+  │ !! metrics                    639L  6C   15m  CC=12     ←0
+  │ !! adaptive                   613L  3C   15m  CC=21     ←0
+  │ !! intent                     561L  4C   18m  CC=12     ←0
+  │ !! analyzer                   493L  1C   10m  CC=49     ←0  ×DUP
+  │ !  chunked_reproduction       479L  4C   12m  CC=13     ←0
+  │ benchmark                  447L  3C    9m  CC=8      ←1
+  │ !! reproduction               440L  1C    8m  CC=63     ←5
+  │ __init__                   439L  0C    2m  CC=2      ←0
+  │ !  errors                     436L  5C   13m  CC=14     ←0
+  │ !  shared_utils               413L  0C   12m  CC=12     ←4
+  │ !! function_logic             400L  1C   13m  CC=44     ←0
+  │ !! logicml                    399L  2C    9m  CC=26     ←0
+  │ !! project_reproducer         396L  3C    8m  CC=17     ←2
+  │ !  common                     388L  0C    8m  CC=12     ←1
+  │ !  refactor                   383L  3C    7m  CC=10     ←3
+  │ !  llm                        373L  2C    8m  CC=11     ←1
+  │ !! markdown_format            364L  2C   10m  CC=23     ←0
+  │ !! mcp_server                 360L  0C    3m  CC=27     ←0
+  │ !! file_formats               351L  0C    4m  CC=45     ←2
+  │ models                     338L  11C    0m  CC=0.0    ←0
+  │ !  llm_clients                273L  0C   12m  CC=10     ←1
+  │ !! code_review                271L  1C    6m  CC=15     ←1
+  │ !  quality                    265L  3C   10m  CC=12     ←2
+  │ !! similarity                 264L  1C    6m  CC=19     ←0
+  │ json_schema                257L  5C    4m  CC=8      ←0
+  │ config                     248L  1C   16m  CC=9      ←1
+  │ !  dependency                 246L  1C   11m  CC=10     ←0
+  │ !! results                    245L  5C   10m  CC=16     ←0
+  │ !! logicml_schema             242L  4C    3m  CC=29     ←0
+  │ !! yaml_schema                218L  5C    3m  CC=17     ←0
+  │ !! markdown_schema            171L  4C    2m  CC=16     ←0
+  │ prompts                    156L  0C    3m  CC=2      ←0
+  │ base                        68L  3C   11m  CC=2      ←1
+  │ __init__                    52L  0C    0m  CC=0.0    ←0
+  │ __init__                    39L  0C    0m  CC=0.0    ←0
+  │ __init__                    35L  0C    0m  CC=0.0    ←0
+  │ __init__                    30L  0C    0m  CC=0.0    ←0
+  │ __init__                    29L  0C    0m  CC=0.0    ←0
+  │ utils                       24L  0C    3m  CC=5      ←3
+  │ __init__                    23L  0C    0m  CC=0.0    ←0
+  │ __main__                    15L  0C    0m  CC=0.0    ←0
+  │ __init__                     7L  0C    0m  CC=0.0    ←0
+  │ base_generator               6L  1C    1m  CC=1      ←0
+  │
+  logic2code/                     CC̄=6.2    ←in:0  →out:75  !! split
+  │ !! renderers                  416L  3C   15m  CC=25     ←0
+  │ !  generator                  302L  3C   10m  CC=11     ←0
+  │ !! cli                        203L  0C    1m  CC=17     ←0
+  │ 02_llm_enhanced            113L  0C    3m  CC=4      ←0
+  │ 01_quickstart              109L  0C    4m  CC=3      ←0
+  │ __init__                    18L  0C    0m  CC=0.0    ←0
+  │ __main__                    11L  0C    0m  CC=0.0    ←0
+  │
+  ./                              CC̄=4.6    ←in:0  →out:0
+  │ !! final_advanced_data_analyzer  1485L  1C   61m  CC=15     ←0
+  │ !! advanced_data_analyzer    1485L  1C   61m  CC=15     ←0
+  │ !! ultimate_advanced_data_analyzer  1485L  1C   61m  CC=15     ←0
+  │ !! fixed_advanced_data_analyzer  1482L  1C   61m  CC=15     ←0
+  │ !! flow                      1144L  9C   51m  CC=10     ←0
+  │ !! generate_graph_viewer     1037L  1C   12m  CC=8      ←0
+  │ !! generate_index_html        738L  0C    1m  CC=1      ←0
+  │ fixed_refactoring_implementation_executor   486L  1C   13m  CC=6      ←0
+  │ !  refactoring_validator      486L  1C   17m  CC=12     ←0
+  │ !  llm_refactoring_executor   461L  1C   18m  CC=13     ←0
+  │ !! advanced_yaml_optimizer    316L  0C    7m  CC=25     ←0
+  │ project_summary_generator   304L  1C   13m  CC=4      ←0
+  │ !! mermaid_to_png             289L  5C    8m  CC=16     ←0
+  │ hybrid_export              287L  0C    7m  CC=9      ←0
+  │ ultimate_yaml_optimizer    260L  0C    7m  CC=6      ←0
+  │ !! fast_analysis              238L  1C    6m  CC=19     ←1
+  │ !  performance_optimizations   237L  0C    3m  CC=12     ←0
+  │ optimize_llm_prompt_fixed   208L  0C    6m  CC=7      ←1
+  │ !  optimize_llm_prompt        179L  0C    5m  CC=10     ←0
+  │ complexity_reduction_examples    89L  3C    9m  CC=2      ←0
+  │ general_refactoring_template    69L  1C    7m  CC=2      ←1
+  │ setup                       66L  0C    1m  CC=2      ←0
+  │ split_yaml                  64L  0C    1m  CC=7      ←0
+  │ pipeline_runner_utils_improved    44L  1C    7m  CC=2      ←56
+  │
+  examples/                       CC̄=4.2    ←in:0  →out:308  !! split
+  │ !! behavioral_benchmark       270L  2C    8m  CC=19     ←0
+  │ 16_terminal_demo           243L  0C   10m  CC=2      ←0
+  │ !! benchmark_report           209L  1C    8m  CC=18     ←0
+  │ 15_unified_benchmark       181L  0C    4m  CC=9      ←1
+  │ !! 12_comprehensive_analysis   128L  0C    2m  CC=18     ←0
+  │ !! benchmark_summary          120L  0C    4m  CC=19     ←1
+  │ 08_format_benchmark        119L  0C    3m  CC=8      ←0
+  │ 06_metrics                 117L  0C    3m  CC=6      ←0
+  │ !  05_llm_integration         109L  0C    1m  CC=12     ←0
+  │ 13_project_benchmark        94L  0C    2m  CC=6      ←0
+  │ 11_token_benchmark          92L  0C    2m  CC=7      ←0
+  │ 09_async_benchmark          79L  0C    2m  CC=3      ←1
+  │ 03_reproduction             75L  0C    1m  CC=3      ←0
+  │ 04_project                  74L  0C    1m  CC=5      ←0
+  │ 01_quick_start              71L  0C    1m  CC=3      ←0
+  │ 10_function_reproduction    71L  0C    2m  CC=5      ←0
+  │ 02_refactoring              68L  0C    1m  CC=6      ←0
+  │ calculator                  29L  1C    3m  CC=3      ←0
+  │ client                      23L  2C    2m  CC=1      ←0
+  │ user                        13L  1C    0m  CC=0.0    ←0
+  │ __init__                     1L  0C    0m  CC=0.0    ←0
+  │ 12_comprehensive_analysis_simple     0L  0C    0m  CC=0.0    ←0
+  │ token_efficiency             0L  0C    0m  CC=0.0    ←0
+  │ windsurf_mcp_integration     0L  0C    0m  CC=0.0    ←0
+  │ 06_metrics_simple            0L  0C    0m  CC=0.0    ←0
+  │ duplicate_detection          0L  0C    0m  CC=0.0    ←0
+  │
+  benchmarks/                     CC̄=3.7    ←in:0  →out:52  !! split
+  │ benchmark_performance      257L  0C    6m  CC=6      ←0
+  │
+  lolm/                           CC̄=3.3    ←in:18  →out:99  !! split
+  │ !! rotation                   717L  6C   37m  CC=16     ←0
+  │ !! manager                    515L  2C   22m  CC=13     ←16
+  │ clients                    341L  6C   20m  CC=9      ←0
+  │ !! config                     334L  1C   14m  CC=20     ←5
+  │ cli                        316L  0C   11m  CC=7      ←0
+  │ provider                   151L  6C   12m  CC=4      ←0
+  │ 03_code_generation         123L  0C    4m  CC=1      ←0
+  │ 02_configuration           119L  0C    5m  CC=5      ←0
+  │ __init__                   118L  0C    0m  CC=0.0    ←0
+  │ 01_quickstart               91L  0C    4m  CC=3      ←0
+  │ __main__                    13L  0C    0m  CC=0.0    ←0
+  │
+  generated_code/                 CC̄=1.0    ←in:14  →out:0  ×DUP
+  │ analyzer                    56L  1C    8m  CC=1      ←8  ×DUP
+  │ __init__                    11L  0C    0m  CC=0.0    ←0
+  │
+  ── zero ──
+     examples/06_metrics_simple.py             0L
+     examples/12_comprehensive_analysis_simple.py  0L
+     examples/duplicate_detection.py           0L
+     examples/token_efficiency.py              0L
+     examples/windsurf_mcp_integration.py      0L
+
+DUPLICATES[1]:
+  ProjectAnalyzer  generated_code/analyzer.py ↔ code2logic/analyzer.py
+    A: 6m  __init__ _detect_entrypoints _print_status _scan_files analyze get_statistics
+    B: 8m  __init__ _detect_entrypoints _get_git_nonignored_files _language_from_shebang _print_status _scan_files analyze get_statistics
+    DIFF: B has +_get_git_nonignored_files,_language_from_shebang → keep B
+
+FUNCTIONS (CC≥10, 209 of 1338):
+   94.0  main                                       94n   3exit  loops+cond+ret  !! split
+   83.0  YAMLGenerator.generate_hybrid              46n   2exit  loops+cond+ret  !! split
+   63.0  generate_file_gherkin                      61n   2exit  loops+cond+ret  !! split
+   52.0  UniversalParser._extract_ast_class         26n   2exit  loops+cond+ret  !! split
+   49.0  UniversalParser._parse_js_ts               44n   2exit  loops+cond+ret  !! split
+   49.0  UniversalParser._parse_js_ts               42n   2exit  loops+cond+ret  !! split
+   49.0  ProjectAnalyzer._scan_files                25n   1exit  loops+cond  ×DUP  !! split
+   48.0  UniversalParser._parse_python              42n   2exit  loops+cond+ret  !! split
+   45.0  _parse_file_elements                       42n   2exit  loops+cond+ret  !! split
+   44.0  FunctionLogicGenerator.generate_toon       37n   2exit  loops+cond+ret  !! split
+   43.0  BenchmarkRunner._template_generate_code    36n   2exit  loops+cond+ret  !! split
+   39.0  BenchmarkRunner.run_project_benchmark      24n   2exit  loops+cond+ret  !! split
+   38.0  UniversalParser._parse_python              11n   2exit  loops+cond+ret  !! split
+   38.0  YAMLGenerator._compact_class               43n   2exit  loops+cond+ret  !! split
+   36.0  TreeSitterParser._parse_js_ts              13n   2exit  loops+cond+ret  !! split
+   34.0  _code2logic_llm_cli                        60n  13exit  loops+cond+ret  !! split
+   34.0  TreeSitterParser._parse_python             20n   2exit  loops+cond+ret  !! split
+   34.0  main                                       49n   1exit  loops+cond  !! split
+   32.0  TreeSitterParser._extract_py_class         31n   3exit  loops+cond+ret  !! split
+   31.0  TreeSitterParser._extract_py_function      30n   3exit  loops+cond+ret  !! split
+   30.0  CompactGenerator.generate                  26n   2exit  loops+cond+ret  !! split
+   29.0  TreeSitterParser._extract_py_constant      16n   3exit  cond+ret  !! split
+   29.0  TreeSitterParser._extract_from_expression_stmt   31n   3exit  loops+cond+ret  !! split
+   29.0  validate_logicml                           36n   3exit  loops+cond+ret  !! split
+   28.0  UniversalParser._extract_ast_enum           2n   1exit    !! split
+   27.0  call_tool                                  33n   8exit  loops+cond+ret  !! split
+   26.0  LogicMLGenerator._generate_module          27n   4exit  loops+cond+ret  !! split
+   26.0  MarkdownGenerator.generate                 25n   2exit  loops+cond+ret  !! split
+   25.0  identify_optimizations                     24n   2exit  loops+cond+ret  !! split
+   25.0  TOONGenerator._generate_modules            23n   2exit  loops+cond+ret  !! split
+   25.0  PythonRenderer.render_class                28n   2exit  loops+cond+ret  !! split
+   25.0  BenchmarkRunner._test_function              3n   2exit  ret  !! split
+   24.0  TreeSitterParser._extract_py_enum           2n   1exit    !! split
+   24.0  PythonRenderer._collect_imports            25n   2exit  loops+cond+ret  !! split
+   23.0  TreeSitterParser._extract_aliases          10n   2exit  loops+cond+ret  !! split
+   23.0  MarkdownHybridGenerator._generate_classes_yaml    9n   2exit  loops+cond+ret  !! split
+   23.0  BenchmarkRunner.run_format_benchmark       20n   2exit  loops+cond+ret  !! split
+   22.0  generate_file_yaml                         26n   2exit  loops+cond+ret  !! split
+   22.0  LogicMLGenerator._generate_method          26n   2exit  loops+cond+ret  !! split
+   22.0  TreeSitterParser._extract_class_attribute   19n   3exit  loops+cond+ret  !! split
+   22.0  _basic_syntax_ok                           29n   9exit  loops+cond+ret  !! split
+   21.0  AdaptiveReproducer.chunk_content           26n   2exit  loops+cond+ret  !! split
+   21.0  UniversalParser._extract_ast_function      21n   2exit  loops+cond+ret  !! split
+   20.0  LogicMLGenerator._generate_class           28n   2exit  loops+cond+ret  !! split
+   20.0  UniversalParser._parse_rust                24n   2exit  loops+cond+ret  !! split
+   20.0  MarkdownGenerator._gen_module              21n   1exit  loops+cond  !! split
+   20.0  TOONGenerator.generate_hybrid              20n   4exit  loops+cond+ret  !! split
+   20.0  load_env_file                               7n   1exit  loops+cond  !! split
+   19.0  FastAnalyzer.analyze_file                   2n   1exit    !! split
+   19.0  UniversalParser._extract_ast_constant      18n   4exit  loops+cond+ret  !! split
+
+  summary:
+    critical(≥10): 209 | high(5-10): 308 | medium(2-5): 469 | low(<2): 352
+    16% CC≥10  39% CC≥5
+
+HOTSPOTS:
+  #1  main                                 fan=72   "calls 72 functions"
+  #2  _code2logic_llm_cli                  fan=57   "calls 57 functions"
+  #3  UniversalParser._parse_rust          fan=37   "UniversalParser method, fan-out=37"
+  #4  UniversalParser._parse_python        fan=35   "UniversalParser method, fan-out=35"
+  #5  generate_file_gherkin                fan=34   "calls 34 functions"
+  #6  YAMLGenerator.generate_hybrid        fan=32   "YAMLGenerator method, fan-out=32"
+  #7  main                                 fan=32   "calls 32 functions"
+  #8  call_tool                            fan=31   "calls 31 functions"
+  #9  FixedHybridDataAnalyzer.analyze_inter_module_dependencies  fan=30   "analysis pipeline, 30 stages"
+  #10 FinalAdvancedDataAnalyzer.analyze_inter_module_dependencies  fan=30   "analysis pipeline, 30 stages"
+
+CLASSES:
+  FixedHybridDataAnalyzer        ████████████████████████  60m  CC̄=5.2   max=15    !!
+  FinalAdvancedDataAnalyzer      ████████████████████████  60m  CC̄=5.2   max=15    !!
+  HybridDataAnalyzer             ████████████████████████  60m  CC̄=5.2   max=15    !!
+  UltimateAdvancedDataAnalyzer   ████████████████████████  60m  CC̄=5.2   max=15    !!
+  TreeSitterParser               ███████████████           39m  CC̄=11.3  max=36    !!
+  YAMLGenerator                  █████████████             34m  CC̄=9.1   max=83    !!
+  ShellRenderer                  █████████████             33m  CC̄=3.4   max=15    !!
+  GherkinGenerator               ████████                  20m  CC̄=5.2   max=16    !!
+  LLMManager                     ███████                   19m  CC̄=4.1   max=13  
+  _PyFunctionBodyAnalyzer        ███████                   18m  CC̄=2.2   max=6   
+  RotationQueue                  ███████                   18m  CC̄=3.1   max=10  
+  LLMRefactoringExecutor         ██████                    17m  CC̄=4.6   max=13  
+  EnhancedFlowExtractor          ██████                    17m  CC̄=5.1   max=10  
+  RenderAPI                      ██████                    17m  CC̄=1.0   max=1   
+  RefactoringValidator           ██████                    16m  CC̄=4.9   max=12  
+  SpecReproducer                 ██████                    16m  CC̄=4.6   max=11  
+  TOONGenerator                  ██████                    16m  CC̄=9.4   max=25    !!
+  UniversalParser                ██████                    15m  CC̄=20.1  max=52    !!
+  AdaptiveReproducer             █████                     14m  CC̄=4.9   max=21    !!
+  Config                         █████                     13m  CC̄=2.5   max=9   
+  IntentAnalyzer                 █████                     13m  CC̄=5.0   max=10  
+  FunctionLogicGenerator         █████                     13m  CC̄=9.4   max=44    !!
+  RefactoringImplementationExecutor ████                      12m  CC̄=2.4   max=6   
+  ProjectSummaryGenerator        ████                      12m  CC̄=1.5   max=4   
+  Logger                         ████                      12m  CC̄=1.5   max=2   
+  GraphGenerator                 ████                      11m  CC̄=3.6   max=8   
+  ReproductionMetrics            ████                      11m  CC̄=5.8   max=12  
+  PythonRenderer                 ████                      11m  CC̄=10.6  max=25    !!
+  BenchmarkRunner                ████                      11m  CC̄=16.7  max=43    !!
+  JSONGenerator                  ████                      10m  CC̄=3.6   max=9   
+  DependencyAnalyzer             ████                      10m  CC̄=5.0   max=10  
+  UniversalParser                ████                      10m  CC̄=15.4  max=49    !!
+  CodeGenerator                  ████                      10m  CC̄=9.2   max=19    !!
+  CodeGenerator                  ████                      10m  CC̄=5.0   max=11  
+  LLMProfiler                    ███                        9m  CC̄=4.3   max=9   
+  ProjectFlowAnalyzer            ███                        9m  CC̄=4.6   max=10  
+  ErrorHandler                   ███                        8m  CC̄=4.9   max=14  
+  BehavioralPatternExtractor     ███                        8m  CC̄=2.2   max=5   
+  LogicMLGenerator               ███                        8m  CC̄=11.1  max=26    !!
+  CSVGenerator                   ███                        8m  CC̄=3.5   max=9   
+  ReproductionBenchmark          ███                        8m  CC̄=4.8   max=8   
+  MarkdownHybridGenerator        ███                        8m  CC̄=9.0   max=23    !!
+  ProjectAnalyzer                ███                        8m  CC̄=12.0  max=49    !!  ×1
+  LLMProvider                    ███                        8m  CC̄=1.6   max=4   
+  LLMRotationManager             ███                        8m  CC̄=2.5   max=12  
+  ConsolidatedMarkdownWrapper    ██                         7m  CC̄=1.1   max=2   
+  CodeAnalyzer                   ██                         7m  CC̄=5.7   max=11  
+  QualityAnalyzer                ██                         7m  CC̄=4.0   max=6   
+  ProjectReproducer              ██                         7m  CC̄=6.4   max=17    !!
+  ProviderHealth                 ██                         7m  CC̄=3.6   max=5   
+  RefactoredComponent            ██                         6m  CC̄=1.0   max=1   
+  ProjectAnalyzer                ██                         6m  CC̄=1.0   max=1     ×1
+  VerboseMixin                   ██                         6m  CC̄=1.3   max=2   
+  MarkdownGenerator              ██                         6m  CC̄=13.2  max=26    !!
+  UniversalReproducer            ██                         6m  CC̄=1.8   max=5   
+  BenchmarkResult                ██                         6m  CC̄=5.5   max=16    !!
+  FastAnalyzer                   ██                         5m  CC̄=8.4   max=19    !!
+  AdaptiveChunker                ██                         5m  CC̄=2.8   max=5   
+  EnhancedIntentGenerator        ██                         5m  CC̄=6.4   max=12  
+  DynamicTracer                  ██                         5m  CC̄=2.6   max=7   
+  ReverseEngineeringGenerator    ██                         5m  CC̄=5.2   max=10  
+  CodeReproducer                 ██                         5m  CC̄=2.0   max=4   
+  OllamaClient                   ██                         5m  CC̄=3.2   max=5   
+  ConsolidatedProcessor          █                          4m  CC̄=1.2   max=2   
+  FlowVisualizer                 █                          4m  CC̄=5.2   max=10  
+  SpecValidator                  █                          4m  CC̄=4.8   max=10  
+  SimilarityDetector             █                          4m  CC̄=8.2   max=19    !!
+  CodeLogic                      █                          4m  CC̄=6.8   max=17    !!
+  StepDefinitionGenerator        █                          4m  CC̄=5.0   max=7   
+  OpenRouterClient               █                          4m  CC̄=3.5   max=9   
+  BaseRenderer                   █                          4m  CC̄=1.2   max=2   
+  MermaidGenerator               █                          3m  CC̄=3.0   max=4   
+  BaseParser                     █                          3m  CC̄=1.0   max=1   
+  ConsolidatedDataNode           █                          3m  CC̄=2.0   max=2   
+  CodeReviewer                   █                          3m  CC̄=5.7   max=9   
+  AnalysisResult                 █                          3m  CC̄=2.0   max=3   
+  ChunkedReproducer              █                          3m  CC̄=3.7   max=6   
+  TOONParser                     █                          3m  CC̄=9.0   max=16    !!
+  CucumberYAMLGenerator          █                          3m  CC̄=11.7  max=19    !!
+  BaseLLMClient                  █                          3m  CC̄=1.7   max=3   
+  LiteLLMClient                  █                          3m  CC̄=2.3   max=4   
+  GroqClient                     █                          3m  CC̄=4.0   max=8   
+  TogetherClient                 █                          3m  CC̄=4.0   max=8   
+  BaseGenerator                                             2m  CC̄=1.0   max=1   
+  ReproductionResult                                        2m  CC̄=4.5   max=8   
+  RefactoringReport                                         2m  CC̄=5.0   max=9   
+  LLMConfig                                                 2m  CC̄=1.0   max=1   
+  LLMRateLimitError                                         2m  CC̄=2.0   max=2   
+  Calculator                                                2m  CC̄=1.5   max=2   
+  APIClient                                                 2m  CC̄=1.0   max=1   
+  MermaidRenderer                                           1m  CC̄=1.0   max=1   
+  MermaidCLIRenderer                                        1m  CC̄=5.0   max=5   
+  MermaidInkRenderer                                        1m  CC̄=3.0   max=3   
+  PuppeteerRenderer                                         1m  CC̄=3.0   max=3   
+  LLMProfile                                                1m  CC̄=3.0   max=3   
+  DataProcessor                                             1m  CC̄=1.0   max=1   
+  AnalysisError                                             1m  CC̄=1.0   max=1   
+  QualityReport                                             1m  CC̄=2.0   max=2   
+  FlowNode                                                  1m  CC̄=3.0   max=3   
+  ExecutionTrace                                            1m  CC̄=4.0   max=4   
+  FileValidation                                            1m  CC̄=1.0   max=1   
+  ReproductionResult                                        1m  CC̄=3.0   max=3   
+  CompactGenerator                                          1m  CC̄=30.0  max=30    !!
+  ProjectGenerator                                          1m  CC̄=1.0   max=1   
+  GenerateOptions                                           1m  CC̄=3.0   max=3   
+  ProviderInfo                                              1m  CC̄=1.0   max=1   
+  RateLimitInfo                                             1m  CC̄=3.0   max=3   
+  FormatResult                                              1m  CC̄=1.0   max=1   
+  FileResult                                                1m  CC̄=2.0   max=2   
+  FunctionResult                                            1m  CC̄=1.0   max=1   
+  BenchmarkConfig                                           1m  CC̄=1.0   max=1   
+  ProfileTestResult                                         0m  CC̄=0.0   max=0.0 
+  LLMConfig                                                 0m  CC̄=0.0   max=0.0 
+  Colors                                                    0m  CC̄=0.0   max=0.0 
+  ErrorSeverity                                             0m  CC̄=0.0   max=0.0 
+  ErrorType                                                 0m  CC̄=0.0   max=0.0 
+  QualityIssue                                              0m  CC̄=0.0   max=0.0 
+  FileResult                                                0m  CC̄=0.0   max=0.0 
+  ProjectResult                                             0m  CC̄=0.0   max=0.0 
+  IntentType                                                0m  CC̄=0.0   max=0.0 
+  Intent                                                    0m  CC̄=0.0   max=0.0 
+  BehavioralPattern                                         0m  CC̄=0.0   max=0.0 
+  ChunkInfo                                                 0m  CC̄=0.0   max=0.0 
+  AdaptiveResult                                            0m  CC̄=0.0   max=0.0 
+  ReproductionStatus                                        0m  CC̄=0.0   max=0.0 
+  Chunk                                                     0m  CC̄=0.0   max=0.0 
+  ChunkedSpec                                               0m  CC̄=0.0   max=0.0 
+  ChunkedResult                                             0m  CC̄=0.0   max=0.0 
+  TextMetrics                                               0m  CC̄=0.0   max=0.0 
+  StructuralMetrics                                         0m  CC̄=0.0   max=0.0 
+  SemanticMetrics                                           0m  CC̄=0.0   max=0.0 
+  FormatMetrics                                             0m  CC̄=0.0   max=0.0 
+  DuplicateGroup                                            0m  CC̄=0.0   max=0.0 
+  RefactoringSuggestion                                     0m  CC̄=0.0   max=0.0 
+  LogicMLSpec                                               0m  CC̄=0.0   max=0.0 
+  FunctionInfo                                              0m  CC̄=0.0   max=0.0 
+  ClassInfo                                                 0m  CC̄=0.0   max=0.0 
+  TypeInfo                                                  0m  CC̄=0.0   max=0.0 
+  ModuleInfo                                                0m  CC̄=0.0   max=0.0 
+  DependencyNode                                            0m  CC̄=0.0   max=0.0 
+  ProjectInfo                                               0m  CC̄=0.0   max=0.0 
+  ConstantInfo                                              0m  CC̄=0.0   max=0.0 
+  FieldInfo                                                 0m  CC̄=0.0   max=0.0 
+  AttributeInfo                                             0m  CC̄=0.0   max=0.0 
+  PropertyInfo                                              0m  CC̄=0.0   max=0.0 
+  OptionalImport                                            0m  CC̄=0.0   max=0.0 
+  FormatResult                                              0m  CC̄=0.0   max=0.0 
+  BenchmarkResult                                           0m  CC̄=0.0   max=0.0 
+  MarkdownSpec                                              0m  CC̄=0.0   max=0.0 
+  ElementType                                               0m  CC̄=0.0   max=0.0 
+  Language                                                  0m  CC̄=0.0   max=0.0 
+  Parameter                                                 0m  CC̄=0.0   max=0.0 
+  CodeElement                                               0m  CC̄=0.0   max=0.0 
+  GherkinScenario                                           0m  CC̄=0.0   max=0.0 
+  GherkinFeature                                            0m  CC̄=0.0   max=0.0 
+  StepDefinition                                            0m  CC̄=0.0   max=0.0 
+  CaseResult                                                0m  CC̄=0.0   max=0.0 
+  FunctionBehaviorResult                                    0m  CC̄=0.0   max=0.0 
+  Artifact                                                  0m  CC̄=0.0   max=0.0 
+  LLMProviderStatus                                         0m  CC̄=0.0   max=0.0 
+  LLMResponse                                               0m  CC̄=0.0   max=0.0 
+  LLMModelInfo                                              0m  CC̄=0.0   max=0.0 
+  GeneratorConfig                                           0m  CC̄=0.0   max=0.0 
+  GenerationResult                                          0m  CC̄=0.0   max=0.0 
+  RenderConfig                                              0m  CC̄=0.0   max=0.0 
+  ProviderState                                             0m  CC̄=0.0   max=0.0 
+  RateLimitType                                             0m  CC̄=0.0   max=0.0 
+  User                                                      0m  CC̄=0.0   max=0.0 
+  Response                                                  0m  CC̄=0.0   max=0.0 
+  MarkdownMethod                                            0m  CC̄=0.0   max=0.0 
+  MarkdownClass                                             0m  CC̄=0.0   max=0.0 
+  MarkdownModule                                            0m  CC̄=0.0   max=0.0 
+  MarkdownSchema                                            0m  CC̄=0.0   max=0.0 
+  LogicMLMethod                                             0m  CC̄=0.0   max=0.0 
+  LogicMLClass                                              0m  CC̄=0.0   max=0.0 
+  LogicMLModule                                             0m  CC̄=0.0   max=0.0 
+  LogicMLSchema                                             0m  CC̄=0.0   max=0.0 
+  MethodSchema                                              0m  CC̄=0.0   max=0.0 
+  ClassSchema                                               0m  CC̄=0.0   max=0.0 
+  FunctionSchema                                            0m  CC̄=0.0   max=0.0 
+  ModuleSchema                                              0m  CC̄=0.0   max=0.0 
+  YAMLSchema                                                0m  CC̄=0.0   max=0.0 
+  JSONMethodSchema                                          0m  CC̄=0.0   max=0.0 
+  JSONClassSchema                                           0m  CC̄=0.0   max=0.0 
+  JSONFunctionSchema                                        0m  CC̄=0.0   max=0.0 
+  JSONModuleSchema                                          0m  CC̄=0.0   max=0.0 
+  JSONSchema                                                0m  CC̄=0.0   max=0.0 
+
+D:
+  code2logic/cli.py:
+    e: Colors,Logger,ensure_dependencies,_get_env_file_path,_read_text_file,_write_text_file,_set_env_var,_unset_env_var,_get_litellm_config_path,_get_user_llm_config_path,_load_user_llm_config,_save_user_llm_config,_load_litellm_yaml,_save_litellm_yaml,_infer_provider_from_litellm_model,_code2logic_llm_cli,main
+    Colors
+    Logger  # Enhanced logger for CLI output....
+      __init__(2)  CC=1.0
+    ensure_dependencies()
+    _get_env_file_path()
+    _read_text_file(path)
+    _write_text_file(path,content)
+    _set_env_var(var_name,value)
+    _unset_env_var(var_name)
+    _get_litellm_config_path()
+    _get_user_llm_config_path()
+    _load_user_llm_config()
+    _save_user_llm_config(data)
+    _load_litellm_yaml()
+    _save_litellm_yaml(data)
+    _infer_provider_from_litellm_model(litellm_model)
+    _code2logic_llm_cli(argv)
+    main(argv)
+  code2logic/generators.py:
+    e: MarkdownGenerator,CompactGenerator,JSONGenerator,YAMLGenerator,CSVGenerator,bytes_to_kb
+    MarkdownGenerator  # Generates Markdown output for project analysis.
+
+Produces hu...
+      generate(2)  CC=26.0  !
+        → _gen_tree(2)  CC=8.0
+        → _print_tree(4)  CC=6.0
+        → _gen_module(4)  CC=20.0  !
+        → _gen_class(3)  CC=12.0
+        → _sig(1)  CC=7.0
+    CompactGenerator  # Generates ultra-compact output for token efficiency.
+
+Optimi...
+      generate(1)  CC=30.0  !
+    JSONGenerator  # Generates JSON output for machine processing.
+
+Suitable for:...
+      generate(3)  CC=2.0
+        → _generate_nested(2)  CC=3.0
+        → _build_signature(1)  CC=7.0
+        → _field_to_dict(1)  CC=4.0
+        → _generate_flat(2)  CC=7.0
+        → _build_element_row(7)  CC=9.0
+        → _categorize(1)  CC=1.0
+        → _extract_domain(1)  CC=1.0
+        → _compute_hash(2)  CC=1.0
+    YAMLGenerator  # Generates YAML output for human-readable representation.
+
+Su...
+      generate(4)  CC=4.0
+        → _build_flat_data(2)  CC=8.0
+        → _build_row(7)  CC=1.0
+        → _build_function_row(6)  CC=4.0
+        → _build_signature(1)  CC=9.0
+        → _categorize(1)  CC=1.0
+        → _extract_domain(1)  CC=1.0
+        → _compute_hash(2)  CC=1.0
+        → _build_method_row(7)  CC=4.0
+        → _generate_simple_yaml(3)  CC=11.0
+        → _build_compact_data(2)  CC=15.0  !
+        → _constants_for_module(2)  CC=6.0
+        → _constant_to_dict(1)  CC=5.0
+        → _compact_imports(1)  CC=2.0
+        → _compact_class(3)  CC=38.0  !
+        → _compact_method(2)  CC=1.0
+        → _compact_function(2)  CC=11.0
+        → _build_nested_data(2)  CC=19.0  !
+        → _constants_for_module_verbose(2)  CC=10.0
+        → _function_to_dict(2)  CC=5.0
+        → _method_to_dict(2)  CC=15.0  !
+        → _build_enhanced_signature(1)  CC=12.0
+        → _field_to_dict(1)  CC=4.0
+    CSVGenerator  # Generates CSV output optimized for LLM processing.
+
+CSV is t...
+      generate(2)  CC=7.0
+        → _build_row(8)  CC=3.0
+        → _categorize(1)  CC=1.0
+        → _extract_domain(1)  CC=1.0
+        → _compute_hash(2)  CC=1.0
+        → _build_function_row(7)  CC=4.0
+        → _build_signature(1)  CC=9.0
+        → _escape_csv(1)  CC=2.0
+    bytes_to_kb(bytes_value)
+  code2logic/reproduction.py:
+    e: CodeReproducer,generate_file_gherkin,compare_code,extract_code_block
+    CodeReproducer  # Code reproduction workflow using LLM....
+      __init__(2)  CC=2.0
+    generate_file_gherkin(file_path)
+    compare_code(original,generated)
+    extract_code_block(text,language)
+  code2logic/parsers.py:
+    e: _PyFunctionBodyAnalyzer,TreeSitterParser,UniversalParser,_normalize_import_path,_clean_imports,_combine_import_name,_truncate_constant_value,_py_expr_to_dotted_name,_analyze_python_function_node,is_tree_sitter_available
+    _PyFunctionBodyAnalyzer
+      __init__(0)  CC=1.0
+    TreeSitterParser  # Parser using Tree-sitter for high-accuracy AST parsing.
+
+Sup...
+      __init__(0)  CC=2.0
+        → _init_parsers(0)  CC=3.0
+    UniversalParser  # Fallback parser using Python AST and regex.
+
+Used when Tree-...
+      __init__(0)  CC=1.0
+    _normalize_import_path(import_path)
+    _clean_imports(imports)
+    _combine_import_name(module_name,identifier)
+    _truncate_constant_value(value_text,limit)
+    _py_expr_to_dotted_name(expr)
+    _analyze_python_function_node(func_node)
+    is_tree_sitter_available()
+  code2logic/universal.py:
+    e: ElementType,Language,Parameter,CodeElement,CodeLogic,UniversalParser,CodeGenerator,UniversalReproducer,reproduce_file
+    ElementType  # Types of code elements....
+    Language  # Supported languages....
+    Parameter  # Function/method parameter....
+    CodeElement  # Universal representation of a code element....
+    CodeLogic  # Universal code logic representation for a single file....
+      to_dict(0)  CC=2.0
+        → _element_to_dict(1)  CC=3.0
+    UniversalParser  # Parse source code into universal CodeLogic format....
+      detect_language(2)  CC=6.0
+    CodeGenerator  # Generate code from CodeLogic in target language....
+      generate(2)  CC=8.0
+        → _generate_python(1)  CC=9.0
+        → _generate_python_element(2)  CC=19.0  !
+        → _generate_typescript(1)  CC=15.0  !
+        → _generate_go(1)  CC=6.0
+        → _generate_sql(1)  CC=5.0
+        → _generate_rust(1)  CC=9.0
+        → _generate_java(1)  CC=10.0
+        → _generate_csharp(1)  CC=10.0
+        → _generate_generic(2)  CC=1.0
+    UniversalReproducer  # Universal code reproduction system....
+      __init__(1)  CC=1.0
+    reproduce_file(source_path,target_lang,output_dir,use_llm)
+  code2logic/analyzer.py:
+    e: ProjectAnalyzer,analyze_project,get_library_status
+    ProjectAnalyzer  ×DUP  # Main class for analyzing software projects.
+
+Orchestrates:
+-...
+      __init__(6)  CC=4.0
+        → _print_status(0)  CC=6.0
+    analyze_project(path,use_treesitter,verbose)
+    get_library_status()
+  code2logic/file_formats.py:
+    e: generate_file_csv,generate_file_json,generate_file_yaml,_parse_file_elements
+    generate_file_csv(file_path)
+    generate_file_json(file_path)
+    generate_file_yaml(file_path)
+    _parse_file_elements(content)
+  code2logic/function_logic.py:
+    e: FunctionLogicGenerator
+    FunctionLogicGenerator
+      __init__(1)  CC=1.0
+  code2logic/benchmarks/runner.py:
+    e: BenchmarkRunner,_test_python_syntax,_test_python_runs,_basic_syntax_ok,_count_structural_elements,_structural_score,_extract_code,run_benchmark
+    BenchmarkRunner  # Unified benchmark runner for code2logic.
+
+Consolidates bench...
+      __init__(2)  CC=2.0
+    _test_python_syntax(code)
+    _test_python_runs(code,timeout)
+    _basic_syntax_ok(code,language)
+    _count_structural_elements(code,language)
+    _structural_score(original,generated,language)
+    _extract_code(response)
+    run_benchmark(source,benchmark_type,formats,limit,output,verbose)
+  scripts/configure_llm.py:
+    e: log,check_ollama,check_litellm,check_env_keys,categorize_models,get_recommended_models,test_model,save_config,load_config,format_size,main
+    log(msg,level)
+    check_ollama()
+    check_litellm()
+    check_env_keys()
+    categorize_models(models)
+    get_recommended_models(models)
+    test_model(model,timeout)
+    save_config(config)
+    load_config()
+    format_size(size_bytes)
+    main()
+  code2logic/schemas/logicml_schema.py:
+    e: LogicMLMethod,LogicMLClass,LogicMLModule,LogicMLSchema,validate_logicml,parse_logicml_header,extract_logicml_signature
+    LogicMLMethod  # Schema for LogicML method....
+    LogicMLClass  # Schema for LogicML class....
+    LogicMLModule  # Schema for LogicML module....
+    LogicMLSchema  # Complete LogicML specification schema.
+
+Design Principles:
+1...
+    validate_logicml(spec)
+    parse_logicml_header(line)
+    extract_logicml_signature(sig_line)
+  code2logic/mcp_server.py:
+    e: handle_request,call_tool,run_server
+    handle_request(request)
+    call_tool(tool_name,arguments)
+    run_server()
+  code2logic/logicml.py:
+    e: LogicMLSpec,LogicMLGenerator,generate_logicml
+    LogicMLSpec  # LogicML specification output....
+    LogicMLGenerator  # Generates LogicML format - optimized for LLM code reproducti...
+      __init__(1)  CC=1.0
+    generate_logicml(project,detail)
+  advanced_yaml_optimizer.py:
+    e: analyze_yaml_optimization,analyze_main_data,analyze_flow_graph,identify_optimizations,apply_optimizations,save_optimized_files,show_comparison
+    analyze_yaml_optimization()
+    analyze_main_data(data)
+    analyze_flow_graph(data)
+    identify_optimizations(main_data,flow_data)
+    apply_optimizations(main_data,flow_data,opportunities)
+    save_optimized_files(optimized_main,optimized_flow)
+    show_comparison(original_main,original_flow,optimized_main,optimized_flow)
+  code2logic/toon_format.py:
+    e: TOONGenerator,TOONParser,generate_toon,parse_toon
+    TOONGenerator  # Generates TOON format output from ProjectInfo.
+
+TOON is opti...
+      __init__(2)  CC=2.0
+    TOONParser  # Parse TOON format back to Python dict.
+
+This is a simplified...
+      __init__(0)  CC=1.0
+    generate_toon(project,detail,use_tabs)
+    parse_toon(content)
+  logic2code/renderers.py:
+    e: RenderConfig,BaseRenderer,PythonRenderer
+    RenderConfig  # Configuration for code rendering....
+    BaseRenderer  # Abstract base class for language-specific renderers....
+      __init__(1)  CC=2.0
+    PythonRenderer  # Python code renderer....
+      render_module(1)  CC=7.0
+        → _collect_imports(1)  CC=24.0  !
+        → _render_constant(1)  CC=13.0
+        → render_class(1)  CC=25.0  !
+        → _render_field(1)  CC=5.0
+        → _render_method(1)  CC=1.0
+        → _render_function_internal(2)  CC=12.0
+        → _build_params(2)  CC=15.0  !
+        → render_function(1)  CC=1.0
+  code2logic/markdown_format.py:
+    e: MarkdownSpec,MarkdownHybridGenerator,generate_markdown_hybrid,generate_file_markdown
+    MarkdownSpec  # Markdown specification for a project....
+    MarkdownHybridGenerator  # Generates optimized Markdown hybrid format.
+
+Combines:
+- Fil...
+      __init__(1)  CC=1.0
+    generate_markdown_hybrid(project,detail)
+    generate_file_markdown(file_path)
+  code2logic/adaptive.py:
+    e: ChunkInfo,AdaptiveResult,AdaptiveReproducer,get_llm_capabilities
+    ChunkInfo  # Information about a code chunk....
+    AdaptiveResult  # Result of adaptive reproduction....
+    AdaptiveReproducer  # Adaptive code reproduction with LLM capability detection....
+      __init__(2)  CC=3.0
+        → _get_capabilities(0)  CC=5.0
+    get_llm_capabilities(model)
+  lolm/config.py:
+    e: LLMConfig,get_config_dir,get_config_path,load_config,save_config,load_env_file,load_litellm_config,save_litellm_config,get_provider_model,set_provider_model,get_api_key,set_api_key,get_provider_priorities_from_litellm
+    LLMConfig  # LLM configuration container....
+      to_dict(0)  CC=1.0
+    get_config_dir()
+    get_config_path()
+    load_config()
+    save_config(config)
+    load_env_file(search_paths)
+    load_litellm_config(search_paths)
+    save_litellm_config(config,path)
+    get_provider_model(provider)
+    set_provider_model(provider,model)
+    get_api_key(provider)
+    set_api_key(provider,key,env_path)
+    get_provider_priorities_from_litellm()
+  fast_analysis.py:
+    e: FastAnalyzer,main
+    FastAnalyzer
+      __init__(1)  CC=1.0
+    main()
+  code2logic/similarity.py:
+    e: SimilarityDetector,is_rapidfuzz_available,get_refactoring_suggestions
+    SimilarityDetector  # Detects similar functions using fuzzy string matching.
+
+Uses...
+      __init__(1)  CC=1.0
+    is_rapidfuzz_available()
+    get_refactoring_suggestions(similar_functions)
+  examples/benchmark_summary.py:
+    e: _fmt_bytes,_token_estimate_bytes,_artifact_row,main
+    _fmt_bytes(n)
+    _token_estimate_bytes(n)
+    _artifact_row(label,path)
+    main()
+  code2logic/gherkin.py:
+    e: GherkinScenario,GherkinFeature,StepDefinition,GherkinGenerator,StepDefinitionGenerator,CucumberYAMLGenerator,csv_to_gherkin,gherkin_to_test_data
+    GherkinScenario  # Represents a single Gherkin scenario....
+    GherkinFeature  # Represents a Gherkin feature file....
+    StepDefinition  # Represents a step definition....
+    GherkinGenerator  # Generates Gherkin feature files from code analysis.
+
+Achieve...
+      __init__(1)  CC=1.0
+    StepDefinitionGenerator  # Generates step definition stubs from Gherkin features.
+
+Supp...
+      generate_pytest_bdd(1)  CC=6.0
+        → _step_to_func_name(1)  CC=1.0
+    CucumberYAMLGenerator  # Generates Cucumber YAML configuration and test data.
+
+YAML f...
+      generate(2)  CC=19.0  !
+        → _extract_domain(1)  CC=5.0
+        → _categorize(1)  CC=11.0
+    csv_to_gherkin(csv_content,language)
+    gherkin_to_test_data(gherkin_content)
+  examples/behavioral_benchmark.py:
+    e: CaseResult,FunctionBehaviorResult,_load_module_from_path,_exec_function_from_code,_values_equal,_run_case,_looks_like_template_stub,_cases_for,_apply_env_hook,main
+    CaseResult
+    FunctionBehaviorResult
+    _load_module_from_path(path,module_name)
+    _exec_function_from_code(code,function_name)
+    _values_equal(got,expected)
+    _run_case(label,fn,expected)
+    _looks_like_template_stub(code)
+    _cases_for(function_name)
+    _apply_env_hook(kwargs)
+    main()
+  examples/12_comprehensive_analysis.py:
+    e: print_comprehensive_analysis,main
+    print_comprehensive_analysis(result)
+    main()
+  examples/benchmark_report.py:
+    e: Artifact,_load_json,_sizeof,_fmt_bytes,_token_estimate_bytes,_calc_function_summary,_calc_file_summary,_read_commands,main
+    Artifact
+    _load_json(path)
+    _sizeof(path)
+    _fmt_bytes(n)
+    _token_estimate_bytes(n)
+    _calc_function_summary(d)
+    _calc_file_summary(d)
+    _read_commands(commands_path)
+    main()
+  code2logic/project_reproducer.py:
+    e: FileResult,ProjectResult,ProjectReproducer,reproduce_project
+    FileResult  # Result for a single file reproduction....
+    ProjectResult  # Result for project reproduction....
+    ProjectReproducer  # Multi-file project reproduction system....
+      __init__(4)  CC=1.0
+    reproduce_project(project_path,output_dir,target_lang,parallel,use_llm)
+  logic2code/cli.py:
+    e: main
+    main()
+  code2logic/schemas/yaml_schema.py:
+    e: MethodSchema,ClassSchema,FunctionSchema,ModuleSchema,YAMLSchema,validate_yaml,_validate_module,_validate_class
+    MethodSchema  # Schema for method definition....
+    ClassSchema  # Schema for class definition....
+    FunctionSchema  # Schema for function definition....
+    ModuleSchema  # Schema for module definition....
+    YAMLSchema  # Complete YAML specification schema.
+
+Structure:
+```yaml
+proj...
+    validate_yaml(spec)
+    _validate_module(module,index)
+    _validate_class(cls,prefix)
+  mermaid_to_png.py:
+    e: MermaidRenderer,MermaidCLIRenderer,MermaidInkRenderer,PuppeteerRenderer,MermaidGenerator,main
+    MermaidRenderer  # Base class for Mermaid renderers....
+      render(2)  CC=1.0
+    MermaidCLIRenderer  # Render using @mermaid-js/mermaid-cli (npx)....
+      render(2)  CC=5.0
+    MermaidInkRenderer  # Render using mmdc (mermaid-cli)....
+      render(2)  CC=3.0
+    PuppeteerRenderer  # Render using Puppeteer with HTML template....
+      render(2)  CC=3.0
+    MermaidGenerator  # Main generator class....
+      __init__(0)  CC=1.0
+    main()
+  lolm/rotation.py:
+    e: ProviderState,RateLimitType,RateLimitInfo,ProviderHealth,RotationQueue,LLMRotationManager,parse_rate_limit_headers,is_rate_limit_error,create_rotation_manager
+    ProviderState  # Provider availability state....
+    RateLimitType  # Type of rate limit encountered....
+    RateLimitInfo  # Information about a rate limit event....
+      get_wait_seconds(0)  CC=3.0
+    ProviderHealth  # Health metrics for a provider....
+      success_rate(0)  CC=2.0
+    RotationQueue  # Priority queue for LLM provider rotation with automatic fail...
+      __init__(3)  CC=1.0
+    LLMRotationManager  # High-level manager for LLM rotation with generation capabili...
+      __init__(3)  CC=1.0
+    parse_rate_limit_headers(headers)
+    is_rate_limit_error(status_code,error_message)
+    create_rotation_manager(providers,verbose)
+  code2logic/schemas/markdown_schema.py:
+    e: MarkdownMethod,MarkdownClass,MarkdownModule,MarkdownSchema,validate_markdown,extract_markdown_sections
+    MarkdownMethod  # Schema for Markdown method....
+    MarkdownClass  # Schema for Markdown class....
+    MarkdownModule  # Schema for Markdown module....
+    MarkdownSchema  # Complete Markdown specification schema....
+    validate_markdown(spec)
+    extract_markdown_sections(spec)
+  code2logic/benchmarks/results.py:
+    e: FormatResult,FileResult,FunctionResult,BenchmarkResult,BenchmarkConfig
+    FormatResult  # Result for a single format test....
+      to_dict(0)  CC=1.0
+    FileResult  # Result for single file reproduction....
+      to_dict(0)  CC=2.0
+        → to_dict(0)  CC=2.0
+    FunctionResult  # Result for single function reproduction....
+      to_dict(0)  CC=1.0
+    BenchmarkResult  # Complete benchmark result....
+      __post_init__(0)  CC=2.0
+    BenchmarkConfig  # Configuration for benchmark runs....
+      to_dict(0)  CC=1.0
+  fixed_advanced_data_analyzer.py:
+    e: FixedHybridDataAnalyzer,main
+    FixedHybridDataAnalyzer  # Fixed analyzer for hybrid export data....
+      __init__(1)  CC=1.0
+    main()
+  final_advanced_data_analyzer.py:
+    e: FinalAdvancedDataAnalyzer,main
+    FinalAdvancedDataAnalyzer  # Final advanced analyzer for hybrid export data with all fixe...
+      __init__(1)  CC=1.0
+    main()
+  advanced_data_analyzer.py:
+    e: HybridDataAnalyzer,main
+    HybridDataAnalyzer  # Advanced analyzer for hybrid export data....
+      __init__(1)  CC=1.0
+    main()
+  ultimate_advanced_data_analyzer.py:
+    e: UltimateAdvancedDataAnalyzer,main
+    UltimateAdvancedDataAnalyzer  # Ultimate analyzer with all map object errors completely fixe...
+      __init__(1)  CC=1.0
+    main()
+  code2logic/code_review.py:
+    e: CodeReviewer,analyze_code_quality,check_security_issues,check_performance_issues
+    CodeReviewer  # Automated code review with optional LLM enhancement....
+      __init__(1)  CC=1.0
+    analyze_code_quality(project)
+    check_security_issues(project)
+    check_performance_issues(project)
+  code2logic/terminal.py:
+    e: ShellRenderer,RenderAPI,get_renderer,set_renderer
+    ShellRenderer  # Renders colorized markdown output in terminal.
+
+Supports syn...
+      __init__(2)  CC=2.0
+        → _supports_colors(0)  CC=4.0
+    RenderAPI  # Convenience API for terminal rendering....
+      heading(1)  CC=1.0
+        → heading(1)  CC=1.0
+    get_renderer(use_colors,verbose)
+    set_renderer(renderer)
+  code2logic/errors.py:
+    e: ErrorSeverity,ErrorType,AnalysisError,AnalysisResult,ErrorHandler,create_error_handler
+    ErrorSeverity  # Error severity levels....
+    ErrorType  # Types of errors that can occur during analysis....
+    AnalysisError  # Represents an error during analysis....
+      to_dict(0)  CC=1.0
+    AnalysisResult  # Result of analysis with errors tracked....
+      add_error(1)  CC=3.0
+    ErrorHandler  # Handles errors during analysis with configurable behavior.
+
+...
+      __init__(4)  CC=2.0
+    create_error_handler(mode,max_file_size_mb)
+  llm_refactoring_executor.py:
+    e: LLMRefactoringExecutor,main
+    LLMRefactoringExecutor  # Execute LLM-based refactoring using generated queries....
+      __init__(1)  CC=1.0
+    main()
+  code2logic/chunked_reproduction.py:
+    e: Chunk,ChunkedSpec,ChunkedResult,ChunkedReproducer,get_llm_limit,chunk_yaml_spec,chunk_gherkin_spec,chunk_markdown_spec,chunk_spec,get_chunk_prompt,merge_chunk_codes,auto_chunk_reproduce,adaptive_chunk_reproduce
+    Chunk  # A chunk of specification for reproduction....
+    ChunkedSpec  # Chunked specification....
+    ChunkedResult  # Result of chunked reproduction....
+    ChunkedReproducer  # Reproduce code from chunked specifications....
+      __init__(3)  CC=2.0
+    get_llm_limit(model_name)
+    chunk_yaml_spec(spec,max_tokens)
+    chunk_gherkin_spec(spec,max_tokens)
+    chunk_markdown_spec(spec,max_tokens)
+    chunk_spec(spec,fmt,max_tokens)
+    get_chunk_prompt(chunk,fmt,file_name,chunk_num,total_chunks)
+    merge_chunk_codes(codes,file_name)
+    auto_chunk_reproduce(spec,fmt,file_name,client,model_name)
+    adaptive_chunk_reproduce(spec,fmt,file_name,client,provider,model)
+  lolm/manager.py:
+    e: ProviderInfo,LLMManager,get_client,list_available_providers
+    ProviderInfo  # Information about a configured provider....
+      __init__(5)  CC=1.0
+    LLMManager  # LLM Manager with multi-provider support.
+
+Manages multiple L...
+      __init__(2)  CC=2.0
+    get_client(provider,model)
+    list_available_providers()
+  performance_optimizations.py:
+    e: run_optimized_analysis,create_performance_script,suggest_alternatives
+    run_optimized_analysis()
+    create_performance_script()
+    suggest_alternatives()
+  refactoring_validator.py:
+    e: RefactoringValidator,main
+    RefactoringValidator  # Validate and test the complete refactoring pipeline....
+      __init__(1)  CC=1.0
+    main()
+  code2logic/quality.py:
+    e: QualityIssue,QualityReport,QualityAnalyzer,analyze_quality,get_quality_summary
+    QualityIssue  # Represents a code quality issue....
+    QualityReport  # Complete quality analysis report....
+      to_dict(0)  CC=2.0
+    QualityAnalyzer  # Analyzes code quality and generates recommendations.
+
+Thresh...
+      __init__(1)  CC=2.0
+    analyze_quality(project,thresholds)
+    get_quality_summary(report)
+  code2logic/shared_utils.py:
+    e: compact_imports,deduplicate_imports,abbreviate_type,expand_type,build_signature,remove_self_from_params,categorize_function,extract_domain,compute_hash,truncate_docstring,escape_for_yaml,clean_identifier
+    compact_imports(imports,max_items)
+    deduplicate_imports(imports)
+    abbreviate_type(type_str)
+    expand_type(abbrev)
+    build_signature(params,return_type,include_self,abbreviate,max_params)
+    remove_self_from_params(params)
+    categorize_function(name)
+    extract_domain(path)
+    compute_hash(name,signature,length)
+    truncate_docstring(docstring,max_length)
+    escape_for_yaml(text)
+    clean_identifier(name)
+  code2logic/intent.py:
+    e: IntentType,Intent,EnhancedIntentGenerator,IntentAnalyzer
+    IntentType  # Types of user intents for code analysis....
+    Intent  # Represents a detected user intent....
+    EnhancedIntentGenerator  # Generator intencji z NLP - lemmatyzacja, ekstrakcja z docstr...
+      __init__(1)  CC=8.0
+    IntentAnalyzer  # Analyzes user queries to detect intent and provide suggestio...
+      __init__(0)  CC=1.0
+  code2logic/metrics.py:
+    e: TextMetrics,StructuralMetrics,SemanticMetrics,FormatMetrics,ReproductionResult,ReproductionMetrics,analyze_reproduction,compare_formats
+    TextMetrics  # Text-level similarity metrics....
+    StructuralMetrics  # Structural code metrics....
+    SemanticMetrics  # Semantic preservation metrics....
+    FormatMetrics  # Format-specific efficiency metrics....
+    ReproductionResult  # Complete reproduction analysis result....
+      to_dict(0)  CC=1.0
+    ReproductionMetrics  # Analyze reproduction quality with multiple metrics....
+      __init__(1)  CC=2.0
+    analyze_reproduction(original,generated,spec,format_name,verbose)
+    compare_formats(original,results,verbose)
+  examples/05_llm_integration.py:
+    e: main
+    main()
+  code2logic/benchmarks/common.py:
+    e: create_single_project,generate_spec,_generate_token_json,_generate_token_json_compact,generate_spec_token,get_async_reproduction_prompt,get_token_reproduction_prompt,get_simple_reproduction_prompt
+    create_single_project(module_info,file_path)
+    generate_spec(project,fmt)
+    _generate_token_json(project)
+    _generate_token_json_compact(project)
+    generate_spec_token(project,fmt)
+    get_async_reproduction_prompt(spec,fmt,file_name,with_tests)
+    get_token_reproduction_prompt(spec,fmt,file_name,language)
+    get_simple_reproduction_prompt(spec,fmt,file_name)
+  code2logic/llm_profiler.py:
+    e: LLMProfile,ProfileTestResult,LLMProfiler,AdaptiveChunker,_get_profiles_path,load_profiles,save_profile,get_profile,get_or_create_profile,_create_default_profile,profile_llm,get_adaptive_chunker
+    LLMProfile  # Profile of LLM capabilities for code reproduction....
+      __post_init__(0)  CC=3.0
+    ProfileTestResult  # Result of a single profile test....
+    LLMProfiler  # Profile LLM capabilities for code reproduction.
+
+Runs standa...
+      __init__(2)  CC=1.0
+    AdaptiveChunker  # Adaptive chunking based on LLM profile.
+
+Automatically adjus...
+      __init__(1)  CC=2.0
+    _get_profiles_path()
+    load_profiles()
+    save_profile(profile)
+    get_profile(provider,model)
+    get_or_create_profile(provider,model)
+    _create_default_profile(provider,model)
+    profile_llm(client,quick)
+    get_adaptive_chunker(provider,model)
+  code2logic/reproducer.py:
+    e: ReproductionStatus,FileValidation,ReproductionResult,SpecReproducer,SpecValidator,_safe_load_yaml_file,reproduce_project,validate_files
+    ReproductionStatus  # Status of file reproduction....
+    FileValidation  # Validation result for a single file....
+      to_dict(0)  CC=1.0
+    ReproductionResult  # Result of reproduction process....
+      summary(0)  CC=3.0
+    SpecReproducer  # Reproduces code structure from logic specifications.
+
+Usage:...
+      __init__(1)  CC=1.0
+    SpecValidator  # Validates generated files against logic specification.
+
+Usag...
+      __init__(0)  CC=1.0
+    _safe_load_yaml_file(path)
+    reproduce_project(spec_path,output_dir,filter_paths,validate,verbose)
+    validate_files(spec_path,generated_dir,filter_paths)
+  logic2code/generator.py:
+    e: GeneratorConfig,GenerationResult,CodeGenerator
+    GeneratorConfig  # Configuration for code generation....
+    GenerationResult  # Result of code generation....
+    CodeGenerator  # Main code generator class.
+
+Reads Code2Logic output files an...
+      __init__(2)  CC=6.0
+  optimize_llm_prompt.py:
+    e: parse_llm_prompt,build_function_tree,build_class_tree,format_tree,optimize_llm_prompt
+    parse_llm_prompt(file_path)
+    build_function_tree(function_calls)
+    build_class_tree(classes)
+    format_tree(tree,indent,is_function)
+    optimize_llm_prompt(input_file,output_file)
+  flow.py:
+    e: FlowNode,ExecutionTrace,BehavioralPattern,EnhancedFlowExtractor,DynamicTracer,BehavioralPatternExtractor,ReverseEngineeringGenerator,FlowVisualizer,ProjectFlowAnalyzer,main
+    FlowNode  # Represents a node in the control flow graph....
+      __post_init__(0)  CC=3.0
+    ExecutionTrace  # Runtime execution trace for dynamic analysis....
+      __post_init__(0)  CC=4.0
+    BehavioralPattern  # Extracted behavioral pattern from code analysis....
+    EnhancedFlowExtractor  # Enhanced AST visitor with data flow and behavior analysis....
+      __init__(2)  CC=1.0
+    DynamicTracer  # Runtime execution tracer for dynamic analysis....
+      __init__(0)  CC=1.0
+    BehavioralPatternExtractor  # Extract behavioral patterns from combined analysis....
+      __init__(2)  CC=1.0
+    ReverseEngineeringGenerator  # Generate reverse engineering ready outputs....
+      __init__(2)  CC=1.0
+    FlowVisualizer  # Visualize flow analysis results....
+      __init__(1)  CC=1.0
+        → _build_graph(0)  CC=4.0
+    ProjectFlowAnalyzer  # Main project flow analyzer combining all techniques....
+      __init__(1)  CC=1.0
+    main()
+  code2logic/llm_clients.py:
+    e: _get_user_llm_config_path,_load_user_llm_config,_get_priority_mode,get_priority_mode,_get_provider_priority_overrides,_get_model_priority_rules,_get_model_priority,_get_provider_model_string,_get_priority_order,_get_effective_provider_order,get_effective_provider_priorities,_candidate_litellm_yaml_paths
+    _get_user_llm_config_path()
+    _load_user_llm_config()
+    _get_priority_mode()
+    get_priority_mode()
+    _get_provider_priority_overrides()
+    _get_model_priority_rules()
+    _get_model_priority(model_string)
+    _get_provider_model_string(provider)
+    _get_priority_order()
+    _get_effective_provider_order()
+    get_effective_provider_priorities()
+    _candidate_litellm_yaml_paths()
+  code2logic/refactor.py:
+    e: DuplicateGroup,RefactoringSuggestion,RefactoringReport,find_duplicates,analyze_quality,suggest_refactoring,compare_codebases,quick_analyze
+    DuplicateGroup  # Group of duplicate functions....
+    RefactoringSuggestion  # Single refactoring suggestion....
+    RefactoringReport  # Complete refactoring analysis report....
+      to_dict(0)  CC=1.0
+    find_duplicates(project_path,threshold)
+    analyze_quality(project_path,include_security,include_performance)
+    suggest_refactoring(project_path,use_llm,client)
+    compare_codebases(project1,project2)
+    quick_analyze(project_path)
+  code2logic/dependency.py:
+    e: DependencyAnalyzer,is_networkx_available
+    DependencyAnalyzer  # Analyzes dependency graphs using NetworkX.
+
+Computes:
+- Page...
+      __init__(0)  CC=2.0
+    is_networkx_available()
+  hybrid_export.py:
+    e: hybrid_export_strategy,separate_orphans_and_consolidated,split_consolidated,split_orphans,create_hybrid_index,list_files,run_hybrid_export
+    hybrid_export_strategy(result,output_base_path)
+    separate_orphans_and_consolidated(result)
+    split_consolidated(base_path,consolidated_data)
+    split_orphans(base_path,orphans_data)
+    create_hybrid_index(base_path,separated_data)
+    list_files(base_path)
+    run_hybrid_export()
+  code2logic/config.py:
+    e: Config,load_env,get_api_key,get_model
+    Config  # Configuration manager for Code2Logic....
+      __init__(1)  CC=1.0
+        → _load_env_file(1)  CC=4.0
+        → _parse_env_file(1)  CC=9.0
+        → _load_config_file(0)  CC=3.0
+    load_env()
+    get_api_key(provider)
+    get_model(provider)
+  examples/15_unified_benchmark.py:
+    e: print_format_results,print_function_results,print_project_results,main
+    print_format_results(result)
+    print_function_results(result)
+    print_project_results(result)
+    main()
+  lolm/clients.py:
+    e: LLMRateLimitError,OpenRouterClient,OllamaClient,LiteLLMClient,GroqClient,TogetherClient
+    LLMRateLimitError  # Exception raised when a rate limit is hit....
+      __init__(5)  CC=2.0
+        → __init__(5)  CC=2.0
+    OpenRouterClient  # OpenRouter API client for cloud LLM access....
+      __init__(2)  CC=3.0
+    OllamaClient  # Ollama client for local LLM inference....
+      __init__(2)  CC=3.0
+    LiteLLMClient  # LiteLLM client for universal LLM access....
+      __init__(1)  CC=2.0
+    GroqClient  # Groq API client for fast inference....
+      __init__(2)  CC=3.0
+    TogetherClient  # Together AI client....
+      __init__(2)  CC=3.0
+  generate_graph_viewer.py:
+    e: GraphGenerator,main
+    GraphGenerator  # Generate interactive graph visualization from YAML data....
+      __init__(1)  CC=1.0
+    main()
+  code2logic/benchmark.py:
+    e: FormatResult,BenchmarkResult,ReproductionBenchmark,run_benchmark
+    FormatResult  # Result for a single format test....
+    BenchmarkResult  # Complete benchmark result....
+    ReproductionBenchmark  # Benchmark reproduction quality across formats....
+      __init__(1)  CC=2.0
+    run_benchmark(files,output_dir,provider,model)
+  examples/08_format_benchmark.py:
+    e: print_format_comparison,print_per_file_results,main
+    print_format_comparison(result)
+    print_per_file_results(result)
+    main()
+  code2logic/schemas/json_schema.py:
+    e: JSONMethodSchema,JSONClassSchema,JSONFunctionSchema,JSONModuleSchema,JSONSchema,validate_json,_validate_json_module,_validate_json_class,parse_json_spec
+    JSONMethodSchema  # Schema for JSON method definition....
+    JSONClassSchema  # Schema for JSON class definition....
+    JSONFunctionSchema  # Schema for JSON function definition....
+    JSONModuleSchema  # Schema for JSON module definition....
+    JSONSchema  # Complete JSON specification schema.
+
+Structure:
+```json
+{
+  ...
+    validate_json(spec)
+    _validate_json_module(module,index)
+    _validate_json_class(cls,prefix)
+    parse_json_spec(spec)
+  optimize_llm_prompt_fixed.py:
+    e: parse_llm_prompt,build_function_tree,build_class_tree,format_function_tree,format_class_tree,optimize_llm_prompt
+    parse_llm_prompt(file_path)
+    build_function_tree(function_calls)
+    build_class_tree(classes)
+    format_function_tree(tree,indent)
+    format_class_tree(tree,indent)
+    optimize_llm_prompt(input_file,output_file)
+  split_yaml.py:
+    e: split_and_optimize_yaml
+    split_and_optimize_yaml()
+  examples/11_token_benchmark.py:
+    e: print_token_efficiency,main
+    print_token_efficiency(result)
+    main()
+  lolm/cli.py:
+    e: cmd_status,cmd_set_provider,cmd_set_model,cmd_key_set,cmd_key_show,cmd_models,cmd_test,cmd_config_show,cmd_priority_set_provider,cmd_priority_set_mode,main
+    cmd_status(args)
+    cmd_set_provider(args)
+    cmd_set_model(args)
+    cmd_key_set(args)
+    cmd_key_show(args)
+    cmd_models(args)
+    cmd_test(args)
+    cmd_config_show(args)
+    cmd_priority_set_provider(args)
+    cmd_priority_set_mode(args)
+    main()
+  fixed_refactoring_implementation_executor.py:
+    e: RefactoringImplementationExecutor,main
+    RefactoringImplementationExecutor  # Execute the actual refactoring implementation....
+      __init__(1)  CC=1.0
+    main()
+  ultimate_yaml_optimizer.py:
+    e: ultimate_yaml_optimization,ultra_compress_main,ultra_compress_flow,create_all_formats,save_all_formats,show_ultimate_comparison,generate_recommendations
+    ultimate_yaml_optimization()
+    ultra_compress_main(data)
+    ultra_compress_flow(data)
+    create_all_formats(main_data,flow_data)
+    save_all_formats(formats)
+    show_ultimate_comparison(original_size,formats)
+    generate_recommendations(formats)
+  examples/06_metrics.py:
+    e: analyze_file,_template_generate,main
+    analyze_file(source_path,verbose,no_llm)
+    _template_generate(spec)
+    main()
+  examples/13_project_benchmark.py:
+    e: print_project_results,main
+    print_project_results(result)
+    main()
+  examples/02_refactoring.py:
+    e: main
+    main()
+  benchmarks/benchmark_performance.py:
+    e: create_test_project,benchmark_original_analyzer,benchmark_streaming_analyzer,benchmark_with_strategies,print_comparison,main
+    create_test_project(size)
+    benchmark_original_analyzer(project_path,runs)
+    benchmark_streaming_analyzer(project_path,runs)
+    benchmark_with_strategies(project_path)
+    print_comparison(original,streaming)
+    main()
+  code2logic/utils.py:
+    e: estimate_tokens,write_text_atomic,cleanup_generated_root
+    estimate_tokens(text)
+    write_text_atomic(path,content)
+    cleanup_generated_root(generated_root,allowed_dirs)
+  examples/10_function_reproduction.py:
+    e: print_results,main
+    print_results(result)
+    main()
+  examples/04_project.py:
+    e: main
+    main()
+  lolm/examples/02_configuration.py:
+    e: show_defaults,show_recommended_models,show_current_config,example_modify_config,show_environment_config
+    show_defaults()
+    show_recommended_models()
+    show_current_config()
+    example_modify_config()
+    show_environment_config()
+  project_summary_generator.py:
+    e: ProjectSummaryGenerator,main
+    ProjectSummaryGenerator  # Generate comprehensive project summary....
+      __init__(1)  CC=1.0
+    main()
+  lolm/provider.py:
+    e: LLMProviderStatus,GenerateOptions,LLMResponse,LLMModelInfo,BaseLLMClient,LLMProvider
+    LLMProviderStatus  # Provider availability status....
+    GenerateOptions  # Options for LLM generation....
+      to_messages(0)  CC=3.0
+    LLMResponse  # Response from LLM generation....
+    LLMModelInfo  # Information about an available model....
+    BaseLLMClient  # Abstract base class for synchronous LLM clients....
+      generate(3)  CC=1.0
+    LLMProvider  # Abstract base class for async LLM providers.
+
+Implementation...
+      is_available(0)  CC=1.0
+  logic2code/examples/02_llm_enhanced.py:
+    e: example_llm_generation,example_hybrid_generation,example_compare_outputs
+    example_llm_generation()
+    example_hybrid_generation()
+    example_compare_outputs()
+  examples/01_quick_start.py:
+    e: main
+    main()
+  examples/09_async_benchmark.py:
+    e: print_results,main
+    print_results(result)
+    main()
+  examples/03_reproduction.py:
+    e: main
+    main()
+  logic2code/examples/01_quickstart.py:
+    e: example_basic_generation,example_with_config,example_stubs_only,example_single_module
+    example_basic_generation()
+    example_with_config()
+    example_stubs_only()
+    example_single_module()
+  lolm/examples/01_quickstart.py:
+    e: example_simple_client,example_specific_provider,example_manager,example_fallback
+    example_simple_client()
+    example_specific_provider()
+    example_manager()
+    example_fallback()
+  examples/code2logic/sample_project/calculator.py:
+    e: Calculator,factorial
+    Calculator  # A tiny calculator used for Code2Logic examples....
+      add(2)  CC=1.0
+    factorial(n)
+  pipeline_runner_utils_improved.py:
+    e: ConsolidatedMarkdownWrapper
+    ConsolidatedMarkdownWrapper  # Consolidated markdown wrapper with reduced complexity....
+      __init__(0)  CC=1.0
+  setup.py:
+    e: read_readme
+    read_readme()
+  general_refactoring_template.py:
+    e: RefactoredComponent,create_refactored_component
+    RefactoredComponent  # Refactored component with improved structure....
+      __init__(0)  CC=1.0
+    create_refactored_component(config)
+  code2logic/base.py:
+    e: VerboseMixin,BaseParser,BaseGenerator
+    VerboseMixin  # Mixin providing verbose logging functionality....
+      __init__(1)  CC=2.0
+    BaseParser  # Base class for code parsers....
+      __init__(1)  CC=1.0
+        → __init__(1)  CC=1.0
+    BaseGenerator  # Base class for output generators....
+      __init__(1)  CC=1.0
+        → __init__(1)  CC=1.0
+  complexity_reduction_examples.py:
+    e: ConsolidatedDataNode,DataProcessor,ConsolidatedProcessor,create_consolidated_system
+    ConsolidatedDataNode  # Consolidated data node with reduced complexity....
+      __post_init__(0)  CC=2.0
+    DataProcessor  # Abstract base class for data processors....
+      process(1)  CC=1.0
+    ConsolidatedProcessor  # Consolidated processor with reduced complexity....
+      __init__(0)  CC=1.0
+    create_consolidated_system()
+  code2logic/prompts.py:
+    e: get_reproduction_prompt,get_review_prompt,get_fix_prompt
+    get_reproduction_prompt(spec,fmt,file_name,language,max_spec_length)
+    get_review_prompt(code,spec,fmt)
+    get_fix_prompt(code,issues,spec)
+  code2logic/__init__.py:
+    e: analyze_quality,reproduce_project
+    analyze_quality(target)
+    reproduce_project(source)
+  examples/16_terminal_demo.py:
+    e: demo_headings,demo_codeblocks,demo_status_messages,demo_progress,demo_tasks,demo_key_value,demo_tables,demo_markdown,demo_log_highlighting,main
+    demo_headings()
+    demo_codeblocks()
+    demo_status_messages()
+    demo_progress()
+    demo_tasks()
+    demo_key_value()
+    demo_tables()
+    demo_markdown()
+    demo_log_highlighting()
+    main()
+  generate_index_html.py:
+    e: generate_index_html
+    generate_index_html()
+  generated_code/analyzer.py:
+    e: ProjectAnalyzer,analyze_project,get_library_status
+    ProjectAnalyzer  ×DUP  # Main class for analyzing software projects....
+      __init__(4)  CC=1.0
+    analyze_project(path,use_treesitter,verbose)
+    get_library_status()
+  code2logic/base_generator.py:
+    e: ProjectGenerator
+    ProjectGenerator
+      generate(1)  CC=1.0
+  lolm/examples/03_code_generation.py:
+    e: generate_function,generate_class,explain_code,review_code
+    generate_function(description)
+    generate_class(description)
+    explain_code(code)
+    review_code(code)
+  examples/code2logic/sample_project/api/client.py:
+    e: Response,APIClient
+    Response  # Very small HTTP-like response placeholder....
+    APIClient  # Example client with async methods....
+      get(1)  CC=1.0
+  generated_code/__init__.py:
+  code2logic/llm/__init__.py:
+  code2logic/__main__.py:
+  code2logic/models.py:
+    e: FunctionInfo,ClassInfo,TypeInfo,ModuleInfo,DependencyNode,ProjectInfo,ConstantInfo,FieldInfo,AttributeInfo,PropertyInfo,OptionalImport,ClassInfo,FunctionInfo,ModuleInfo
+    FunctionInfo  # Information about a function or method.
+
+Attributes:
+    nam...
+    ClassInfo  # Information about a class or interface.
+
+Attributes:
+    nam...
+    TypeInfo  # Information about a type alias, interface, or enum.
+
+Attribu...
+    ModuleInfo  # Information about a source file/module.
+
+Attributes:
+    pat...
+    DependencyNode  # Node in the dependency graph with metrics.
+
+Attributes:
+    ...
+    ProjectInfo  # Complete project analysis results.
+
+Attributes:
+    name: Pr...
+    ConstantInfo  # Module-level constant information....
+    FieldInfo  # Dataclass field information....
+    AttributeInfo  # Instance attribute information (self.x = ...)....
+    PropertyInfo  # Property information (@property, @x.setter)....
+    OptionalImport  # Try/except import block information....
+    ClassInfo  # Information about a class or interface.
+
+Attributes:
+    nam...
+    FunctionInfo  # Information about a function or method.
+
+Attributes:
+    nam...
+    ModuleInfo  # Information about a source file/module.
+
+Attributes:
+    pat...
+  examples/12_comprehensive_analysis_simple.py:
+  examples/token_efficiency.py:
+  examples/windsurf_mcp_integration.py:
+  examples/06_metrics_simple.py:
+  examples/duplicate_detection.py:
+  lolm/__init__.py:
+  lolm/__main__.py:
+  logic2code/__init__.py:
+  logic2code/__main__.py:
+  examples/code2logic/sample_project/__init__.py:
+  examples/code2logic/sample_project/models/user.py:
+    e: User
+    User  # Simple user model....
+  code2logic/schemas/__init__.py:
+  code2logic/benchmarks/__init__.py:
+  code2logic/core/__init__.py:
+  code2logic/formats/__init__.py:
+  code2logic/tools/__init__.py:
+  code2logic/integrations/__init__.py:

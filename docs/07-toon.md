@@ -32,8 +32,6 @@ TOON is included in Code2Logic by default:
 from code2logic import TOONGenerator, TOONParser, parse_toon
 ```
 
-## Usage
-
 ### Generate TOON
 
 ```python
@@ -71,7 +69,6 @@ print(ultra)
 
 **Sample Ultra-Compact Output:**
 ```
-# myproject | 15f 1700L | python:15
 # Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
 M[2]:
   utils.py,50
@@ -109,38 +106,24 @@ modules[2]{path,lang,lines}:
 
 parsed = parse_toon(toon_data)
 print(parsed['modules'])
-# [{'path': 'utils.py', 'lang': 'python', 'lines': '50'}, ...]
-```
-
-### CLI Usage
-
-```bash
 # Generate TOON output
 code2logic /path/to/project -f toon -o analysis.toon
 
 # With full detail
 code2logic /path/to/project -f toon -d full
 
-# Reduce repeated directory prefixes in the modules table
 # (when consecutive entries are in the same folder, emits ./file)
 code2logic /path/to/project -f toon --no-repeat-module -o analysis.toon
 
 # Generate function-logic as TOON + reduce repeats in function_details
 code2logic /path/to/project -f toon --function-logic --name project -o ./ --no-repeat-details
 
-# Generate function-logic TOON
 # Output file: function.toon
 code2logic /path/to/project -f toon --function-logic function.toon --name project -o ./
 
-# Generate function-logic TOON + schema
-# Output files:
-# - function.toon
 # - function-schema.json
 code2logic /path/to/project -f toon --function-logic function.toon --with-schema --name project -o ./
 
-# Generate function-logic TOON + schema + compress repeated module paths
-# Output files:
-# - function.toon
 # - function-schema.json
 code2logic /path/to/project -f toon --compact --no-repeat-module --function-logic function.toon --with-schema --name project -o ./
 ```
@@ -187,7 +170,6 @@ code2logic /path/to/project -f toon --function-logic --with-schema --name projec
 Output fragment:
 
 ```toon
-# myproject function-logic | 3 modules
 # Convention: name with . = method, ~name = async, cc:N shown only when >1
 project: myproject
 generated: "2026-02-25T09:00:00"
@@ -232,12 +214,6 @@ Only modules with at least one function/method are listed. Empty modules (`__ini
 By default, the `does` (intent/purpose) column is **omitted** from function-logic TOON to save tokens. Use `--does` to include it:
 
 ```bash
-# Without --does (default, compact):
-#   functions[2]{line,name,sig}:
-#     77,~index_page cc:2,()
-
-# With --does (adds intent column):
-#   functions[2]{line,name,sig,does}:
 #     77,~index_page cc:2,(),Serve the firmware UI
 
 code2logic /path/to/project -f toon --function-logic --does --name project -o ./
@@ -270,8 +246,6 @@ For lower token usage, TOON uses short language codes in `lang` columns and in `
 - `ts` = TypeScript
 
 If a language is unknown or not mapped, the full language name is emitted.
-
-## Format Syntax
 
 ### Basic Key-Value
 
@@ -379,8 +353,6 @@ module_details:
 | **Explicit lengths** | `[N]` suffix | Helps LLM parsing |
 | **Schema hints** | `{field1,field2}` | Clear structure |
 
-## Comparison with Other Formats
-
 ### vs JSON
 - **6x smaller** token usage
 - Same data structure support
@@ -395,8 +367,6 @@ module_details:
 - Similar compression
 - Better for general data
 - Simpler syntax
-
-## API Reference
 
 ### TOONGenerator
 

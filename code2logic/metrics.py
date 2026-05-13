@@ -22,27 +22,29 @@ from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Tuple
 
 # Configure logging
-logger = logging.getLogger('code2logic.metrics')
+logger = logging.getLogger("code2logic.metrics")
 
 
 @dataclass
 class TextMetrics:
     """Text-level similarity metrics."""
-    char_similarity: float = 0.0      # Character-level similarity
-    line_similarity: float = 0.0      # Line-level similarity
-    word_similarity: float = 0.0      # Word-level similarity
-    levenshtein_ratio: float = 0.0    # Levenshtein distance ratio
-    jaccard_similarity: float = 0.0   # Jaccard index (word sets)
-    cosine_similarity: float = 0.0    # Cosine similarity (word vectors)
 
-    diff_added: int = 0               # Lines added
-    diff_removed: int = 0             # Lines removed
-    diff_changed: int = 0             # Lines changed
+    char_similarity: float = 0.0  # Character-level similarity
+    line_similarity: float = 0.0  # Line-level similarity
+    word_similarity: float = 0.0  # Word-level similarity
+    levenshtein_ratio: float = 0.0  # Levenshtein distance ratio
+    jaccard_similarity: float = 0.0  # Jaccard index (word sets)
+    cosine_similarity: float = 0.0  # Cosine similarity (word vectors)
+
+    diff_added: int = 0  # Lines added
+    diff_removed: int = 0  # Lines removed
+    diff_changed: int = 0  # Lines changed
 
 
 @dataclass
 class StructuralMetrics:
     """Structural code metrics."""
+
     classes_original: int = 0
     classes_generated: int = 0
     classes_match: bool = False
@@ -63,35 +65,37 @@ class StructuralMetrics:
     attributes_generated: int = 0
     attributes_match: bool = False
 
-    structural_score: float = 0.0     # Overall structural match %
-    element_coverage: float = 0.0     # % of elements reproduced
+    structural_score: float = 0.0  # Overall structural match %
+    element_coverage: float = 0.0  # % of elements reproduced
 
 
 @dataclass
 class SemanticMetrics:
     """Semantic preservation metrics."""
-    naming_similarity: float = 0.0    # How similar are identifier names
-    docstring_present: float = 0.0    # % of docstrings preserved
-    type_hints_present: float = 0.0   # % of type hints preserved
-    decorator_match: float = 0.0      # % of decorators preserved
-    signature_match: float = 0.0      # % of function signatures matching
-    intent_score: float = 0.0         # Overall intent preservation
+
+    naming_similarity: float = 0.0  # How similar are identifier names
+    docstring_present: float = 0.0  # % of docstrings preserved
+    type_hints_present: float = 0.0  # % of type hints preserved
+    decorator_match: float = 0.0  # % of decorators preserved
+    signature_match: float = 0.0  # % of function signatures matching
+    intent_score: float = 0.0  # Overall intent preservation
 
 
 @dataclass
 class FormatMetrics:
     """Format-specific efficiency metrics."""
+
     format_name: str = ""
     spec_chars: int = 0
     spec_lines: int = 0
-    spec_tokens: int = 0              # Estimated tokens
+    spec_tokens: int = 0  # Estimated tokens
 
     original_chars: int = 0
     generated_chars: int = 0
 
-    compression_ratio: float = 0.0    # original / spec
-    expansion_ratio: float = 0.0      # generated / spec
-    efficiency_score: float = 0.0     # similarity / compression
+    compression_ratio: float = 0.0  # original / spec
+    expansion_ratio: float = 0.0  # generated / spec
+    efficiency_score: float = 0.0  # similarity / compression
 
     token_cost_estimate: float = 0.0  # Estimated API cost
 
@@ -99,6 +103,7 @@ class FormatMetrics:
 @dataclass
 class ReproductionResult:
     """Complete reproduction analysis result."""
+
     source_file: str = ""
     format_used: str = ""
     timestamp: str = ""
@@ -108,8 +113,8 @@ class ReproductionResult:
     semantic: SemanticMetrics = field(default_factory=SemanticMetrics)
     format: FormatMetrics = field(default_factory=FormatMetrics)
 
-    overall_score: float = 0.0        # Weighted overall score
-    quality_grade: str = ""           # A, B, C, D, F
+    overall_score: float = 0.0  # Weighted overall score
+    quality_grade: str = ""  # A, B, C, D, F
 
     recommendations: List[str] = field(default_factory=list)
 
@@ -176,7 +181,7 @@ class ReproductionResult:
             for rec in self.recommendations:
                 lines.append(f"- {rec}")
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
 
 class ReproductionMetrics:
@@ -229,7 +234,9 @@ class ReproductionMetrics:
         # Format metrics
         if spec:
             logger.debug("Computing format metrics...")
-            result.format = self._compute_format_metrics(original, generated, spec, format_name)
+            result.format = self._compute_format_metrics(
+                original, generated, spec, format_name
+            )
 
         # Overall score
         result.overall_score = self._compute_overall_score(result)
@@ -238,7 +245,9 @@ class ReproductionMetrics:
         # Generate recommendations
         result.recommendations = self._generate_recommendations(result)
 
-        logger.info(f"Analysis complete: {result.quality_grade} ({result.overall_score:.1f}%)")
+        logger.info(
+            f"Analysis complete: {result.quality_grade} ({result.overall_score:.1f}%)"
+        )
 
         return result
 
@@ -247,11 +256,11 @@ class ReproductionMetrics:
         metrics = TextMetrics()
 
         # Normalize
-        orig_lines = [l.rstrip() for l in original.split('\n') if l.strip()]
-        gen_lines = [l.rstrip() for l in generated.split('\n') if l.strip()]
+        orig_lines = [l.rstrip() for l in original.split("\n") if l.strip()]
+        gen_lines = [l.rstrip() for l in generated.split("\n") if l.strip()]
 
-        orig_words = re.findall(r'\w+', original.lower())
-        gen_words = re.findall(r'\w+', generated.lower())
+        orig_words = re.findall(r"\w+", original.lower())
+        gen_words = re.findall(r"\w+", generated.lower())
 
         # Character similarity (SequenceMatcher)
         matcher = difflib.SequenceMatcher(None, original, generated)
@@ -279,9 +288,13 @@ class ReproductionMetrics:
         metrics.cosine_similarity = self._cosine_similarity(orig_words, gen_words)
 
         # Diff stats
-        diff = list(difflib.unified_diff(orig_lines, gen_lines, lineterm=''))
-        metrics.diff_added = sum(1 for d in diff if d.startswith('+') and not d.startswith('+++'))
-        metrics.diff_removed = sum(1 for d in diff if d.startswith('-') and not d.startswith('---'))
+        diff = list(difflib.unified_diff(orig_lines, gen_lines, lineterm=""))
+        metrics.diff_added = sum(
+            1 for d in diff if d.startswith("+") and not d.startswith("+++")
+        )
+        metrics.diff_removed = sum(
+            1 for d in diff if d.startswith("-") and not d.startswith("---")
+        )
         metrics.diff_changed = metrics.diff_added + metrics.diff_removed
 
         return metrics
@@ -294,44 +307,46 @@ class ReproductionMetrics:
         all_words = set(counter1.keys()) | set(counter2.keys())
 
         dot_product = sum(counter1.get(w, 0) * counter2.get(w, 0) for w in all_words)
-        magnitude1 = sum(v ** 2 for v in counter1.values()) ** 0.5
-        magnitude2 = sum(v ** 2 for v in counter2.values()) ** 0.5
+        magnitude1 = sum(v**2 for v in counter1.values()) ** 0.5
+        magnitude2 = sum(v**2 for v in counter2.values()) ** 0.5
 
         if magnitude1 * magnitude2 == 0:
             return 0
 
         return (dot_product / (magnitude1 * magnitude2)) * 100
 
-    def _compute_structural_metrics(self, original: str, generated: str) -> StructuralMetrics:
+    def _compute_structural_metrics(
+        self, original: str, generated: str
+    ) -> StructuralMetrics:
         """Compute structural metrics using AST when possible, regex as fallback."""
         metrics = StructuralMetrics()
 
         orig = self._count_elements_ast(original)
         gen = self._count_elements_ast(generated)
 
-        metrics.classes_original = orig['classes']
-        metrics.classes_generated = gen['classes']
-        metrics.classes_match = orig['classes'] == gen['classes']
+        metrics.classes_original = orig["classes"]
+        metrics.classes_generated = gen["classes"]
+        metrics.classes_match = orig["classes"] == gen["classes"]
 
-        metrics.functions_original = orig['functions']
-        metrics.functions_generated = gen['functions']
-        metrics.functions_match = orig['functions'] == gen['functions']
+        metrics.functions_original = orig["functions"]
+        metrics.functions_generated = gen["functions"]
+        metrics.functions_match = orig["functions"] == gen["functions"]
 
-        metrics.methods_original = orig['methods']
-        metrics.methods_generated = gen['methods']
-        metrics.methods_match = orig['methods'] == gen['methods']
+        metrics.methods_original = orig["methods"]
+        metrics.methods_generated = gen["methods"]
+        metrics.methods_match = orig["methods"] == gen["methods"]
 
-        metrics.imports_original = orig['imports']
-        metrics.imports_generated = gen['imports']
-        metrics.imports_match = orig['imports'] == gen['imports']
+        metrics.imports_original = orig["imports"]
+        metrics.imports_generated = gen["imports"]
+        metrics.imports_match = orig["imports"] == gen["imports"]
 
-        metrics.attributes_original = orig['attributes']
-        metrics.attributes_generated = gen['attributes']
-        metrics.attributes_match = orig['attributes'] == gen['attributes']
+        metrics.attributes_original = orig["attributes"]
+        metrics.attributes_generated = gen["attributes"]
+        metrics.attributes_match = orig["attributes"] == gen["attributes"]
 
         # Ratio-based structural score (partial credit instead of binary)
         total = 0.0
-        for key in ('classes', 'functions', 'methods', 'imports', 'attributes'):
+        for key in ("classes", "functions", "methods", "imports", "attributes"):
             ov, gv = orig[key], gen[key]
             if ov == 0 and gv == 0:
                 total += 1.0
@@ -357,11 +372,17 @@ class ReproductionMetrics:
         except SyntaxError:
             # Fallback to regex for unparseable code
             return {
-                'classes': len(re.findall(r'^class\s+\w+', code, re.MULTILINE)),
-                'functions': len(re.findall(r'^(?:async\s+)?def\s+\w+', code, re.MULTILINE)),
-                'methods': len(re.findall(r'^\s+(?:async\s+)?def\s+\w+', code, re.MULTILINE)),
-                'imports': len(re.findall(r'^(?:from|import)\s+', code, re.MULTILINE)),
-                'attributes': len(re.findall(r'^\s+\w+\s*(?::\s*[^=\n]+)?\s*=', code, re.MULTILINE)),
+                "classes": len(re.findall(r"^class\s+\w+", code, re.MULTILINE)),
+                "functions": len(
+                    re.findall(r"^(?:async\s+)?def\s+\w+", code, re.MULTILINE)
+                ),
+                "methods": len(
+                    re.findall(r"^\s+(?:async\s+)?def\s+\w+", code, re.MULTILINE)
+                ),
+                "imports": len(re.findall(r"^(?:from|import)\s+", code, re.MULTILINE)),
+                "attributes": len(
+                    re.findall(r"^\s+\w+\s*(?::\s*[^=\n]+)?\s*=", code, re.MULTILINE)
+                ),
             }
 
         classes = 0
@@ -393,20 +414,26 @@ class ReproductionMetrics:
                 functions += 1
 
         return {
-            'classes': classes,
-            'functions': functions,
-            'methods': methods,
-            'imports': imports,
-            'attributes': attributes,
+            "classes": classes,
+            "functions": functions,
+            "methods": methods,
+            "imports": imports,
+            "attributes": attributes,
         }
 
-    def _compute_semantic_metrics(self, original: str, generated: str) -> SemanticMetrics:
+    def _compute_semantic_metrics(
+        self, original: str, generated: str
+    ) -> SemanticMetrics:
         """Compute semantic preservation metrics."""
         metrics = SemanticMetrics()
 
         # Extract identifiers
-        orig_identifiers = set(re.findall(r'\b([A-Z][a-z]+|[a-z_][a-z0-9_]*)\b', original))
-        gen_identifiers = set(re.findall(r'\b([A-Z][a-z]+|[a-z_][a-z0-9_]*)\b', generated))
+        orig_identifiers = set(
+            re.findall(r"\b([A-Z][a-z]+|[a-z_][a-z0-9_]*)\b", original)
+        )
+        gen_identifiers = set(
+            re.findall(r"\b([A-Z][a-z]+|[a-z_][a-z0-9_]*)\b", generated)
+        )
 
         # Naming similarity
         common = len(orig_identifiers & gen_identifiers)
@@ -422,16 +449,16 @@ class ReproductionMetrics:
             metrics.docstring_present = 100 if gen_docstrings == 0 else 50
 
         # Type hints presence
-        orig_hints = len(re.findall(r':\s*\w+[\[\],\s\w]*(?:\s*=|$|\))', original))
-        gen_hints = len(re.findall(r':\s*\w+[\[\],\s\w]*(?:\s*=|$|\))', generated))
+        orig_hints = len(re.findall(r":\s*\w+[\[\],\s\w]*(?:\s*=|$|\))", original))
+        gen_hints = len(re.findall(r":\s*\w+[\[\],\s\w]*(?:\s*=|$|\))", generated))
         if orig_hints > 0:
             metrics.type_hints_present = min(gen_hints / orig_hints, 1.0) * 100
         else:
             metrics.type_hints_present = 100
 
         # Decorator match
-        orig_decorators = set(re.findall(r'@\w+', original))
-        gen_decorators = set(re.findall(r'@\w+', generated))
+        orig_decorators = set(re.findall(r"@\w+", original))
+        gen_decorators = set(re.findall(r"@\w+", generated))
         if orig_decorators:
             common_dec = len(orig_decorators & gen_decorators)
             metrics.decorator_match = (common_dec / len(orig_decorators)) * 100
@@ -439,8 +466,8 @@ class ReproductionMetrics:
             metrics.decorator_match = 100
 
         # Signature match (function definitions)
-        orig_sigs = set(re.findall(r'def\s+(\w+)\s*\([^)]*\)', original))
-        gen_sigs = set(re.findall(r'def\s+(\w+)\s*\([^)]*\)', generated))
+        orig_sigs = set(re.findall(r"def\s+(\w+)\s*\([^)]*\)", original))
+        gen_sigs = set(re.findall(r"def\s+(\w+)\s*\([^)]*\)", generated))
         if orig_sigs:
             common_sigs = len(orig_sigs & gen_sigs)
             metrics.signature_match = (common_sigs / len(orig_sigs)) * 100
@@ -449,11 +476,11 @@ class ReproductionMetrics:
 
         # Intent score (average of semantic metrics)
         metrics.intent_score = (
-            metrics.naming_similarity +
-            metrics.docstring_present +
-            metrics.type_hints_present +
-            metrics.decorator_match +
-            metrics.signature_match
+            metrics.naming_similarity
+            + metrics.docstring_present
+            + metrics.type_hints_present
+            + metrics.decorator_match
+            + metrics.signature_match
         ) / 5
 
         return metrics
@@ -469,7 +496,7 @@ class ReproductionMetrics:
         metrics = FormatMetrics(format_name=format_name)
 
         metrics.spec_chars = len(spec)
-        metrics.spec_lines = len(spec.split('\n'))
+        metrics.spec_lines = len(spec.split("\n"))
         metrics.spec_tokens = len(spec) // 4  # Rough estimate
 
         metrics.original_chars = len(original)
@@ -498,29 +525,29 @@ class ReproductionMetrics:
         """Compute weighted overall score."""
         # Weights for different metric categories
         weights = {
-            'text': 0.3,
-            'structural': 0.35,
-            'semantic': 0.35,
+            "text": 0.3,
+            "structural": 0.35,
+            "semantic": 0.35,
         }
 
         text_score = (
-            result.text.char_similarity * 0.2 +
-            result.text.line_similarity * 0.3 +
-            result.text.jaccard_similarity * 0.25 +
-            result.text.cosine_similarity * 0.25
+            result.text.char_similarity * 0.2
+            + result.text.line_similarity * 0.3
+            + result.text.jaccard_similarity * 0.25
+            + result.text.cosine_similarity * 0.25
         )
 
         structural_score = (
-            result.structural.structural_score * 0.6 +
-            result.structural.element_coverage * 0.4
+            result.structural.structural_score * 0.6
+            + result.structural.element_coverage * 0.4
         )
 
         semantic_score = result.semantic.intent_score
 
         overall = (
-            text_score * weights['text'] +
-            structural_score * weights['structural'] +
-            semantic_score * weights['semantic']
+            text_score * weights["text"]
+            + structural_score * weights["structural"]
+            + semantic_score * weights["semantic"]
         )
 
         return overall
@@ -528,25 +555,29 @@ class ReproductionMetrics:
     def _get_grade(self, score: float) -> str:
         """Get letter grade from score."""
         if score >= 80:
-            return 'A'
+            return "A"
         elif score >= 65:
-            return 'B'
+            return "B"
         elif score >= 50:
-            return 'C'
+            return "C"
         elif score >= 35:
-            return 'D'
+            return "D"
         else:
-            return 'F'
+            return "F"
 
     def _generate_recommendations(self, result: ReproductionResult) -> List[str]:
         """Generate improvement recommendations."""
         recs = []
 
         if result.structural.structural_score < 50:
-            recs.append("Improve structural matching - ensure all classes and functions are captured")
+            recs.append(
+                "Improve structural matching - ensure all classes and functions are captured"
+            )
 
         if result.semantic.naming_similarity < 60:
-            recs.append("Improve identifier naming - use more descriptive names in specification")
+            recs.append(
+                "Improve identifier naming - use more descriptive names in specification"
+            )
 
         if result.semantic.type_hints_present < 50:
             recs.append("Add type hints to specification for better type preservation")
@@ -555,10 +586,14 @@ class ReproductionMetrics:
             recs.append("Include docstrings in specification for better documentation")
 
         if result.text.jaccard_similarity < 40:
-            recs.append("Improve vocabulary coverage - specification may be missing key terms")
+            recs.append(
+                "Improve vocabulary coverage - specification may be missing key terms"
+            )
 
         if result.format.compression_ratio > 5:
-            recs.append("High compression - consider adding more detail to specification")
+            recs.append(
+                "High compression - consider adding more detail to specification"
+            )
 
         if result.format.efficiency_score < 0.3:
             recs.append("Low efficiency - try different format or add more structure")
@@ -616,23 +651,27 @@ def compare_formats(
 
     # Find best format for each metric category
     best = {
-        'overall': max(comparisons.items(), key=lambda x: x[1].overall_score),
-        'text': max(comparisons.items(), key=lambda x: x[1].text.char_similarity),
-        'structural': max(comparisons.items(), key=lambda x: x[1].structural.structural_score),
-        'semantic': max(comparisons.items(), key=lambda x: x[1].semantic.intent_score),
-        'efficiency': max(comparisons.items(), key=lambda x: x[1].format.efficiency_score),
+        "overall": max(comparisons.items(), key=lambda x: x[1].overall_score),
+        "text": max(comparisons.items(), key=lambda x: x[1].text.char_similarity),
+        "structural": max(
+            comparisons.items(), key=lambda x: x[1].structural.structural_score
+        ),
+        "semantic": max(comparisons.items(), key=lambda x: x[1].semantic.intent_score),
+        "efficiency": max(
+            comparisons.items(), key=lambda x: x[1].format.efficiency_score
+        ),
     }
 
     return {
-        'results': {k: v.to_dict() for k, v in comparisons.items()},
-        'best': {k: v[0] for k, v in best.items()},
-        'summary': {
+        "results": {k: v.to_dict() for k, v in comparisons.items()},
+        "best": {k: v[0] for k, v in best.items()},
+        "summary": {
             format_name: {
-                'overall': r.overall_score,
-                'grade': r.quality_grade,
-                'text': r.text.char_similarity,
-                'structural': r.structural.structural_score,
-                'semantic': r.semantic.intent_score,
+                "overall": r.overall_score,
+                "grade": r.quality_grade,
+                "text": r.text.char_similarity,
+                "structural": r.structural.structural_score,
+                "semantic": r.semantic.intent_score,
             }
             for format_name, r in comparisons.items()
         },

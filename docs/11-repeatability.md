@@ -1,8 +1,6 @@
 
 [← README](../README.md) | [Docs Index](00-index.md)
 
-## 📊 Podsumowanie - Test Powtarzalności
-
 ### Wyniki Testu (3 uruchomienia)
 
 | Format | Avg Similarity | Line Variance | Syntax OK | Różnice |
@@ -46,9 +44,6 @@ examples/14_repeatability_test.py  # Test powtarzalności
 examples/output/repeatability_test.json  # Wyniki
 ```
 
-### 🚀 Użycie
-
-```bash
 # Test powtarzalności (3 runy)
 python examples/14_repeatability_test.py \
   --file tests/samples/sample_class.py

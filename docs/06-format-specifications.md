@@ -13,8 +13,6 @@ Complete specifications for Code2Logic output formats.
 
 ---
 
-## YAML Format
-
 ### Schema (YAML)
 
 ```yaml
@@ -83,11 +81,6 @@ if not is_valid:
 
 ---
 
-## LogicML Format
-
-### Schema (LogicML)
-
-```yaml
 # filename.py | ClassName, Class2 | N lines
 
 imports:
@@ -172,19 +165,10 @@ is_valid, errors = validate_logicml(spec)
 
 ---
 
-## Markdown Hybrid Format
-
-### Schema (Markdown Hybrid)
-
-```markdown
-# Module: filename.py
-
 ## Metadata
 - Language: python
 - Lines: 150
 - Imports: typing, dataclasses
-
-## Classes
 
 ### ClassName
 
@@ -210,20 +194,12 @@ Scenario: Method behavior
   Then returns expected result
 ```
 
-## Functions
-
 ### Validation (Markdown Hybrid)
 
 ````python
 from code2logic import validate_markdown
 
 spec = """
-# Module: utils.py
-
-## Classes
-
-### Helper
-**Methods:**
 #### process
 ```yaml
 signature: (self, data: str) -> str
@@ -252,8 +228,6 @@ is_valid, errors = validate_markdown(spec)
 
 ---
 
-## API Usage
-
 ### Generate and Validate
 
 ```python
@@ -279,9 +253,6 @@ logicml_spec = logicml_gen.generate(project)
 is_valid, errors = validate_logicml(logicml_spec.content)
 ```
 
-### Benchmarking
-
-```bash
 # Compare formats
 python examples/11_token_benchmark.py \
   --folder /path/to/code \
@@ -294,8 +265,6 @@ python examples/13_project_benchmark.py \
 ```
 
 ---
-
-## Quality Analysis API
 
 ### Analyze Code Quality
 
@@ -310,13 +279,6 @@ project = analyze_project('/path/to/project')
 report = analyze_quality(project)
 
 print(get_quality_summary(report))
-# Quality Score: 85.0/100
-# Issues Found: 3
-# Issues by Severity:
-#   🔴 High: 1
-#   🟡 Medium: 2
-```
-
 ### Quality Thresholds
 
 | Metric | Default | Description |
@@ -339,8 +301,6 @@ report = analyzer.analyze(project)
 ```
 
 ---
-
-## Duplicate Detection & Refactoring
 
 ### Find Similar Functions
 

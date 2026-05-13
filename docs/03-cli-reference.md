@@ -58,8 +58,6 @@ If `CODE2LOGIC_DEFAULT_PROVIDER=auto`, Code2Logic tries providers in priority or
 | `--status` | | Show library availability |
 | `--version` | | Show version |
 
-## Output Formats
-
 ### Markdown (default)
 
 ```bash
@@ -84,9 +82,6 @@ code2logic /path/to/project -f csv -o analysis.csv
 
 Tabular format, good for data analysis and spreadsheets.
 
-### JSON
-
-```bash
 # Nested JSON
 code2logic /path/to/project -f json -o analysis.json
 
@@ -94,9 +89,6 @@ code2logic /path/to/project -f json -o analysis.json
 code2logic /path/to/project -f json --flat -o analysis.json
 ```
 
-### YAML
-
-```bash
 # Standard YAML
 code2logic /path/to/project -f yaml -o analysis.yaml
 
@@ -109,16 +101,10 @@ code2logic /path/to/project -f yaml --compact --with-schema
 
 Human-readable structured format with compact variant using short keys and `meta.legend` for LLM transparency.
 
-### Hybrid YAML
-
-```bash
 # Hybrid YAML (recommended for code regeneration / best fidelity)
 code2logic /path/to/project -f hybrid -o analysis.hybrid.yaml
 ```
 
-### TOON
-
-```bash
 # Standard TOON (token-efficient)
 code2logic /path/to/project -f toon -o analysis.toon
 
@@ -204,21 +190,10 @@ code2logic /path/to/project -f csv -d standard
 code2logic /path/to/project -f csv -d full
 ```
 
-## Examples
-
-### Basic Analysis
-
-```bash
-# Analyze current directory
-code2logic .
-
 # Analyze specific project
 code2logic /path/to/myproject
 ```
 
-### Save to File
-
-```bash
 # Save as Gherkin
 code2logic /path/to/project -f gherkin -o tests.feature
 
@@ -226,30 +201,9 @@ code2logic /path/to/project -f gherkin -o tests.feature
 code2logic /path/to/project -f json -o analysis.json
 ```
 
-### Verbose Mode
-
-```bash
 # Show progress and statistics
 code2logic /path/to/project -v
 
-# Output:
-# CODE2LOGIC
-# ══════════
-#     Version: 1.0.1
-# [1] Checking dependencies... (0.00s)
-# [2] Analyzing project: /path/to/project (0.01s)
-# ✓ Analysis complete (0.19s)
-# ──────────────────────────────────────────────────
-#     Files: 30
-#     Lines: 10,835
-#     Languages: python
-#     Functions: 115
-#     Classes: 28
-```
-
-### Pipe to Other Tools
-
-```bash
 # Pipe to jq for JSON processing
 code2logic /path/to/project -f json | jq '.modules[0]'
 
@@ -260,9 +214,6 @@ code2logic /path/to/project -f csv | grep "function"
 code2logic /path/to/project -f csv -d minimal | wc -l
 ```
 
-### Integration with LLM
-
-```bash
 # Generate context for LLM prompt
 code2logic /path/to/project -f gherkin -d minimal > context.feature
 
@@ -270,9 +221,6 @@ code2logic /path/to/project -f gherkin -d minimal > context.feature
 cat context.feature | ollama run qwen2.5-coder:7b "Generate tests for this"
 ```
 
-## Environment Variables
-
-```bash
 # Skip dependency installation
 CODE2LOGIC_NO_INSTALL=1 code2logic /path/to/project
 

@@ -6,14 +6,14 @@ and produces various types of tests (unit tests, integration tests, property tes
 
 Usage:
     from logic2test import TestGenerator
-    
+
     generator = TestGenerator('project.c2l.yaml')
     generator.generate_unit_tests('tests/')
 """
 
-from .generator import TestGenerator, GeneratorConfig, GenerationResult
+from .generator import GenerationResult, GeneratorConfig, TestGenerator
 from .parsers import LogicParser
 from .templates import TestTemplate
 
-__version__ = '1.0.48'
-__all__ = ['TestGenerator', 'GeneratorConfig', 'GenerationResult', 'LogicParser', 'TestTemplate']
+__version__ = "1.0.48"
+__all__ = ["TestGenerator", "GeneratorConfig", "GenerationResult", "LogicParser", "TestTemplate"]

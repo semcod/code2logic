@@ -141,7 +141,9 @@ def generate_spec_token(project: ProjectInfo, fmt: str) -> str:
     return generate_spec(project, fmt)
 
 
-def get_async_reproduction_prompt(spec: str, fmt: str, file_name: str, with_tests: bool = False) -> str:
+def get_async_reproduction_prompt(
+    spec: str, fmt: str, file_name: str, with_tests: bool = False
+) -> str:
     base_prompts = {
         "gherkin": f"""Generate Python code from this Gherkin/BDD specification.
 Implement all scenarios as working, production-ready code.
@@ -188,7 +190,9 @@ Name the test class Test<ClassName> or TestFunctions."""
     return prompt
 
 
-def get_token_reproduction_prompt(spec: str, fmt: str, file_name: str, language: str = "python") -> str:
+def get_token_reproduction_prompt(
+    spec: str, fmt: str, file_name: str, language: str = "python"
+) -> str:
     format_hints = {
         "json": """Parse the JSON structure carefully:
 - 'modules' array contains file-level info with 'classes' and 'functions'
@@ -333,11 +337,11 @@ CRITICAL RULES:
     }
     lang_label = lang_label_map.get(language_norm, language_norm)
 
-    lang_hint = lang_hints.get(language_norm, '')
-    lang_hint_line = f"\n{lang_hint}" if lang_hint else ''
+    lang_hint = lang_hints.get(language_norm, "")
+    lang_hint_line = f"\n{lang_hint}" if lang_hint else ""
 
     prompt = f"""Generate complete {lang_label} source code from this {fmt.upper()} specification.
-{format_hints.get(fmt, '')}{lang_hint_line}
+{format_hints.get(fmt, "")}{lang_hint_line}
 
 SPECIFICATION:
 {spec_truncated}

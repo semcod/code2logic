@@ -20,7 +20,7 @@ import re
 import sys
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -29,31 +29,67 @@ from ..llm_clients import BaseLLMClient, get_client
 from ..metrics import ReproductionMetrics
 from ..terminal import render
 from ..utils import estimate_tokens
-from .common import create_single_project, generate_spec_token, get_token_reproduction_prompt
-from .results import BenchmarkConfig, BenchmarkResult, FileResult, FormatResult, FunctionResult
+from .common import (
+    create_single_project,
+    generate_spec_token,
+    get_token_reproduction_prompt,
+)
+from .results import (
+    BenchmarkConfig,
+    BenchmarkResult,
+    FileResult,
+    FormatResult,
+    FunctionResult,
+)
+
+TIMEOUT_5 = 5
+CONSTANT_30 = 30
+CONSTANT_50 = 50
+CONSTANT_80 = 80
+MAX_3000 = 3000
+
+
+TIMEOUT_5 = TIMEOUT_5
+CONSTANT_30 = CONSTANT_30
+CONSTANT_50 = CONSTANT_50
+CONSTANT_80 = CONSTANT_80
+MAX_3000 = MAX_3000
+
+
+TIMEOUT_5 = TIMEOUT_5
+CONSTANT_30 = CONSTANT_30
+CONSTANT_50 = CONSTANT_50
+CONSTANT_80 = CONSTANT_80
+MAX_3000 = MAX_3000
+
+
+TIMEOUT_5 = TIMEOUT_5
+CONSTANT_30 = CONSTANT_30
+CONSTANT_50 = CONSTANT_50
+CONSTANT_80 = CONSTANT_80
+MAX_3000 = MAX_3000
 
 
 def _test_python_syntax(code: str) -> bool:
     """Test if Python code has valid syntax."""
     try:
-        compile(code, '<string>', 'exec')
+        compile(code, "<string>", "exec")
         return True
     except SyntaxError:
         return False
 
 
-def _test_python_runs(code: str, timeout: int = 5) -> bool:
+def _test_python_runs(code: str, timeout: int = TIMEOUT_5) -> bool:
     """Test if Python code runs without errors."""
     import subprocess
     import tempfile
 
     try:
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
             f.write(code)
             f.flush()
             result = subprocess.run(
-                [sys.executable, f.name],
-                capture_output=True, timeout=timeout
+                [sys.executable, f.name], capture_output=True, timeout=timeout
             )
             return result.returncode == 0
     except subprocess.TimeoutExpired:
@@ -69,7 +105,7 @@ def _basic_syntax_ok(code: str, language: str) -> bool:
         return False
     if language in ("javascript", "typescript"):
         # Basic bracket/brace balance to catch the most common truncations
-        pairs = {')': '(', ']': '[', '}': '{'}
+        pairs = {")": "(", "]": "[", "}": "{"}
         stack: List[str] = []
         for ch in s:
             if ch in "([{":
@@ -97,46 +133,64 @@ def _count_structural_elements(code: str, language: str) -> dict:
     s = code or ""
     if language == "python":
         return {
-            'classes': len(re.findall(r'^class\s+\w+', s, re.MULTILINE)),
-            'functions': len(re.findall(r'^def\s+\w+', s, re.MULTILINE)),
-            'imports': len(re.findall(r'^(?:from|import)\s+', s, re.MULTILINE)),
+            "classes": len(re.findall(r"^class\s+\w+", s, re.MULTILINE)),
+            "functions": len(re.findall(r"^def\s+\w+", s, re.MULTILINE)),
+            "imports": len(re.findall(r"^(?:from|import)\s+", s, re.MULTILINE)),
         }
     if language in ("javascript", "typescript"):
         return {
-            'classes': len(re.findall(r'\bclass\s+\w+', s)),
-            'functions': len(re.findall(r'\bfunction\s+\w+\s*\(', s)) + len(re.findall(r'\bconst\s+\w+\s*=\s*(?:async\s*)?\([^)]*\)\s*=>', s)),
-            'types': len(re.findall(r'\binterface\s+\w+', s)) + len(re.findall(r'\btype\s+\w+\s*=', s)) + len(re.findall(r'\benum\s+\w+', s)),
-            'imports': len(re.findall(r'^import\s+', s, re.MULTILINE)) + len(re.findall(r'\brequire\(', s)),
+            "classes": len(re.findall(r"\bclass\s+\w+", s)),
+            "functions": len(re.findall(r"\bfunction\s+\w+\s*\(", s))
+            + len(re.findall(r"\bconst\s+\w+\s*=\s*(?:async\s*)?\([^)]*\)\s*=>", s)),
+            "types": len(re.findall(r"\binterface\s+\w+", s))
+            + len(re.findall(r"\btype\s+\w+\s*=", s))
+            + len(re.findall(r"\benum\s+\w+", s)),
+            "imports": len(re.findall(r"^import\s+", s, re.MULTILINE))
+            + len(re.findall(r"\brequire\(", s)),
         }
     if language == "go":
         return {
-            'types': len(re.findall(r'^type\s+\w+\s+(?:struct|interface)\b', s, re.MULTILINE)),
-            'functions': len(re.findall(r'^func\s+(?:\([^)]*\)\s*)?\w+\s*\(', s, re.MULTILINE)),
-            'imports': len(re.findall(r'^import\b', s, re.MULTILINE)),
+            "types": len(
+                re.findall(r"^type\s+\w+\s+(?:struct|interface)\b", s, re.MULTILINE)
+            ),
+            "functions": len(
+                re.findall(r"^func\s+(?:\([^)]*\)\s*)?\w+\s*\(", s, re.MULTILINE)
+            ),
+            "imports": len(re.findall(r"^import\b", s, re.MULTILINE)),
         }
     if language == "rust":
         return {
-            'types': len(re.findall(r'\bstruct\s+\w+', s)) + len(re.findall(r'\benum\s+\w+', s)) + len(re.findall(r'\btrait\s+\w+', s)),
-            'functions': len(re.findall(r'\bfn\s+\w+\s*\(', s)),
-            'imports': len(re.findall(r'^use\s+', s, re.MULTILINE)),
+            "types": len(re.findall(r"\bstruct\s+\w+", s))
+            + len(re.findall(r"\benum\s+\w+", s))
+            + len(re.findall(r"\btrait\s+\w+", s)),
+            "functions": len(re.findall(r"\bfn\s+\w+\s*\(", s)),
+            "imports": len(re.findall(r"^use\s+", s, re.MULTILINE)),
         }
     if language == "java":
         return {
-            'types': len(re.findall(r'\bclass\s+\w+', s)) + len(re.findall(r'\binterface\s+\w+', s)) + len(re.findall(r'\benum\s+\w+', s)) + len(re.findall(r'\brecord\s+\w+', s)),
-            'functions': len(re.findall(r'\b\w+\s+\w+\s*\([^)]*\)\s*\{', s)),
-            'imports': len(re.findall(r'^import\s+', s, re.MULTILINE)),
+            "types": len(re.findall(r"\bclass\s+\w+", s))
+            + len(re.findall(r"\binterface\s+\w+", s))
+            + len(re.findall(r"\benum\s+\w+", s))
+            + len(re.findall(r"\brecord\s+\w+", s)),
+            "functions": len(re.findall(r"\b\w+\s+\w+\s*\([^)]*\)\s*\{", s)),
+            "imports": len(re.findall(r"^import\s+", s, re.MULTILINE)),
         }
     if language == "csharp":
         return {
-            'types': len(re.findall(r'\bclass\s+\w+', s)) + len(re.findall(r'\binterface\s+\w+', s)) + len(re.findall(r'\brecord\s+\w+', s)),
-            'functions': len(re.findall(r'\b\w+\s+\w+\s*\([^)]*\)\s*\{', s)),
-            'imports': len(re.findall(r'^using\s+', s, re.MULTILINE)),
+            "types": len(re.findall(r"\bclass\s+\w+", s))
+            + len(re.findall(r"\binterface\s+\w+", s))
+            + len(re.findall(r"\brecord\s+\w+", s)),
+            "functions": len(re.findall(r"\b\w+\s+\w+\s*\([^)]*\)\s*\{", s)),
+            "imports": len(re.findall(r"^using\s+", s, re.MULTILINE)),
         }
     if language == "sql":
         upper = s.upper()
         return {
-            'types': len(re.findall(r'\bCREATE\s+TABLE\s+\w+', upper)) + len(re.findall(r'\bCREATE\s+(?:OR\s+REPLACE\s+)?VIEW\s+\w+', upper)),
-            'functions': len(re.findall(r'\bCREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION\s+\w+', upper)),
+            "types": len(re.findall(r"\bCREATE\s+TABLE\s+\w+", upper))
+            + len(re.findall(r"\bCREATE\s+(?:OR\s+REPLACE\s+)?VIEW\s+\w+", upper)),
+            "functions": len(
+                re.findall(r"\bCREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION\s+\w+", upper)
+            ),
         }
     return {}
 
@@ -165,19 +219,28 @@ def _extract_code(response: str) -> str:
 
     # Try to find code block — check language-specific markers first, then generic
     markers = [
-        '```python', '```py',
-        '```javascript', '```js', '```typescript', '```ts',
-        '```go', '```rust', '```rs',
-        '```java', '```csharp', '```cs', '```c#',
-        '```sql',
-        '```',
+        "```python",
+        "```py",
+        "```javascript",
+        "```js",
+        "```typescript",
+        "```ts",
+        "```go",
+        "```rust",
+        "```rs",
+        "```java",
+        "```csharp",
+        "```cs",
+        "```c#",
+        "```sql",
+        "```",
     ]
     for marker in markers:
         if marker in response:
             start = response.find(marker) + len(marker)
-            if start < len(response) and response[start] == '\n':
+            if start < len(response) and response[start] == "\n":
                 start += 1
-            end = response.find('```', start)
+            end = response.find("```", start)
             if end > start:
                 return response[start:end].strip()
             return response[start:].strip()
@@ -196,7 +259,7 @@ class BenchmarkRunner:
     def __init__(
         self,
         client: Optional[BaseLLMClient] = None,
-        config: Optional[BenchmarkConfig] = None
+        config: Optional[BenchmarkConfig] = None,
     ):
         """
         Initialize benchmark runner.
@@ -221,7 +284,9 @@ class BenchmarkRunner:
             self.client = get_client()
         return self.client
 
-    def _template_generate_code(self, spec: str, fmt: str, file_name: str, language: str = "python") -> str:
+    def _template_generate_code(
+        self, spec: str, fmt: str, file_name: str, language: str = "python"
+    ) -> str:
         """Generate minimal code without an LLM (fallback mode)."""
         import re
 
@@ -236,26 +301,43 @@ class BenchmarkRunner:
         functions.extend(re.findall(r"\bFunction:\s*([A-Za-z_][A-Za-z0-9_]*)", spec))
         functions.extend(re.findall(r"\bScenario:\s*([A-Za-z_][A-Za-z0-9_]*)", spec))
         # TOON format: function lines like "  42,func_name,(params)"
-        functions.extend(re.findall(r'^\s+\d+,([A-Za-z_][A-Za-z0-9_]*),', spec, re.MULTILINE))
+        functions.extend(
+            re.findall(r"^\s+\d+,([A-Za-z_][A-Za-z0-9_]*),", spec, re.MULTILINE)
+        )
         # TOON class.method: "  42,ClassName.method_name,"
-        for cm in re.findall(r'^\s+\d+,([A-Z][A-Za-z0-9_]*)\.([a-z_][A-Za-z0-9_]*),', spec, re.MULTILINE):
+        for cm in re.findall(
+            r"^\s+\d+,([A-Z][A-Za-z0-9_]*)\.([a-z_][A-Za-z0-9_]*),", spec, re.MULTILINE
+        ):
             classes.append(cm[0])
             functions.append(cm[1])
         # YAML/JSON: "n: ClassName" or name patterns
-        classes.extend(re.findall(r'(?:^|\s)n:\s*([A-Z][A-Za-z0-9_]*)', spec, re.MULTILINE))
+        classes.extend(
+            re.findall(r"(?:^|\s)n:\s*([A-Z][A-Za-z0-9_]*)", spec, re.MULTILINE)
+        )
         # CSV format: path,type,name columns
-        for row_m in re.findall(r',class,([A-Z][A-Za-z0-9_]*),', spec):
+        for row_m in re.findall(r",class,([A-Z][A-Za-z0-9_]*),", spec):
             classes.append(row_m)
-        for row_m in re.findall(r',(?:function|method),([a-z_][A-Za-z0-9_]*),', spec):
+        for row_m in re.findall(r",(?:function|method),([a-z_][A-Za-z0-9_]*),", spec):
             functions.append(row_m)
         # Gherkin: Feature/Scenario names
-        functions.extend(re.findall(r'Scenario(?:\s+Outline)?:\s*(?:Test\s+)?([A-Za-z_][A-Za-z0-9_]*)', spec))
+        functions.extend(
+            re.findall(
+                r"Scenario(?:\s+Outline)?:\s*(?:Test\s+)?([A-Za-z_][A-Za-z0-9_]*)", spec
+            )
+        )
         # Non-Python: func/fn/function declarations
         functions.extend(re.findall(r"\bfunc\s+([A-Za-z_][A-Za-z0-9_]*)", spec))
         functions.extend(re.findall(r"\bfn\s+([A-Za-z_][A-Za-z0-9_]*)", spec))
-        functions.extend(re.findall(r"\bfunction\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(", spec))
+        functions.extend(
+            re.findall(r"\bfunction\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(", spec)
+        )
         # Java/C# style: "public static Type methodName("
-        functions.extend(re.findall(r"(?:public|private)\s+(?:static\s+)?\w+\s+([a-z][A-Za-z0-9_]*)\s*\(", spec))
+        functions.extend(
+            re.findall(
+                r"(?:public|private)\s+(?:static\s+)?\w+\s+([a-z][A-Za-z0-9_]*)\s*\(",
+                spec,
+            )
+        )
         # Interfaces/structs/enums
         classes.extend(re.findall(r"\binterface\s+([A-Za-z_][A-Za-z0-9_]*)", spec))
         classes.extend(re.findall(r"\bstruct\s+([A-Za-z_][A-Za-z0-9_]*)", spec))
@@ -271,8 +353,10 @@ class BenchmarkRunner:
                     out.append(it)
             return out
 
-        classes = [c for c in uniq(classes) if c.isidentifier()][:5]
-        functions = [f for f in uniq(functions) if f.isidentifier() and f not in classes][:10]
+        classes = [c for c in uniq(classes) if c.isidentifier()][:TIMEOUT_5]
+        functions = [
+            f for f in uniq(functions) if f.isidentifier() and f not in classes
+        ][:10]
 
         language_norm = (language or "python").strip().lower()
         if language_norm == "python":
@@ -307,7 +391,7 @@ from typing import Any, Optional, List, Dict
 
         if not classes and not functions:
             # Always emit something valid
-            safe_name = Path(file_name).stem.replace('-', '_').replace('.', '_')
+            safe_name = Path(file_name).stem.replace("-", "_").replace(".", "_")
             safe_name = safe_name if safe_name.isidentifier() else "GeneratedModule"
             classes = ["GeneratedClass"]
             functions = ["generated_function"]
@@ -395,15 +479,17 @@ class {cls}:
             except Exception as e:
                 client = None
                 if verbose:
-                    render.warning(f"LLM not available ({str(e)[:80]}). Falling back to template mode.")
+                    render.warning(
+                        f"LLM not available ({str(e)[:CONSTANT_80]}). Falling back to template mode."
+                    )
         else:
             client = None
 
         result = BenchmarkResult(
-            benchmark_type='format',
+            benchmark_type="format",
             source_path=folder,
-            provider=getattr(client, 'provider', 'none') if client else 'none',
-            model=getattr(client, 'model', 'none') if client else 'none',
+            provider=getattr(client, "provider", "none") if client else "none",
+            model=getattr(client, "model", "none") if client else "none",
         )
 
         # Analyze project
@@ -415,7 +501,10 @@ class {cls}:
 
         if verbose:
             render.heading(2, "Format Benchmark")
-            render.codeblock("yaml", f"folder: {folder}\nfiles: {len(modules)}\nformats: [{', '.join(formats)}]")
+            render.codeblock(
+                "yaml",
+                f"folder: {folder}\nfiles: {len(modules)}\nformats: [{', '.join(formats)}]",
+            )
 
         start_time = time.time()
 
@@ -424,7 +513,7 @@ class {cls}:
             abs_file = path / module_info.path
             if not abs_file.exists():
                 continue
-            original = abs_file.read_text(encoding='utf-8', errors='ignore')
+            original = abs_file.read_text(encoding="utf-8", errors="ignore")
 
             single_project = create_single_project(module_info, abs_file)
 
@@ -515,12 +604,16 @@ class {cls}:
             result.spec_tokens = estimate_tokens(spec)
 
             # Generate prompt
-            prompt = get_token_reproduction_prompt(spec, fmt, file_name, language=language)
+            prompt = get_token_reproduction_prompt(
+                spec, fmt, file_name, language=language
+            )
 
             # Reproduce
             start = time.time()
             if client is None:
-                generated = self._template_generate_code(spec, fmt, file_name, language=language)
+                generated = self._template_generate_code(
+                    spec, fmt, file_name, language=language
+                )
                 result.gen_time = 0.0
             else:
                 response = client.generate(prompt, max_tokens=self.config.max_tokens)
@@ -530,7 +623,7 @@ class {cls}:
 
             # Test quality
             language_norm = (language or "python").strip().lower()
-            if language_norm == 'python':
+            if language_norm == "python":
                 result.syntax_ok = _test_python_syntax(generated)
                 if result.syntax_ok:
                     result.runs_ok = _test_python_runs(generated)
@@ -540,13 +633,22 @@ class {cls}:
 
             # Calculate metrics
             if original and generated:
-                if language_norm == 'python':
+                if language_norm == "python":
                     metrics = ReproductionMetrics()
-                    analysis = metrics.analyze(original, generated, spec, format_name=fmt)
+                    analysis = metrics.analyze(
+                        original, generated, spec, format_name=fmt
+                    )
                     result.score = analysis.overall_score
                     result.similarity = analysis.text.char_similarity
                 else:
-                    sim = difflib.SequenceMatcher(None, ' '.join(original.split()), ' '.join(generated.split())).ratio() * 100
+                    sim = (
+                        difflib.SequenceMatcher(
+                            None,
+                            " ".join(original.split()),
+                            " ".join(generated.split()),
+                        ).ratio()
+                        * 100
+                    )
                     struct = _structural_score(original, generated, language_norm)
                     result.similarity = sim
                     result.score = (sim * 0.7) + (struct * 0.3)
@@ -558,7 +660,7 @@ class {cls}:
                 result.token_efficiency = result.score / result.spec_tokens * 100
 
             if verbose:
-                if result.score > 50:
+                if result.score > CONSTANT_50:
                     render.task(f"{fmt}: {result.score:.1f}%", "done")
                 else:
                     render.task(f"{fmt}: {result.score:.1f}%", "pending")
@@ -566,7 +668,7 @@ class {cls}:
         except Exception as e:
             result.error = str(e)[:100]
             if verbose:
-                render.task(f"{fmt}: {str(e)[:50]}", "failed")
+                render.task(f"{fmt}: {str(e)[:CONSTANT_50]}", "failed")
 
         return result
 
@@ -596,16 +698,18 @@ class {cls}:
             except Exception as e:
                 client = None
                 if verbose:
-                    render.warning(f"LLM not available ({str(e)[:80]}). Falling back to template mode.")
+                    render.warning(
+                        f"LLM not available ({str(e)[:CONSTANT_80]}). Falling back to template mode."
+                    )
         else:
             client = None
 
         result = BenchmarkResult(
-            benchmark_type='file',
+            benchmark_type="file",
             source_path=file_path,
             total_files=1,
-            provider=getattr(client, 'provider', 'none') if client else 'none',
-            model=getattr(client, 'model', 'none') if client else 'none',
+            provider=getattr(client, "provider", "none") if client else "none",
+            model=getattr(client, "model", "none") if client else "none",
         )
 
         path = Path(file_path)
@@ -621,18 +725,20 @@ class {cls}:
                 break
 
         if not module_info:
-            result.file_results.append(FileResult(
-                file_path=file_path,
-                language='python',
-                error="Module not found in analysis"
-            ))
+            result.file_results.append(
+                FileResult(
+                    file_path=file_path,
+                    language="python",
+                    error="Module not found in analysis",
+                )
+            )
             return result
 
         single_project = create_single_project(module_info, path)
 
         file_result = FileResult(
             file_path=file_path,
-            language='python',
+            language="python",
             original_size=len(original),
         )
 
@@ -649,8 +755,8 @@ class {cls}:
 
             if verbose:
                 if fmt_result.error:
-                    render.task(f"{fmt}: {fmt_result.error[:30]}", "failed")
-                elif fmt_result.score > 50:
+                    render.task(f"{fmt}: {fmt_result.error[:CONSTANT_30]}", "failed")
+                elif fmt_result.score > CONSTANT_50:
                     render.task(f"{fmt}: {fmt_result.score:.1f}%", "done")
                 else:
                     render.task(f"{fmt}: {fmt_result.score:.1f}%", "pending")
@@ -698,23 +804,30 @@ class {cls}:
             except Exception as e:
                 client = None
                 if verbose:
-                    render.warning(f"LLM not available ({str(e)[:80]}). Falling back to template mode.")
+                    render.warning(
+                        f"LLM not available ({str(e)[:CONSTANT_80]}). Falling back to template mode."
+                    )
         else:
             client = None
 
         result = BenchmarkResult(
-            benchmark_type='function',
+            benchmark_type="function",
             source_path=file_path,
-            provider=getattr(client, 'provider', 'none') if client else 'none',
-            model=getattr(client, 'model', 'none') if client else 'none',
+            provider=getattr(client, "provider", "none") if client else "none",
+            model=getattr(client, "model", "none") if client else "none",
         )
 
         path = Path(file_path)
         content = path.read_text()
 
         # Detect language
-        ext_to_lang = {'.py': 'python', '.js': 'javascript', '.ts': 'typescript', '.go': 'go'}
-        language = ext_to_lang.get(path.suffix, 'python')
+        ext_to_lang = {
+            ".py": "python",
+            ".js": "javascript",
+            ".ts": "typescript",
+            ".go": "go",
+        }
+        language = ext_to_lang.get(path.suffix, "python")
 
         # Parse file
         parser = UniversalParser()
@@ -735,7 +848,9 @@ class {cls}:
         start_time = time.time()
 
         for func in functions:
-            func_result = self._test_function(func, content, language, path, client, verbose)
+            func_result = self._test_function(
+                func, content, language, path, client, verbose
+            )
             result.function_results.append(func_result)
 
         result.total_time = time.time() - start_time
@@ -761,29 +876,29 @@ class {cls}:
 
         try:
             # Extract original code
-            lines = content.split('\n')
+            lines = content.split("\n")
             start = func.start_line - 1
             end = func.end_line if func.end_line else start + func.lines
 
             # Include decorators for Python
-            if language == 'python' and start > 0:
+            if language == "python" and start > 0:
                 i = start - 1
-                while i >= 0 and lines[i].strip().startswith('@'):
+                while i >= 0 and lines[i].strip().startswith("@"):
                     start = i
                     i -= 1
 
-            result.original_code = '\n'.join(lines[start:end])
+            result.original_code = "\n".join(lines[start:end])
 
             # Create spec with richer context
-            calls_str = ', '.join(getattr(func, 'calls', []) or []) or 'None'
-            raises_str = ', '.join(getattr(func, 'raises', []) or []) or 'None'
-            cc = getattr(func, 'complexity', 1) or 1
+            calls_str = ", ".join(getattr(func, "calls", []) or []) or "None"
+            raises_str = ", ".join(getattr(func, "raises", []) or []) or "None"
+            cc = getattr(func, "complexity", 1) or 1
             spec = f"""Function: {func.name}
 Language: {language}
-Signature: {func.name}({', '.join(func.params)}) -> {func.return_type or 'None'}
-Description: {func.intent or func.docstring or 'No description'}
+Signature: {func.name}({", ".join(func.params)}) -> {func.return_type or "None"}
+Description: {func.intent or func.docstring or "No description"}
 Is Async: {func.is_async}
-Decorators: {', '.join(func.decorators) if func.decorators else 'None'}
+Decorators: {", ".join(func.decorators) if func.decorators else "None"}
 Calls: {calls_str}
 Raises: {raises_str}
 Complexity: {cc}
@@ -796,7 +911,7 @@ Lines: {func.lines}
 
 REQUIREMENTS:
 - Generate a complete, working {language} function with REAL logic (not a stub)
-- Match the signature EXACTLY: {func.name}({', '.join(func.params)}) -> {func.return_type or 'None'}
+- Match the signature EXACTLY: {func.name}({", ".join(func.params)}) -> {func.return_type or "None"}
 - Use the Description to implement actual behavior
 - Include decorators if specified
 - The function should be ~{func.lines} lines long
@@ -808,28 +923,37 @@ REQUIREMENTS:
 
             if client is None:
                 # Offline fallback: emit a skeleton function with matching name/params.
-                params = ", ".join(func.params) if getattr(func, "params", None) else "*args, **kwargs"
+                params = (
+                    ", ".join(func.params)
+                    if getattr(func, "params", None)
+                    else "*args, **kwargs"
+                )
                 rt = func.return_type or "Any"
                 async_kw = "async " if getattr(func, "is_async", False) else ""
-                result.reproduced_code = f"{async_kw}def {func.name}({params}) -> {rt}:\n    return None\n"
+                result.reproduced_code = (
+                    f"{async_kw}def {func.name}({params}) -> {rt}:\n    return None\n"
+                )
                 result.gen_time = 0.0
             else:
                 start_time = time.time()
-                response = client.generate(prompt, max_tokens=3000)
+                response = client.generate(prompt, max_tokens=MAX_3000)
                 result.gen_time = time.time() - start_time
                 result.reproduced_code = _extract_code(response)
 
             # Test syntax
-            if language == 'python':
+            if language == "python":
                 result.syntax_ok = _test_python_syntax(result.reproduced_code)
             else:
                 result.syntax_ok = len(result.reproduced_code) > 10
 
             # Calculate similarity
             from difflib import SequenceMatcher
-            orig_norm = ' '.join(result.original_code.split())
-            repr_norm = ' '.join(result.reproduced_code.split())
-            result.similarity = SequenceMatcher(None, orig_norm, repr_norm).ratio() * 100
+
+            orig_norm = " ".join(result.original_code.split())
+            repr_norm = " ".join(result.reproduced_code.split())
+            result.similarity = (
+                SequenceMatcher(None, orig_norm, repr_norm).ratio() * 100
+            )
 
             if verbose:
                 syntax = "S✓" if result.syntax_ok else "S✗"
@@ -870,15 +994,17 @@ REQUIREMENTS:
             except Exception as e:
                 client = None
                 if verbose:
-                    render.warning(f"LLM not available ({str(e)[:80]}). Falling back to template mode.")
+                    render.warning(
+                        f"LLM not available ({str(e)[:CONSTANT_80]}). Falling back to template mode."
+                    )
         else:
             client = None
 
         result = BenchmarkResult(
-            benchmark_type='project',
+            benchmark_type="project",
             source_path=project_path,
-            provider=getattr(client, 'provider', 'none') if client else 'none',
-            model=getattr(client, 'model', 'none') if client else 'none',
+            provider=getattr(client, "provider", "none") if client else "none",
+            model=getattr(client, "model", "none") if client else "none",
         )
 
         # Analyze
@@ -904,7 +1030,14 @@ REQUIREMENTS:
             if len(modules) > 1 and max_workers > 1:
                 with ThreadPoolExecutor(max_workers=max_workers) as ex:
                     futs = {
-                        ex.submit(self._reproduce_module, module, fmt, project_path, client, verbose): (i, module)
+                        ex.submit(
+                            self._reproduce_module,
+                            module,
+                            fmt,
+                            project_path,
+                            client,
+                            verbose,
+                        ): (i, module)
                         for i, module in enumerate(modules)
                     }
                     for fut in as_completed(futs):
@@ -915,7 +1048,9 @@ REQUIREMENTS:
                         if file_result.format_results:
                             fmt_result = list(file_result.format_results.values())[0]
                         else:
-                            fmt_result = FormatResult(format_name=fmt, score=file_result.score)
+                            fmt_result = FormatResult(
+                                format_name=fmt, score=file_result.score
+                            )
                             file_result.format_results[fmt] = fmt_result
 
                         # Find existing file result or create new
@@ -931,8 +1066,10 @@ REQUIREMENTS:
                             result.file_results.append(file_result)
 
                         if verbose:
-                            status = "✓" if file_result.score > 50 else "○"
-                            print(f"  [{i+1}/{len(modules)}] {Path(file_result.file_path).name}: {file_result.score:.1f}% {status}")
+                            status = "✓" if file_result.score > CONSTANT_50 else "○"
+                            print(
+                                f"  [{i + 1}/{len(modules)}] {Path(file_result.file_path).name}: {file_result.score:.1f}% {status}"
+                            )
             else:
                 for i, module in enumerate(modules):
                     file_result = self._reproduce_module(
@@ -943,7 +1080,9 @@ REQUIREMENTS:
                     if file_result.format_results:
                         fmt_result = list(file_result.format_results.values())[0]
                     else:
-                        fmt_result = FormatResult(format_name=fmt, score=file_result.score)
+                        fmt_result = FormatResult(
+                            format_name=fmt, score=file_result.score
+                        )
                         file_result.format_results[fmt] = fmt_result
 
                     # Find existing file result or create new
@@ -959,8 +1098,10 @@ REQUIREMENTS:
                         result.file_results.append(file_result)
 
                     if verbose:
-                        status = "✓" if file_result.score > 50 else "○"
-                        print(f"  [{i+1}/{len(modules)}] {Path(file_result.file_path).name}: {file_result.score:.1f}% {status}")
+                        status = "✓" if file_result.score > CONSTANT_50 else "○"
+                        print(
+                            f"  [{i + 1}/{len(modules)}] {Path(file_result.file_path).name}: {file_result.score:.1f}% {status}"
+                        )
 
         result.total_time = time.time() - start_time
 
@@ -1035,7 +1176,13 @@ REQUIREMENTS:
 
             # Test format
             fmt_result = self._test_format(
-                single_project, original, fmt, abs_path.name, client, verbose=False, language=module_info.language
+                single_project,
+                original,
+                fmt,
+                abs_path.name,
+                client,
+                verbose=False,
+                language=module_info.language,
             )
 
             file_result.format_results[fmt] = fmt_result
@@ -1052,7 +1199,7 @@ REQUIREMENTS:
 
 def run_benchmark(
     source: str,
-    benchmark_type: str = 'format',
+    benchmark_type: str = "format",
     formats: List[str] = None,
     limit: Optional[int] = None,
     output: Optional[str] = None,
@@ -1078,13 +1225,13 @@ def run_benchmark(
     """
     runner = BenchmarkRunner()
 
-    if benchmark_type == 'format':
+    if benchmark_type == "format":
         result = runner.run_format_benchmark(source, formats, limit, verbose)
-    elif benchmark_type == 'file':
+    elif benchmark_type == "file":
         result = runner.run_file_benchmark(source, formats, verbose)
-    elif benchmark_type == 'function':
+    elif benchmark_type == "function":
         result = runner.run_function_benchmark(source, limit=limit, verbose=verbose)
-    elif benchmark_type == 'project':
+    elif benchmark_type == "project":
         result = runner.run_project_benchmark(source, formats, limit, verbose)
     else:
         raise ValueError(f"Unknown benchmark type: {benchmark_type}")

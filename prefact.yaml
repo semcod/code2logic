@@ -1,0 +1,82 @@
+project_root: .
+package_name: ''
+include:
+- '**/*.py'
+exclude:
+- '**/__pycache__/**'
+- '**/node_modules/**'
+- '**/.venv/**'
+- '**/venv/**'
+- '**/.git/**'
+- '**/build/**'
+- '**/dist/**'
+- '**/*.egg-info/**'
+- '**/tests/**'
+tools:
+  parallel: true
+  cache: true
+  ruff:
+    enabled: true
+    max_line_length: 88
+    select:
+    - E
+    - F
+    - W
+    - I
+    ignore:
+    - E501
+  mypy:
+    enabled: true
+    strict: false
+    ignore_missing_imports: true
+  isort:
+    enabled: true
+    profile: black
+    multi_line_output: 3
+performance:
+  max_workers: 4
+  cache_size: 104857600
+  chunk_size: 10
+rules:
+  unused-imports:
+    enabled: true
+    tools:
+    - ruff
+    - autoflake
+    severity: error
+  relative-imports:
+    enabled: true
+    tools:
+    - libcst
+    auto_fix: true
+  missing-return-type:
+    enabled: true
+    tools:
+    - mypy
+    severity: warning
+  llm-hallucinations:
+    enabled: true
+  magic-numbers:
+    enabled: true
+plugins:
+  enabled: true
+  directories:
+  - ~/.prefact/plugins
+  - ./.prefact/plugins
+environments:
+  development:
+    rules:
+      print-statements:
+        enabled: true
+      magic-numbers:
+        enabled: false
+    performance:
+      max_workers: 2
+  production:
+    rules:
+      print-statements:
+        enabled: false
+      magic-numbers:
+        enabled: true
+    performance:
+      max_workers: 8

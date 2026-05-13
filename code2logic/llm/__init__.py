@@ -20,8 +20,8 @@ from ..llm_clients import (
 )
 
 
-_llm_module_path = Path(__file__).resolve().parents[1] / 'llm.py'
-_spec = spec_from_file_location('code2logic._llm_module', _llm_module_path)
+_llm_module_path = Path(__file__).resolve().parents[1] / "llm.py"
+_spec = spec_from_file_location("code2logic._llm_module", _llm_module_path)
 if _spec is None or _spec.loader is None:
     raise ImportError(f"Unable to load LLM module from {_llm_module_path}")
 _llm_module = module_from_spec(_spec)
@@ -33,20 +33,20 @@ get_available_backends = _llm_module.get_available_backends
 
 __all__ = [
     # Core clients (from lolm)
-    'BaseLLMClient',
-    'OpenRouterClient',
-    'OllamaLocalClient',
-    'LiteLLMClient',
-    'get_client',
+    "BaseLLMClient",
+    "OpenRouterClient",
+    "OllamaLocalClient",
+    "LiteLLMClient",
+    "get_client",
     # Manager
-    'LLMManager',
-    'LLMConfig',
+    "LLMManager",
+    "LLMConfig",
     # Constants
-    'RECOMMENDED_MODELS',
-    'DEFAULT_MODELS',
+    "RECOMMENDED_MODELS",
+    "DEFAULT_MODELS",
     # Intent
-    'EnhancedIntentGenerator',
+    "EnhancedIntentGenerator",
     # Analyzer
-    'CodeAnalyzer',
-    'get_available_backends',
+    "CodeAnalyzer",
+    "get_available_backends",
 ]

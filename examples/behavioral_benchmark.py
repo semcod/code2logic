@@ -24,7 +24,7 @@ import os
 import tempfile
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Tuple
 
 
 @dataclass
@@ -89,7 +89,9 @@ def _run_case(label: str, fn: Callable[[], Any], expected: Any) -> CaseResult:
         err = "" if ok else "mismatch"
         return CaseResult(name=label, ok=ok, expected=expected, got=got, error=err)
     except Exception as e:
-        return CaseResult(name=label, ok=False, expected=expected, got=None, error=str(e)[:200])
+        return CaseResult(
+            name=label, ok=False, expected=expected, got=None, error=str(e)[:200]
+        )
 
 
 def _looks_like_template_stub(code: str) -> bool:
@@ -100,7 +102,9 @@ def _looks_like_template_stub(code: str) -> bool:
     return "return None" in s and "pass" not in s and "raise" not in s
 
 
-def _cases_for(function_name: str) -> List[Tuple[str, Callable[[], Tuple[Tuple[Any, ...], Dict[str, Any]]]]]:
+def _cases_for(
+    function_name: str,
+) -> List[Tuple[str, Callable[[], Tuple[Tuple[Any, ...], Dict[str, Any]]]]]:
     """Return list of (label, args_kwargs_builder)."""
     if function_name == "calculate_total":
         return [
@@ -125,6 +129,7 @@ def _cases_for(function_name: str) -> List[Tuple[str, Callable[[], Tuple[Tuple[A
             ("invalid_domain", lambda: (("a@b",), {})),
         ]
     if function_name == "load_json_file":
+
         def builder_valid() -> Tuple[Tuple[Any, ...], Dict[str, Any]]:
             td = tempfile.mkdtemp(prefix="c2l_json_")
             p_ok = Path(td) / "ok.json"
@@ -149,7 +154,13 @@ def _cases_for(function_name: str) -> List[Tuple[str, Callable[[], Tuple[Tuple[A
     if function_name == "get_env_or_default":
         return [
             ("default", lambda: (("C2L_TEST_MISSING", "zzz"), {})),
-            ("present", lambda: (("C2L_TEST_KEY", "zzz"), {"__setenv": ("C2L_TEST_KEY", "abc")})),
+            (
+                "present",
+                lambda: (
+                    ("C2L_TEST_KEY", "zzz"),
+                    {"__setenv": ("C2L_TEST_KEY", "abc")},
+                ),
+            ),
         ]
     if function_name == "chunk_list":
         return [("chunks", lambda: (([1, 2, 3, 4, 5], 2), {}))]
@@ -170,9 +181,13 @@ def _apply_env_hook(kwargs: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def main() -> None:
-    bench_path = Path(os.environ.get("BENCH_FUNCTION_JSON", "examples/output/benchmark_function.json"))
+    bench_path = Path(
+        os.environ.get("BENCH_FUNCTION_JSON", "examples/output/benchmark_function.json")
+    )
     out_dir = Path(os.environ.get("BENCH_OUTPUT", "examples/output"))
-    source_path = Path(os.environ.get("BENCH_FUNCTION_SOURCE", "tests/samples/sample_functions.py"))
+    source_path = Path(
+        os.environ.get("BENCH_FUNCTION_SOURCE", "tests/samples/sample_functions.py")
+    )
 
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -192,7 +207,11 @@ def main() -> None:
 
         cases_spec = _cases_for(fn_name)
         if not cases_spec:
-            results.append(FunctionBehaviorResult(function_name=fn_name, cases=[], ok=False, error="no cases defined"))
+            results.append(
+                FunctionBehaviorResult(
+                    function_name=fn_name, cases=[], ok=False, error="no cases defined"
+                )
+            )
             continue
 
         if _looks_like_template_stub(reproduced_code):
@@ -210,7 +229,14 @@ def main() -> None:
         try:
             repro_fn = _exec_function_from_code(reproduced_code, fn_name)
         except Exception as e:
-            results.append(FunctionBehaviorResult(function_name=fn_name, cases=[], ok=False, error=f"exec failed: {str(e)[:200]}"))
+            results.append(
+                FunctionBehaviorResult(
+                    function_name=fn_name,
+                    cases=[],
+                    ok=False,
+                    error=f"exec failed: {str(e)[:200]}",
+                )
+            )
             continue
 
         case_results = []
@@ -221,7 +247,11 @@ def main() -> None:
                 kwargs = _apply_env_hook(kwargs)
                 expected_val = getattr(original_mod, fn_name)(*args, **kwargs)
             except Exception as e:
-                case_results.append(CaseResult(name=label, ok=False, error=f"original failed: {str(e)[:200]}"))
+                case_results.append(
+                    CaseResult(
+                        name=label, ok=False, error=f"original failed: {str(e)[:200]}"
+                    )
+                )
                 continue
 
             def thunk(a=args, k=kwargs):
@@ -230,7 +260,9 @@ def main() -> None:
             case_results.append(_run_case(label, thunk, expected_val))
 
         ok = all(c.ok for c in case_results) if case_results else False
-        results.append(FunctionBehaviorResult(function_name=fn_name, cases=case_results, ok=ok))
+        results.append(
+            FunctionBehaviorResult(function_name=fn_name, cases=case_results, ok=ok)
+        )
 
     total = len(results)
     skipped = sum(1 for r in results if r.skipped)

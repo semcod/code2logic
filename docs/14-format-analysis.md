@@ -12,8 +12,6 @@ code2logic supports multiple output formats, each optimized for different use ca
 4. **Markdown** - Documentation-friendly format
 5. **Compact** - Minimal text representation
 
-## Format Characteristics
-
 ### JSON Format
 
 **Advantages for LLM:**
@@ -191,8 +189,6 @@ utils.py,re,import,0.8
 | Dependencies | 35 |
 | Lines of Code | 5000 |
 
-## Modules
-
 ### main.py
 
 **Path:** `/project/main.py`
@@ -282,8 +278,6 @@ models.py (120 LOC)
 - Ideal for summarization tasks
 - Minimal context for focused analysis
 
-## LLM Integration Recommendations
-
 ### For Complex Analysis Tasks
 
 **Recommended Format:** JSON
@@ -356,8 +350,6 @@ models.py (120 LOC)
 3. Provide quick insights
 4. Generate concise responses
 
-## Format Conversion Strategies
-
 ### JSON to YAML
 
 ```python
@@ -392,12 +384,6 @@ data = df.to_dict('records')
 ```python
 import re
 from markdown import markdown
-
-# Parse headers, tables, and lists
-# Extract structured information
-```
-
-## LLM Prompt Optimization
 
 ### For JSON Processing
 
@@ -443,8 +429,6 @@ Calculate:
 
 Provide statistical analysis with trends and recommendations.
 ```
-
-## Performance Considerations
 
 ### Memory Usage
 

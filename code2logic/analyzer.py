@@ -49,58 +49,79 @@ class ProjectAnalyzer:
 
     # Language extension mapping
     LANGUAGE_EXTENSIONS: Dict[str, str] = {
-        '.py': 'python',
-        '.js': 'javascript',
-        '.mjs': 'javascript',
-        '.cjs': 'javascript',
-        '.jsx': 'javascript',
-        '.ts': 'typescript',
-        '.tsx': 'typescript',
-        '.mts': 'typescript',
-        '.cts': 'typescript',
-        '.sql': 'sql',
-        '.java': 'java',
-        '.go': 'go',
-        '.rs': 'rust',
-        '.cs': 'csharp',
-        '.c': 'cpp',
-        '.cpp': 'cpp',
-        '.cc': 'cpp',
-        '.h': 'cpp',
-        '.hpp': 'cpp',
-        '.php': 'php',
-        '.rb': 'ruby',
-        '.kt': 'kotlin',
-        '.swift': 'swift',
+        ".py": "python",
+        ".js": "javascript",
+        ".mjs": "javascript",
+        ".cjs": "javascript",
+        ".jsx": "javascript",
+        ".ts": "typescript",
+        ".tsx": "typescript",
+        ".mts": "typescript",
+        ".cts": "typescript",
+        ".sql": "sql",
+        ".java": "java",
+        ".go": "go",
+        ".rs": "rust",
+        ".cs": "csharp",
+        ".c": "cpp",
+        ".cpp": "cpp",
+        ".cc": "cpp",
+        ".h": "cpp",
+        ".hpp": "cpp",
+        ".php": "php",
+        ".rb": "ruby",
+        ".kt": "kotlin",
+        ".swift": "swift",
     }
 
     # Directories to ignore
     IGNORE_DIRS: set = {
-        '.git', '.svn', '.hg',
-        'node_modules', '__pycache__', '.venv', 'venv', 'env',
-        'target', 'build', 'dist', 'out', '.next',
-        '.idea', '.vscode', '.pytest_cache',
-        'vendor', 'packages', '.tox', 'coverage',
-        '.mypy_cache', '.ruff_cache', '.cache',
+        ".git",
+        ".svn",
+        ".hg",
+        "node_modules",
+        "__pycache__",
+        ".venv",
+        "venv",
+        "env",
+        "target",
+        "build",
+        "dist",
+        "out",
+        ".next",
+        ".idea",
+        ".vscode",
+        ".pytest_cache",
+        "vendor",
+        "packages",
+        ".tox",
+        "coverage",
+        ".mypy_cache",
+        ".ruff_cache",
+        ".cache",
     }
 
     # Files to ignore
     IGNORE_FILES: set = {
-        '.gitignore', '.dockerignore',
-        'package-lock.json', 'yarn.lock',
-        'Pipfile.lock', 'poetry.lock',
-        'Cargo.lock', 'pnpm-lock.yaml',
+        ".gitignore",
+        ".dockerignore",
+        "package-lock.json",
+        "yarn.lock",
+        "Pipfile.lock",
+        "poetry.lock",
+        "Cargo.lock",
+        "pnpm-lock.yaml",
     }
 
     @staticmethod
     def _language_from_shebang(first_line: str) -> Optional[str]:
-        s = (first_line or '').strip().lower()
-        if not s.startswith('#!'):
+        s = (first_line or "").strip().lower()
+        if not s.startswith("#!"):
             return None
-        if 'python' in s:
-            return 'python'
-        if 'node' in s:
-            return 'javascript'
+        if "python" in s:
+            return "python"
+        if "node" in s:
+            return "javascript"
         return None
 
     def __init__(
@@ -132,9 +153,7 @@ class ProjectAnalyzer:
 
         # Initialize parsers
         self.ts_parser = (
-            TreeSitterParser()
-            if use_treesitter and TREE_SITTER_AVAILABLE
-            else None
+            TreeSitterParser() if use_treesitter and TREE_SITTER_AVAILABLE else None
         )
         self.fallback_parser = UniversalParser()
 
@@ -181,14 +200,22 @@ class ProjectAnalyzer:
         dep_metrics = self.dep_analyzer.analyze_metrics()
         t_dep = time.time() - t0
         if self.verbose:
-            log.info("Dependency analysis complete: nodes=%d time=%.2fs", len(dep_graph or {}), t_dep)
+            log.info(
+                "Dependency analysis complete: nodes=%d time=%.2fs",
+                len(dep_graph or {}),
+                t_dep,
+            )
 
         # Detect entry points
         t0 = time.time()
         entrypoints = self._detect_entrypoints()
         t_ep = time.time() - t0
         if self.verbose:
-            log.info("Entrypoint detection complete: entrypoints=%d time=%.2fs", len(entrypoints), t_ep)
+            log.info(
+                "Entrypoint detection complete: entrypoints=%d time=%.2fs",
+                len(entrypoints),
+                t_ep,
+            )
 
         # Find similar functions
         similar: Dict[str, List[str]] = {}
@@ -197,7 +224,11 @@ class ProjectAnalyzer:
             similar = self.sim_detector.find_similar_functions(self.modules)
             t_sim = time.time() - t0
             if self.verbose:
-                log.info("Similarity detection complete: matches=%d time=%.2fs", len(similar), t_sim)
+                log.info(
+                    "Similarity detection complete: matches=%d time=%.2fs",
+                    len(similar),
+                    t_sim,
+                )
         else:
             if self.verbose:
                 log.info("Similarity detection skipped (--no-similarity)")
@@ -216,8 +247,8 @@ class ProjectAnalyzer:
             similar_functions=similar,
             total_files=len(self.modules),
             total_lines=sum(m.lines_total for m in self.modules),
-            total_bytes=sum(getattr(m, 'file_bytes', 0) for m in self.modules),
-            generated_at=datetime.now().isoformat()
+            total_bytes=sum(getattr(m, "file_bytes", 0) for m in self.modules),
+            generated_at=datetime.now().isoformat(),
         )
 
     def _scan_files(self):
@@ -232,7 +263,9 @@ class ProjectAnalyzer:
         if self.respect_gitignore:
             git_file_list = self._get_git_nonignored_files()
             if git_file_list is not None and self.verbose:
-                log.info("Using git file list (non-ignored): files=%d", len(git_file_list))
+                log.info(
+                    "Using git file list (non-ignored): files=%d", len(git_file_list)
+                )
 
         if git_file_list is not None:
             for fp in git_file_list:
@@ -244,9 +277,9 @@ class ProjectAnalyzer:
 
                 ext = fp.suffix.lower()
                 language = self.LANGUAGE_EXTENSIONS.get(ext)
-                if language is None and ext == '':
+                if language is None and ext == "":
                     try:
-                        with fp.open('r', encoding='utf-8', errors='ignore') as f:
+                        with fp.open("r", encoding="utf-8", errors="ignore") as f:
                             language = self._language_from_shebang(f.readline())
                     except Exception:
                         language = None
@@ -257,7 +290,11 @@ class ProjectAnalyzer:
                 files_matched += 1
                 self.languages[language] += 1
 
-                if self.verbose and files_seen > 0 and (files_seen % scan_progress_every) == 0:
+                if (
+                    self.verbose
+                    and files_seen > 0
+                    and (files_seen % scan_progress_every) == 0
+                ):
                     log.info(
                         "Scan progress: seen=%d matched=%d parsed=%d modules=%d time=%.2fs",
                         files_seen,
@@ -268,7 +305,7 @@ class ProjectAnalyzer:
                     )
 
                 try:
-                    content = fp.read_text(encoding='utf-8', errors='ignore')
+                    content = fp.read_text(encoding="utf-8", errors="ignore")
                 except Exception:
                     continue
 
@@ -298,7 +335,9 @@ class ProjectAnalyzer:
                     try:
                         module.file_bytes = fp.stat().st_size
                     except Exception:
-                        module.file_bytes = len(content.encode('utf-8', errors='ignore'))
+                        module.file_bytes = len(
+                            content.encode("utf-8", errors="ignore")
+                        )
                     self.modules.append(module)
 
         else:
@@ -313,9 +352,9 @@ class ProjectAnalyzer:
 
                     ext = fp.suffix.lower()
                     language = self.LANGUAGE_EXTENSIONS.get(ext)
-                    if language is None and ext == '':
+                    if language is None and ext == "":
                         try:
-                            with fp.open('r', encoding='utf-8', errors='ignore') as f:
+                            with fp.open("r", encoding="utf-8", errors="ignore") as f:
                                 language = self._language_from_shebang(f.readline())
                         except Exception:
                             language = None
@@ -326,7 +365,11 @@ class ProjectAnalyzer:
                     files_matched += 1
                     self.languages[language] += 1
 
-                    if self.verbose and files_seen > 0 and (files_seen % scan_progress_every) == 0:
+                    if (
+                        self.verbose
+                        and files_seen > 0
+                        and (files_seen % scan_progress_every) == 0
+                    ):
                         log.info(
                             "Scan progress: seen=%d matched=%d parsed=%d modules=%d time=%.2fs",
                             files_seen,
@@ -337,7 +380,7 @@ class ProjectAnalyzer:
                         )
 
                     try:
-                        content = fp.read_text(encoding='utf-8', errors='ignore')
+                        content = fp.read_text(encoding="utf-8", errors="ignore")
                     except Exception:
                         continue
 
@@ -352,14 +395,20 @@ class ProjectAnalyzer:
                             module = self.ts_parser.parse(rel_path, content, language)
                     except Exception as e:
                         if self.verbose:
-                            log.debug("Tree-sitter parser failed for %s: %s", rel_path, e)
+                            log.debug(
+                                "Tree-sitter parser failed for %s: %s", rel_path, e
+                            )
 
                     if module is None:
                         try:
-                            module = self.fallback_parser.parse(rel_path, content, language)
+                            module = self.fallback_parser.parse(
+                                rel_path, content, language
+                            )
                         except Exception as e:
                             if self.verbose:
-                                log.debug("Fallback parser failed for %s: %s", rel_path, e)
+                                log.debug(
+                                    "Fallback parser failed for %s: %s", rel_path, e
+                                )
                             continue
 
                     if module:
@@ -367,7 +416,9 @@ class ProjectAnalyzer:
                         try:
                             module.file_bytes = fp.stat().st_size
                         except Exception:
-                            module.file_bytes = len(content.encode('utf-8', errors='ignore'))
+                            module.file_bytes = len(
+                                content.encode("utf-8", errors="ignore")
+                            )
                         self.modules.append(module)
 
         if self.verbose:
@@ -382,13 +433,20 @@ class ProjectAnalyzer:
 
     def _get_git_nonignored_files(self) -> Optional[List[Path]]:
         """Return list of non-ignored files according to git, or None if unavailable."""
-        git_dir = self.root_path / '.git'
+        git_dir = self.root_path / ".git"
         if not git_dir.exists():
             return None
 
         try:
             proc = subprocess.run(
-                ['git', '-C', str(self.root_path), 'ls-files', '-co', '--exclude-standard'],
+                [
+                    "git",
+                    "-C",
+                    str(self.root_path),
+                    "ls-files",
+                    "-co",
+                    "--exclude-standard",
+                ],
                 check=False,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.DEVNULL,
@@ -401,8 +459,8 @@ class ProjectAnalyzer:
             return None
 
         files: List[Path] = []
-        for line in (proc.stdout or '').splitlines():
-            rel = (line or '').strip()
+        for line in (proc.stdout or "").splitlines():
+            rel = (line or "").strip()
             if not rel:
                 continue
             files.append(self.root_path / rel)
@@ -418,10 +476,22 @@ class ProjectAnalyzer:
 
         # Common entry point file names
         main_files = {
-            'main.py', 'app.py', 'server.py', '__main__.py', 'run.py',
-            'main.js', 'app.js', 'server.js', 'index.js',
-            'main.ts', 'app.ts', 'server.ts', 'index.ts',
-            'main.go', 'main.rs', 'Main.java',
+            "main.py",
+            "app.py",
+            "server.py",
+            "__main__.py",
+            "run.py",
+            "main.js",
+            "app.js",
+            "server.js",
+            "index.js",
+            "main.ts",
+            "app.ts",
+            "server.ts",
+            "index.ts",
+            "main.go",
+            "main.rs",
+            "Main.java",
         }
 
         for m in self.modules:
@@ -430,7 +500,11 @@ class ProjectAnalyzer:
 
             if fn in main_files and m.path not in eps:
                 eps.append(m.path)
-            elif fn in ('index.js', 'index.ts') and parent in ('.', 'src') and m.path not in eps:
+            elif (
+                fn in ("index.js", "index.ts")
+                and parent in (".", "src")
+                and m.path not in eps
+            ):
                 eps.append(m.path)
 
         return eps[:10]
@@ -443,12 +517,12 @@ class ProjectAnalyzer:
             Dict with analysis statistics
         """
         return {
-            'total_files': len(self.modules),
-            'total_lines': sum(m.lines_total for m in self.modules),
-            'total_code_lines': sum(m.lines_code for m in self.modules),
-            'languages': dict(self.languages),
-            'total_classes': sum(len(m.classes) for m in self.modules),
-            'total_functions': sum(len(m.functions) for m in self.modules),
+            "total_files": len(self.modules),
+            "total_lines": sum(m.lines_total for m in self.modules),
+            "total_code_lines": sum(m.lines_code for m in self.modules),
+            "languages": dict(self.languages),
+            "total_classes": sum(len(m.classes) for m in self.modules),
+            "total_functions": sum(len(m.functions) for m in self.modules),
         }
 
 
@@ -485,9 +559,9 @@ def get_library_status() -> Dict[str, bool]:
         Dict mapping library name to availability status
     """
     return {
-        'tree_sitter': TREE_SITTER_AVAILABLE,
-        'networkx': NETWORKX_AVAILABLE,
-        'rapidfuzz': RAPIDFUZZ_AVAILABLE,
-        'nltk': NLTK_AVAILABLE,
-        'spacy': SPACY_AVAILABLE,
+        "tree_sitter": TREE_SITTER_AVAILABLE,
+        "networkx": NETWORKX_AVAILABLE,
+        "rapidfuzz": RAPIDFUZZ_AVAILABLE,
+        "nltk": NLTK_AVAILABLE,
+        "spacy": SPACY_AVAILABLE,
     }

@@ -13,13 +13,15 @@ from typing import Any, Callable, Dict, List, Optional
 
 class ErrorSeverity(Enum):
     """Error severity levels."""
-    WARNING = "warning"      # Non-fatal, continue processing
-    ERROR = "error"          # File skipped, continue with others
-    CRITICAL = "critical"    # Stop processing
+
+    WARNING = "warning"  # Non-fatal, continue processing
+    ERROR = "error"  # File skipped, continue with others
+    CRITICAL = "critical"  # Stop processing
 
 
 class ErrorType(Enum):
     """Types of errors that can occur during analysis."""
+
     # Filesystem errors
     FILE_NOT_FOUND = "file_not_found"
     PERMISSION_DENIED = "permission_denied"
@@ -50,6 +52,7 @@ class ErrorType(Enum):
 @dataclass
 class AnalysisError:
     """Represents an error during analysis."""
+
     type: ErrorType
     severity: ErrorSeverity
     path: str
@@ -59,18 +62,19 @@ class AnalysisError:
 
     def to_dict(self) -> Dict[str, Any]:
         return {
-            'type': self.type.value,
-            'severity': self.severity.value,
-            'path': self.path,
-            'message': self.message,
-            'exception': self.exception,
-            'suggestion': self.suggestion,
+            "type": self.type.value,
+            "severity": self.severity.value,
+            "path": self.path,
+            "message": self.message,
+            "exception": self.exception,
+            "suggestion": self.suggestion,
         }
 
 
 @dataclass
 class AnalysisResult:
     """Result of analysis with errors tracked."""
+
     success: bool = True
     errors: List[AnalysisError] = field(default_factory=list)
     warnings: List[AnalysisError] = field(default_factory=list)
@@ -233,9 +237,9 @@ class ErrorHandler:
 
             # Check if binary
             try:
-                with open(path, 'rb') as f:
+                with open(path, "rb") as f:
                     chunk = f.read(8192)
-                    if b'\x00' in chunk:
+                    if b"\x00" in chunk:
                         self.handle_error(
                             ErrorType.BINARY_FILE,
                             str(path),
@@ -247,17 +251,17 @@ class ErrorHandler:
                 pass
 
             # Try reading with different encodings
-            encodings = ['utf-8', 'latin-1', 'cp1252', 'utf-16']
+            encodings = ["utf-8", "latin-1", "cp1252", "utf-16"]
             for encoding in encodings:
                 try:
-                    content = path.read_text(encoding=encoding, errors='strict')
+                    content = path.read_text(encoding=encoding, errors="strict")
                     return content
                 except UnicodeDecodeError:
                     continue
 
             # Last resort: ignore errors
             try:
-                return path.read_text(encoding='utf-8', errors='ignore')
+                return path.read_text(encoding="utf-8", errors="ignore")
             except Exception as e:
                 self.handle_error(
                     ErrorType.ENCODING_ERROR,
@@ -336,7 +340,7 @@ class ErrorHandler:
         """
         try:
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(content, encoding='utf-8')
+            path.write_text(content, encoding="utf-8")
             return True
 
         except PermissionError as e:
@@ -375,12 +379,7 @@ class ErrorHandler:
             return False
 
     def safe_parse(
-        self,
-        path: str,
-        content: str,
-        parser_func: Callable,
-        *args,
-        **kwargs
+        self, path: str, content: str, parser_func: Callable, *args, **kwargs
     ) -> Any:
         """
         Safely parse content with error handling.

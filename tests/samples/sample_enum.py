@@ -15,6 +15,7 @@ from typing import List
 
 class Status(Enum):
     """Status enumeration with auto values."""
+
     PENDING = auto()
     RUNNING = auto()
     COMPLETED = auto()
@@ -24,6 +25,7 @@ class Status(Enum):
 
 class Priority(IntEnum):
     """Priority levels as integers."""
+
     LOW = 1
     MEDIUM = 2
     HIGH = 3
@@ -33,11 +35,12 @@ class Priority(IntEnum):
 
 class Color(Enum):
     """Color enumeration with string values."""
+
     RED = "red"
     GREEN = "green"
     BLUE = "blue"
     YELLOW = "yellow"
-    
+
     @classmethod
     def from_hex(cls, hex_code: str) -> "Color":
         """Create color from hex code."""
@@ -52,6 +55,7 @@ class Color(Enum):
 
 class HttpStatus(IntEnum):
     """HTTP status codes."""
+
     OK = 200
     CREATED = 201
     BAD_REQUEST = 400
@@ -59,12 +63,12 @@ class HttpStatus(IntEnum):
     FORBIDDEN = 403
     NOT_FOUND = 404
     INTERNAL_ERROR = 500
-    
+
     @property
     def is_success(self) -> bool:
         """Check if status is success."""
         return 200 <= self.value < 300
-    
+
     @property
     def is_error(self) -> bool:
         """Check if status is error."""
@@ -73,11 +77,12 @@ class HttpStatus(IntEnum):
 
 class TaskType(Enum):
     """Task type enumeration."""
+
     BUILD = "build"
     TEST = "test"
     DEPLOY = "deploy"
     CLEANUP = "cleanup"
-    
+
     def get_timeout(self) -> int:
         """Get default timeout for task type."""
         timeouts = {
@@ -87,7 +92,7 @@ class TaskType(Enum):
             TaskType.CLEANUP: 60,
         }
         return timeouts.get(self, 60)
-    
+
     def get_allowed_statuses(self) -> List[Status]:
         """Get allowed statuses for this task type."""
         if self == TaskType.CLEANUP:

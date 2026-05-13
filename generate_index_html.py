@@ -10,19 +10,20 @@ from pathlib import Path
 
 def generate_index_html():
     """Generate index.html with embedded data."""
-    
+
     print("🔄 Generating index.html with embedded data...")
-    
+
     # Load index.yaml
-    index_path = Path('output_hybrid/index.yaml')
-    with open(index_path, 'r') as f:
+    index_path = Path("output_hybrid/index.yaml")
+    with open(index_path, "r") as f:
         index_data = yaml.safe_load(f)
-    
+
     # Convert to JSON for embedding
     index_json = json.dumps(index_data, indent=2)
-    
+
     # HTML template with embedded data
-    html_template = '''<!DOCTYPE html>
+    html_template = (
+        """<!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
@@ -365,7 +366,9 @@ def generate_index_html():
 
     <script>
         // Embedded data to avoid CORS issues
-        window.indexData = ''' + index_json + ''';
+        window.indexData = """
+        + index_json
+        + """;
 
         // Global variables
         let treeData = null;
@@ -718,21 +721,22 @@ def generate_index_html():
         });
     </script>
 </body>
-</html>'''
-    
+</html>"""
+    )
+
     # Write the complete HTML file
-    output_path = Path('output_hybrid/index.html')
-    with open(output_path, 'w', encoding='utf-8') as f:
+    output_path = Path("output_hybrid/index.html")
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write(html_template)
-    
-    print(f"✓ Generated index.html with embedded data")
+
+    print("✓ Generated index.html with embedded data")
     print(f"  • File: {output_path}")
     print(f"  • Size: {output_path.stat().st_size / 1024:.1f}K")
-    print(f"  • CORS issue resolved")
-    print(f"  • Ready to open in browser")
-    
+    print("  • CORS issue resolved")
+    print("  • Ready to open in browser")
+
     return output_path
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     generate_index_html()

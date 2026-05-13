@@ -154,9 +154,9 @@ class TestMarkdownGenerator:
         """Test different detail levels."""
         gen = MarkdownGenerator()
 
-        compact = gen.generate(sample_project, 'compact')
-        standard = gen.generate(sample_project, 'standard')
-        detailed = gen.generate(sample_project, 'detailed')
+        compact = gen.generate(sample_project, "compact")
+        standard = gen.generate(sample_project, "standard")
+        detailed = gen.generate(sample_project, "detailed")
 
         # Detailed should be longest
         assert len(detailed) >= len(standard)
@@ -212,10 +212,10 @@ class TestJSONGenerator:
 
         data = json.loads(output)
 
-        assert data['name'] == 'test_project'
-        assert data['statistics']['files'] == 2
-        assert data['statistics']['lines'] == 70
-        assert len(data['modules']) == 2
+        assert data["name"] == "test_project"
+        assert data["statistics"]["files"] == 2
+        assert data["statistics"]["lines"] == 70
+        assert len(data["modules"]) == 2
 
     def test_generate_modules(self, sample_project):
         """Test module structure in JSON."""
@@ -224,12 +224,12 @@ class TestJSONGenerator:
 
         data = json.loads(output)
 
-        main_module = next(m for m in data['modules'] if m['path'] == 'main.py')
+        main_module = next(m for m in data["modules"] if m["path"] == "main.py")
 
-        assert main_module['language'] == 'python'
-        assert 'hello' in main_module['exports']
-        assert len(main_module['classes']) == 1
-        assert len(main_module['functions']) == 1
+        assert main_module["language"] == "python"
+        assert "hello" in main_module["exports"]
+        assert len(main_module["classes"]) == 1
+        assert len(main_module["functions"]) == 1
 
     def test_generate_functions(self, sample_project):
         """Test function structure in JSON."""
@@ -238,12 +238,12 @@ class TestJSONGenerator:
 
         data = json.loads(output)
 
-        main_module = next(m for m in data['modules'] if m['path'] == 'main.py')
-        hello_func = main_module['functions'][0]
+        main_module = next(m for m in data["modules"] if m["path"] == "main.py")
+        hello_func = main_module["functions"][0]
 
-        assert hello_func['name'] == 'hello'
-        assert 'signature' in hello_func
-        assert hello_func['intent'] == 'greets someone'
+        assert hello_func["name"] == "hello"
+        assert "signature" in hello_func
+        assert hello_func["intent"] == "greets someone"
 
     def test_generate_classes(self, sample_project):
         """Test class structure in JSON."""
@@ -252,9 +252,9 @@ class TestJSONGenerator:
 
         data = json.loads(output)
 
-        main_module = next(m for m in data['modules'] if m['path'] == 'main.py')
-        greeter_class = main_module['classes'][0]
+        main_module = next(m for m in data["modules"] if m["path"] == "main.py")
+        greeter_class = main_module["classes"][0]
 
-        assert greeter_class['name'] == 'Greeter'
-        assert 'BaseGreeter' in greeter_class['bases']
-        assert len(greeter_class['methods']) == 1
+        assert greeter_class["name"] == "Greeter"
+        assert "BaseGreeter" in greeter_class["bases"]
+        assert len(greeter_class["methods"]) == 1

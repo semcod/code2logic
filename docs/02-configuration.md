@@ -16,19 +16,9 @@ code2logic llm set-model openrouter nvidia/nemotron-3-nano-30b-a3b:free
 code2logic llm set-provider auto
 ```
 
-### Quick Setup
-
-```bash
 # Copy example configuration
 cp .env.example .env
 
-# Edit with your API keys
-nano .env
-```
-
-### Shell Commands
-
-```bash
 # OpenRouter (recommended for cloud LLM)
 export OPENROUTER_API_KEY="sk-or-v1-your-key-here"
 export OPENROUTER_MODEL="qwen/qwen-2.5-coder-32b-instruct"
@@ -89,8 +79,6 @@ code2logic llm set-provider auto
 code2logic llm set-model openrouter nvidia/nemotron-3-nano-30b-a3b:free
 code2logic llm key set openrouter <OPENROUTER_API_KEY>
 ```
-
-## Provider Configuration
 
 ### OpenRouter
 
@@ -153,29 +141,10 @@ export ANTHROPIC_API_KEY="sk-ant-..."
 export ANTHROPIC_MODEL="claude-3-sonnet-20240229"
 ```
 
-## Makefile Commands
-
-```bash
-# Configure LLM providers
-make llm
-
-# List available models
-make llm-list
-
-# Test configured models
-make llm-test
-
-# Show configuration status
-make llm-status
-```
-
 ## Python Configuration
 
 ```python
 from code2logic.config import Config
-
-# Load configuration
-config = Config()
 
 # Get API key
 api_key = config.get_api_key('openrouter')
@@ -186,9 +155,6 @@ model = config.get_model('ollama')
 # Check providers
 providers = config.list_configured_providers()
 print(providers)
-# {'openrouter': True, 'openai': False, 'ollama': True, ...}
-```
-
 ## Configuration File
 
 Advanced users can create `~/.code2logic/config.json`.
@@ -213,8 +179,6 @@ LLM routing preferences (priority mode, provider priority overrides, model/famil
   "verbose": false
 }
 ```
-
-## Troubleshooting
 
 ### API Key Not Found
 

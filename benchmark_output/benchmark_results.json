@@ -1,0 +1,232 @@
+{
+  "results": [
+    {
+      "source_file": "code2logic/analyzer.py",
+      "source_chars": 16999,
+      "source_classes": 2,
+      "source_functions": 10,
+      "timestamp": "2026-03-01T08:20:08.068170",
+      "model": "arcee-ai/trinity-large-preview:free",
+      "formats": [
+        {
+          "format_name": "gherkin",
+          "spec_chars": 1813,
+          "spec_tokens": 453,
+          "generated_chars": 1913,
+          "similarity": 5.45,
+          "structural_score": 33.33,
+          "classes_match": true,
+          "functions_match": true,
+          "generation_time": 25.87093687057495,
+          "error": null
+        },
+        {
+          "format_name": "csv",
+          "spec_chars": 504,
+          "spec_tokens": 126,
+          "generated_chars": 705,
+          "similarity": 1.35,
+          "structural_score": 33.33,
+          "classes_match": true,
+          "functions_match": true,
+          "generation_time": 9.256284713745117,
+          "error": null
+        },
+        {
+          "format_name": "json",
+          "spec_chars": 1327,
+          "spec_tokens": 331,
+          "generated_chars": 2602,
+          "similarity": 4.9,
+          "structural_score": 16.67,
+          "classes_match": true,
+          "functions_match": false,
+          "generation_time": 14.215356349945068,
+          "error": null
+        },
+        {
+          "format_name": "yaml",
+          "spec_chars": 723,
+          "spec_tokens": 180,
+          "generated_chars": 2139,
+          "similarity": 2.51,
+          "structural_score": 50.0,
+          "classes_match": true,
+          "functions_match": true,
+          "generation_time": 19.906359910964966,
+          "error": null
+        },
+        {
+          "format_name": "markdown",
+          "spec_chars": 52641,
+          "spec_tokens": 13160,
+          "generated_chars": 7410,
+          "similarity": 0.0,
+          "structural_score": 0.0,
+          "classes_match": false,
+          "functions_match": false,
+          "generation_time": 240.72772550582886,
+          "error": null
+        }
+      ],
+      "best_format": "gherkin",
+      "best_similarity": 5.45
+    },
+    {
+      "source_file": "code2logic/generators.py",
+      "source_chars": 86868,
+      "source_classes": 21,
+      "source_functions": 63,
+      "timestamp": "2026-03-01T08:27:10.535918",
+      "model": "arcee-ai/trinity-large-preview:free",
+      "formats": [
+        {
+          "format_name": "gherkin",
+          "spec_chars": 7879,
+          "spec_tokens": 1969,
+          "generated_chars": 9705,
+          "similarity": 5.5,
+          "structural_score": 16.67,
+          "classes_match": false,
+          "functions_match": true,
+          "generation_time": 98.84758257865906,
+          "error": null
+        },
+        {
+          "format_name": "csv",
+          "spec_chars": 7266,
+          "spec_tokens": 1816,
+          "generated_chars": 6515,
+          "similarity": 0.78,
+          "structural_score": 0.0,
+          "classes_match": false,
+          "functions_match": false,
+          "generation_time": 55.16198539733887,
+          "error": null
+        },
+        {
+          "format_name": "json",
+          "spec_chars": 13842,
+          "spec_tokens": 3460,
+          "generated_chars": 15186,
+          "similarity": 2.65,
+          "structural_score": 0.0,
+          "classes_match": false,
+          "functions_match": false,
+          "generation_time": 110.94180679321289,
+          "error": null
+        },
+        {
+          "format_name": "yaml",
+          "spec_chars": 9158,
+          "spec_tokens": 2289,
+          "generated_chars": 8830,
+          "similarity": 4.89,
+          "structural_score": 0.0,
+          "classes_match": false,
+          "functions_match": false,
+          "generation_time": 98.1123309135437,
+          "error": null
+        },
+        {
+          "format_name": "markdown",
+          "spec_chars": 52641,
+          "spec_tokens": 13160,
+          "generated_chars": 9219,
+          "similarity": 0.44,
+          "structural_score": 0.0,
+          "classes_match": false,
+          "functions_match": false,
+          "generation_time": 59.4030921459198,
+          "error": null
+        }
+      ],
+      "best_format": "gherkin",
+      "best_similarity": 5.5
+    },
+    {
+      "source_file": "code2logic/cli.py",
+      "source_chars": 40661,
+      "source_classes": 3,
+      "source_functions": 27,
+      "timestamp": "2026-03-01T08:31:18.087263",
+      "model": "arcee-ai/trinity-large-preview:free",
+      "formats": [
+        {
+          "format_name": "gherkin",
+          "spec_chars": 2305,
+          "spec_tokens": 576,
+          "generated_chars": 3292,
+          "similarity": 3.25,
+          "structural_score": 16.67,
+          "classes_match": false,
+          "functions_match": true,
+          "generation_time": 42.28096151351929,
+          "error": null
+        },
+        {
+          "format_name": "csv",
+          "spec_chars": 1823,
+          "spec_tokens": 455,
+          "generated_chars": 3838,
+          "similarity": 4.76,
+          "structural_score": 16.67,
+          "classes_match": false,
+          "functions_match": true,
+          "generation_time": 34.378265380859375,
+          "error": null
+        },
+        {
+          "format_name": "json",
+          "spec_chars": 4425,
+          "spec_tokens": 1106,
+          "generated_chars": 5374,
+          "similarity": 5.52,
+          "structural_score": 0.0,
+          "classes_match": false,
+          "functions_match": false,
+          "generation_time": 45.8345365524292,
+          "error": null
+        },
+        {
+          "format_name": "yaml",
+          "spec_chars": 2550,
+          "spec_tokens": 637,
+          "generated_chars": 4653,
+          "similarity": 4.32,
+          "structural_score": 16.67,
+          "classes_match": false,
+          "functions_match": true,
+          "generation_time": 41.22260880470276,
+          "error": null
+        },
+        {
+          "format_name": "markdown",
+          "spec_chars": 52641,
+          "spec_tokens": 13160,
+          "generated_chars": 5582,
+          "similarity": 0.0,
+          "structural_score": 0.0,
+          "classes_match": false,
+          "functions_match": false,
+          "generation_time": 83.83453845977783,
+          "error": null
+        }
+      ],
+      "best_format": "json",
+      "best_similarity": 5.52
+    }
+  ],
+  "summary": {
+    "total_files": 3,
+    "average_by_format": {
+      "gherkin": 4.733333333333333,
+      "csv": 2.2966666666666664,
+      "json": 4.3566666666666665,
+      "yaml": 3.9066666666666663,
+      "markdown": 0.14666666666666667
+    },
+    "best_format": "gherkin",
+    "best_average": 4.733333333333333
+  }
+}

@@ -1,3 +1,20 @@
+## [Unreleased]
+
+
+- feat(config): deep code analysis engine with 6 supporting modules
+- feat(goal): deep code analysis engine with 7 supporting modules
+- feat: add AppDefaults integration — auto-load default LLM profile
+- feat: delegate env file I/O to getv.EnvStore (with fallback)
+- feat(tests): configuration management system
+- feat(docs): CLI interface improvements
+- feat(examples): CLI interface improvements
+- chore(config): enhance configuration management with version tracking
+- chore(goal): code quality metrics with 2 supporting modules
+- refactor(goal): code analysis engine
+- refactor(goal): CLI interface improvements
+- refactor(examples): configuration management system
+- release: release
+
 ## [0.2.1] - 2026-02-28
 
 ### Summary

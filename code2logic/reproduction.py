@@ -43,7 +43,7 @@ def generate_file_gherkin(file_path: Path) -> str:
     imports = []
     module_doc = ""
 
-    lines = content.split('\n')
+    lines = content.split("\n")
     in_class = None
     in_docstring = False
     in_class_docstring = False
@@ -64,7 +64,7 @@ def generate_file_gherkin(file_path: Path) -> str:
         if in_docstring and not in_class:
             if '"""' in stripped:
                 docstring_lines.append(stripped.rstrip('"""'))
-                module_doc = ' '.join(docstring_lines)[:200]
+                module_doc = " ".join(docstring_lines)[:200]
                 in_docstring = False
             else:
                 docstring_lines.append(stripped)
@@ -74,77 +74,119 @@ def generate_file_gherkin(file_path: Path) -> str:
         if in_class_docstring:
             if '"""' in stripped:
                 docstring_lines.append(stripped.rstrip('"""'))
-                class_docstring = ' '.join(docstring_lines)[:150]
-                classes[-1]['docstring'] = class_docstring
+                class_docstring = " ".join(docstring_lines)[:150]
+                classes[-1]["docstring"] = class_docstring
                 in_class_docstring = False
             else:
                 docstring_lines.append(stripped)
             continue
 
         # Imports
-        if stripped.startswith('from ') or stripped.startswith('import '):
+        if stripped.startswith("from ") or stripped.startswith("import "):
             imports.append(stripped)
 
         # Classes
-        if stripped.startswith('class '):
-            class_name = stripped.split('(')[0].split(':')[0].replace('class ', '')
+        if stripped.startswith("class "):
+            class_name = stripped.split("(")[0].split(":")[0].replace("class ", "")
             in_class = class_name
-            classes.append({'name': class_name, 'attributes': [], 'methods': [], 'docstring': ''})
+            classes.append(
+                {"name": class_name, "attributes": [], "methods": [], "docstring": ""}
+            )
 
         # Class docstring start
-        if in_class and stripped.startswith('"""') and not classes[-1]['docstring']:
+        if in_class and stripped.startswith('"""') and not classes[-1]["docstring"]:
             if stripped.count('"""') >= 2:
-                classes[-1]['docstring'] = stripped.strip('"""').strip()[:100]
+                classes[-1]["docstring"] = stripped.strip('"""').strip()[:100]
             else:
                 in_class_docstring = True
                 docstring_lines = [stripped.lstrip('"""')]
             continue
 
         # Class attributes with FULL type info
-        if in_class and ':' in stripped and not stripped.startswith('def ') and not stripped.startswith('#'):
+        if (
+            in_class
+            and ":" in stripped
+            and not stripped.startswith("def ")
+            and not stripped.startswith("#")
+        ):
             if stripped.startswith('"""') or stripped.startswith("'''"):
                 continue
-            if any(stripped.startswith(x) for x in ['Attributes', '-', 'Args', 'Returns', 'Raises', 'Note', 'Example']):
+            if any(
+                stripped.startswith(x)
+                for x in [
+                    "Attributes",
+                    "-",
+                    "Args",
+                    "Returns",
+                    "Raises",
+                    "Note",
+                    "Example",
+                ]
+            ):
                 continue
-            if any(x in stripped.lower() for x in ['path to', 'the ', 'a ', 'an ', 'this ', 'that ', 'if ', 'when ']):
+            if any(
+                x in stripped.lower()
+                for x in [
+                    "path to",
+                    "the ",
+                    "a ",
+                    "an ",
+                    "this ",
+                    "that ",
+                    "if ",
+                    "when ",
+                ]
+            ):
                 continue
-            if stripped[0].islower() and not re.match(r'^[a-z_][a-z0-9_]*\s*:', stripped):
+            if stripped[0].islower() and not re.match(
+                r"^[a-z_][a-z0-9_]*\s*:", stripped
+            ):
                 continue
 
             attr_full = stripped
-            if attr_full and not attr_full.startswith('return'):
-                attr_name = attr_full.split(':')[0].strip()
-                if attr_name and attr_name.isidentifier() and attr_name not in ['try', 'if', 'for', 'while', 'class', 'def', 'return']:
-                    existing = [a['name'] for a in classes[-1]['attributes'] if isinstance(a, dict)]
+            if attr_full and not attr_full.startswith("return"):
+                attr_name = attr_full.split(":")[0].strip()
+                if (
+                    attr_name
+                    and attr_name.isidentifier()
+                    and attr_name
+                    not in ["try", "if", "for", "while", "class", "def", "return"]
+                ):
+                    existing = [
+                        a["name"]
+                        for a in classes[-1]["attributes"]
+                        if isinstance(a, dict)
+                    ]
                     if attr_name not in existing:
-                        classes[-1]['attributes'].append({
-                            'name': attr_name,
-                            'full': attr_full
-                        })
+                        classes[-1]["attributes"].append(
+                            {"name": attr_name, "full": attr_full}
+                        )
 
         # Functions/methods with signatures
-        if stripped.startswith('def '):
+        if stripped.startswith("def "):
             func_line = stripped
-            if func_line.endswith(':'):
+            if func_line.endswith(":"):
                 func_line = func_line[:-1]
-            func_name = func_line.split('(')[0].replace('def ', '')
+            func_name = func_line.split("(")[0].replace("def ", "")
 
             try:
-                params_part = func_line.split('(', 1)[1].rsplit(')', 1)[0]
-                return_part = func_line.split('->')[-1].strip() if '->' in func_line else 'None'
+                params_part = func_line.split("(", 1)[1].rsplit(")", 1)[0]
+                return_part = (
+                    func_line.split("->")[-1].strip() if "->" in func_line else "None"
+                )
             except (IndexError, ValueError):
-                params_part = ''
-                return_part = 'None'
+                params_part = ""
+                return_part = "None"
 
             func_info = {
-                'name': func_name,
-                'params': params_part,
-                'returns': return_part,
-                'full': func_line
+                "name": func_name,
+                "params": params_part,
+                "returns": return_part,
+                "full": func_line,
             }
 
             if in_class:
-                classes[-1]['methods'].append(func_info)
+                classes[-1]["methods"].append(func_info)
             else:
                 functions.append(func_info)
 
@@ -166,43 +208,53 @@ def generate_file_gherkin(file_path: Path) -> str:
             gherkin_lines.append(f"      | {imp} |")
         gherkin_lines.append("")
 
-    is_dataclass = '@dataclass' in content
+    is_dataclass = "@dataclass" in content
 
     for cls in classes:
         gherkin_lines.append("  @dataclass" if is_dataclass else "  @class")
-        gherkin_lines.append(f"  Scenario: Define {cls['name']} {'dataclass' if is_dataclass else 'class'}")
+        gherkin_lines.append(
+            f"  Scenario: Define {cls['name']} {'dataclass' if is_dataclass else 'class'}"
+        )
 
-        if cls['docstring']:
+        if cls["docstring"]:
             gherkin_lines.append(f"    # {cls['docstring'][:80]}")
 
-        gherkin_lines.append(f"    Given a {'dataclass' if is_dataclass else 'class'} named \"{cls['name']}\"")
+        gherkin_lines.append(
+            f'    Given a {"dataclass" if is_dataclass else "class"} named "{cls["name"]}"'
+        )
 
-        if cls['attributes']:
-            gherkin_lines.append("    Then it should have the following typed attributes:")
+        if cls["attributes"]:
+            gherkin_lines.append(
+                "    Then it should have the following typed attributes:"
+            )
             gherkin_lines.append("      | name | type | default |")
-            for attr in cls['attributes']:
+            for attr in cls["attributes"]:
                 if isinstance(attr, dict):
-                    full = attr['full']
-                    name = attr['name']
-                    type_part = ''
-                    default_part = ''
-                    if ':' in full:
-                        after_colon = full.split(':', 1)[1].strip()
-                        if '=' in after_colon:
-                            type_part = after_colon.split('=')[0].strip()
-                            default_part = after_colon.split('=', 1)[1].strip()
+                    full = attr["full"]
+                    name = attr["name"]
+                    type_part = ""
+                    default_part = ""
+                    if ":" in full:
+                        after_colon = full.split(":", 1)[1].strip()
+                        if "=" in after_colon:
+                            type_part = after_colon.split("=")[0].strip()
+                            default_part = after_colon.split("=", 1)[1].strip()
                         else:
                             type_part = after_colon
-                    gherkin_lines.append(f"      | {name} | {type_part} | {default_part} |")
+                    gherkin_lines.append(
+                        f"      | {name} | {type_part} | {default_part} |"
+                    )
                 else:
                     gherkin_lines.append(f"      | {attr} | | |")
 
-        if cls['methods']:
+        if cls["methods"]:
             gherkin_lines.append("    And it should have the following methods:")
             gherkin_lines.append("      | name | params | returns |")
-            for method in cls['methods']:
+            for method in cls["methods"]:
                 if isinstance(method, dict):
-                    gherkin_lines.append(f"      | {method['name']} | {method['params'][:50]} | {method['returns']} |")
+                    gherkin_lines.append(
+                        f"      | {method['name']} | {method['params'][:50]} | {method['returns']} |"
+                    )
                 else:
                     gherkin_lines.append(f"      | {method} | | |")
 
@@ -211,15 +263,15 @@ def generate_file_gherkin(file_path: Path) -> str:
     for func in functions:
         if isinstance(func, dict):
             gherkin_lines.append(f"  Scenario: Define {func['name']} function")
-            gherkin_lines.append(f"    Given a function named \"{func['name']}\"")
+            gherkin_lines.append(f'    Given a function named "{func["name"]}"')
             gherkin_lines.append(f"    With parameters: {func['params']}")
             gherkin_lines.append(f"    And returns: {func['returns']}")
         else:
             gherkin_lines.append(f"  Scenario: Define {func} function")
-            gherkin_lines.append(f"    Given a function named \"{func}\"")
+            gherkin_lines.append(f'    Given a function named "{func}"')
         gherkin_lines.append("")
 
-    return '\n'.join(gherkin_lines)
+    return "\n".join(gherkin_lines)
 
 
 def compare_code(original: str, generated: str) -> Dict[str, Any]:
@@ -232,8 +284,9 @@ def compare_code(original: str, generated: str) -> Dict[str, Any]:
     Returns:
         Dictionary with comparison metrics
     """
+
     def normalize(code: str) -> List[str]:
-        lines = code.strip().split('\n')
+        lines = code.strip().split("\n")
         return [line.rstrip() for line in lines if line.strip()]
 
     orig_lines = normalize(original)
@@ -242,43 +295,41 @@ def compare_code(original: str, generated: str) -> Dict[str, Any]:
     matcher = difflib.SequenceMatcher(None, orig_lines, gen_lines)
     similarity = matcher.ratio() * 100
 
-    diff = list(difflib.unified_diff(
-        orig_lines, gen_lines,
-        fromfile='original',
-        tofile='generated',
-        lineterm=''
-    ))
+    diff = list(
+        difflib.unified_diff(
+            orig_lines, gen_lines, fromfile="original", tofile="generated", lineterm=""
+        )
+    )
 
     def count_elements(code: str) -> Dict[str, int]:
         return {
-            'classes': code.count('class '),
-            'functions': code.count('def '),
-            'imports': code.count('import '),
-            'docstrings': code.count('"""'),
-            'lines': len(code.strip().split('\n')),
-            'chars': len(code),
+            "classes": code.count("class "),
+            "functions": code.count("def "),
+            "imports": code.count("import "),
+            "docstrings": code.count('"""'),
+            "lines": len(code.strip().split("\n")),
+            "chars": len(code),
         }
 
     orig_elements = count_elements(original)
     gen_elements = count_elements(generated)
 
     struct_matches = sum(
-        1 for k in orig_elements
-        if orig_elements[k] == gen_elements.get(k, 0)
+        1 for k in orig_elements if orig_elements[k] == gen_elements.get(k, 0)
     )
     struct_score = (struct_matches / len(orig_elements)) * 100
 
     return {
-        'similarity_percent': round(similarity, 2),
-        'structural_score': round(struct_score, 2),
-        'original_elements': orig_elements,
-        'generated_elements': gen_elements,
-        'diff_lines': len([d for d in diff if d.startswith('+') or d.startswith('-')]),
-        'diff': '\n'.join(diff[:50]),
+        "similarity_percent": round(similarity, 2),
+        "structural_score": round(struct_score, 2),
+        "original_elements": orig_elements,
+        "generated_elements": gen_elements,
+        "diff_lines": len([d for d in diff if d.startswith("+") or d.startswith("-")]),
+        "diff": "\n".join(diff[:50]),
     }
 
 
-def extract_code_block(text: str, language: str = 'python') -> str:
+def extract_code_block(text: str, language: str = "python") -> str:
     """Extract code block from LLM response.
 
     Args:
@@ -323,7 +374,9 @@ class CodeReproducer:
         """
         self.client = client or get_client(provider)
 
-    def reproduce_file(self, source_path: str, output_dir: str = None) -> Dict[str, Any]:
+    def reproduce_file(
+        self, source_path: str, output_dir: str = None
+    ) -> Dict[str, Any]:
         """Reproduce code from a source file.
 
         Args:
@@ -348,12 +401,12 @@ class CodeReproducer:
         comparison = compare_code(original_code, generated_code)
 
         results = {
-            'timestamp': datetime.now().isoformat(),
-            'source_file': str(source_path),
-            'original_code': original_code,
-            'gherkin': gherkin,
-            'generated_code': generated_code,
-            'comparison': comparison,
+            "timestamp": datetime.now().isoformat(),
+            "source_file": str(source_path),
+            "original_code": original_code,
+            "gherkin": gherkin,
+            "generated_code": generated_code,
+            "comparison": comparison,
         }
 
         # Save if output_dir provided
@@ -362,7 +415,7 @@ class CodeReproducer:
 
         return results
 
-    def generate_from_gherkin(self, gherkin: str, language: str = 'python') -> str:
+    def generate_from_gherkin(self, gherkin: str, language: str = "python") -> str:
         """Generate code from Gherkin specification.
 
         Args:
@@ -399,42 +452,42 @@ Include proper docstrings and type hints."""
         """Save reproduction results to files."""
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        (output_dir / 'original.py').write_text(results['original_code'])
-        (output_dir / 'specification.feature').write_text(results['gherkin'])
-        (output_dir / 'generated.py').write_text(results['generated_code'])
+        (output_dir / "original.py").write_text(results["original_code"])
+        (output_dir / "specification.feature").write_text(results["gherkin"])
+        (output_dir / "generated.py").write_text(results["generated_code"])
 
         # Generate report
         report = self._generate_report(results)
-        (output_dir / 'COMPARISON_REPORT.md').write_text(report)
+        (output_dir / "COMPARISON_REPORT.md").write_text(report)
 
     def _generate_report(self, results: Dict[str, Any]) -> str:
         """Generate markdown comparison report."""
-        comp = results['comparison']
+        comp = results["comparison"]
 
         return f"""# Code Reproduction Comparison Report
 
-> Generated: {results['timestamp']}
-> Source: `{results['source_file']}`
+> Generated: {results["timestamp"]}
+> Source: `{results["source_file"]}`
 
 ## Summary
 
 | Metric | Value |
 |--------|-------|
-| **Similarity** | {comp['similarity_percent']}% |
-| **Structural Score** | {comp['structural_score']}% |
-| **Diff Lines** | {comp['diff_lines']} |
+| **Similarity** | {comp["similarity_percent"]}% |
+| **Structural Score** | {comp["structural_score"]}% |
+| **Diff Lines** | {comp["diff_lines"]} |
 
 ## Structural Comparison
 
 | Element | Original | Generated | Match |
 |---------|----------|-----------|-------|
-| classes | {comp['original_elements']['classes']} | {comp['generated_elements']['classes']} | {'✓' if comp['original_elements']['classes'] == comp['generated_elements']['classes'] else '✗'} |
-| functions | {comp['original_elements']['functions']} | {comp['generated_elements']['functions']} | {'✓' if comp['original_elements']['functions'] == comp['generated_elements']['functions'] else '✗'} |
-| lines | {comp['original_elements']['lines']} | {comp['generated_elements']['lines']} | {'✓' if comp['original_elements']['lines'] == comp['generated_elements']['lines'] else '✗'} |
+| classes | {comp["original_elements"]["classes"]} | {comp["generated_elements"]["classes"]} | {"✓" if comp["original_elements"]["classes"] == comp["generated_elements"]["classes"] else "✗"} |
+| functions | {comp["original_elements"]["functions"]} | {comp["generated_elements"]["functions"]} | {"✓" if comp["original_elements"]["functions"] == comp["generated_elements"]["functions"] else "✗"} |
+| lines | {comp["original_elements"]["lines"]} | {comp["generated_elements"]["lines"]} | {"✓" if comp["original_elements"]["lines"] == comp["generated_elements"]["lines"] else "✗"} |
 
 ## Diff (first 50 lines)
 
 ```diff
-{comp['diff']}
+{comp["diff"]}
 ```
 """

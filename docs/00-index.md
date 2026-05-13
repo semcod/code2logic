@@ -64,9 +64,6 @@ Code2Logic analyzes codebases and generates structured representations optimized
 | function.toon | 49,3% | 29 271 | 1,68 | Function-level detail |
 | gherkin | 38,6% | ~25 000 | ~1,54 | BDD scenarios |
 
-## Quick Start
-
-```bash
 # Install
 pip install code2logic
 
@@ -79,9 +76,6 @@ project = analyze_project("/path/to/project")
 print(f"Files: {project.total_files}")
 ```
 
-## Configuration
-
-```bash
 # Set API keys for LLM features
 export OPENROUTER_API_KEY="sk-or-v1-..."
 export OLLAMA_HOST="http://localhost:11434"

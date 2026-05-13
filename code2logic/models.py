@@ -31,6 +31,7 @@ class FunctionInfo:
         start_line: Starting line number in source
         end_line: Ending line number in source
     """
+
     name: str
     params: List[str]
     return_type: Optional[str]
@@ -63,6 +64,7 @@ class ClassInfo:
         generic_params: List of generic type parameters
         is_dataclass: Whether this is a dataclass (@dataclass decorator)
     """
+
     name: str
     bases: List[str]
     docstring: Optional[str]
@@ -83,6 +85,7 @@ class TypeInfo:
         kind: Type kind ('type', 'interface', 'enum', 'struct', 'trait')
         definition: Short definition string
     """
+
     name: str
     kind: str  # 'type', 'interface', 'enum', 'struct', 'trait'
     definition: str
@@ -106,6 +109,7 @@ class ModuleInfo:
         lines_total: Total line count
         lines_code: Lines of actual code (excluding comments/blanks)
     """
+
     path: str
     language: str
     imports: List[str]
@@ -131,6 +135,7 @@ class DependencyNode:
         is_hub: Whether this is a hub module (high centrality)
         cluster: Cluster ID for grouping related modules
     """
+
     path: str
     in_degree: int = 0
     out_degree: int = 0
@@ -156,6 +161,7 @@ class ProjectInfo:
         total_lines: Total line count across all files
         generated_at: ISO timestamp of analysis
     """
+
     name: str
     root_path: str
     languages: Dict[str, int]
@@ -180,15 +186,19 @@ Class = ClassInfo
 @dataclass
 class ConstantInfo:
     """Module-level constant information."""
+
     name: str
     type_annotation: str = ""
     value: Optional[str] = None
-    value_keys: Optional[List[str]] = None  # For dicts - just keys to avoid size explosion
+    value_keys: Optional[List[str]] = (
+        None  # For dicts - just keys to avoid size explosion
+    )
 
 
 @dataclass
 class FieldInfo:
     """Dataclass field information."""
+
     name: str
     type_annotation: str
     default: Optional[str] = None
@@ -198,6 +208,7 @@ class FieldInfo:
 @dataclass
 class AttributeInfo:
     """Instance attribute information (self.x = ...)."""
+
     name: str
     type_annotation: str = ""
     set_in_init: bool = True
@@ -206,6 +217,7 @@ class AttributeInfo:
 @dataclass
 class PropertyInfo:
     """Property information (@property, @x.setter)."""
+
     name: str
     type_annotation: str = ""
     has_getter: bool = False
@@ -216,6 +228,7 @@ class PropertyInfo:
 @dataclass
 class OptionalImport:
     """Try/except import block information."""
+
     module: str
     from_module: Optional[str] = None
     imports: List[str] = field(default_factory=list)
@@ -241,6 +254,7 @@ class ClassInfo:
         is_abstract: Whether this is an abstract class
         generic_params: List of generic type parameters
     """
+
     name: str
     bases: List[str] = field(default_factory=list)
     decorators: List[str] = field(default_factory=list)
@@ -279,6 +293,7 @@ class FunctionInfo:
         start_line: Line number where function starts
         end_line: Line number where function ends
     """
+
     name: str
     params: List[str] = field(default_factory=list)
     params_with_defaults: Dict[str, str] = field(default_factory=dict)
@@ -321,6 +336,7 @@ class ModuleInfo:
         lines_code: Lines of actual code (excluding comments/blanks)
         file_bytes: Size of the source file in bytes
     """
+
     path: str
     language: str = "python"
     imports: List[str] = field(default_factory=list)

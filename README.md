@@ -227,3 +227,20 @@ Apache License 2.0 - see [LICENSE](LICENSE) for details.
 ## Author
 
 Created by **Tom Sapletta** - [tom@sapletta.com](mailto:tom@sapletta.com)
+
+<!-- taskill:status:start -->
+
+## Status
+
+_Last updated by [taskill](https://github.com/oqlos/taskill) at 2026-04-25 13:36 UTC_
+
+| Metric | Value |
+|---|---|
+| HEAD | `bdf9336` |
+| Coverage | — |
+| Failing tests | — |
+| Commits in last cycle | 50 |
+
+> Large refactor and feature sweep: added a deep code analysis engine and supporting modules, improved configuration management and CLI, integrated AppDefaults for auto-loading a default LLM profile, and delegated env file I/O to getv.EnvStore. Docs, examples, and tests were updated alongside several chore/quality improvements and a release commit.
+
+<!-- taskill:status:end -->

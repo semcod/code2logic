@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Print benchmark summary from JSON result files."""
+
 import json
 import os
 import sys
@@ -9,8 +10,8 @@ def _fmt_bytes(n: int) -> str:
     if n < 1024:
         return f"{n} B"
     if n < 1024 * 1024:
-        return f"{n/1024:.1f} KB"
-    return f"{n/1024/1024:.1f} MB"
+        return f"{n / 1024:.1f} KB"
+    return f"{n / 1024 / 1024:.1f} MB"
 
 
 def _token_estimate_bytes(n: int) -> int:
@@ -51,7 +52,11 @@ def main():
             total = d.get("total_functions", len(fr))
             sims = [x.get("similarity", 0.0) for x in fr]
             avg_sim = sum(sims) / len(sims) if sims else 0.0
-            syn = (sum(1 for x in fr if x.get("syntax_ok")) / len(fr) * 100) if fr else 0.0
+            syn = (
+                (sum(1 for x in fr if x.get("syntax_ok")) / len(fr) * 100)
+                if fr
+                else 0.0
+            )
             print(
                 f"{name:<12} {total:>6} "
                 f"{avg_sim:>9.1f}% "

@@ -26,6 +26,7 @@ from .llm_clients import LiteLLMClient, OllamaLocalClient, OpenRouterClient, get
 @dataclass
 class LLMConfig:
     """Configuration for LLM backend."""
+
     provider: str = "ollama"  # "ollama" or "litellm"
     model: str = "qwen2.5-coder:7b"
     base_url: str = "http://localhost:11434"
@@ -68,7 +69,7 @@ Be specific, practical, and provide code examples when helpful."""
         provider: str = None,
         base_url: str = None,
         api_key: str = None,
-        **kwargs
+        **kwargs,
     ):
         """
         Initialize CodeAnalyzer.
@@ -78,18 +79,20 @@ Be specific, practical, and provide code examples when helpful."""
             provider: "ollama" or "litellm"
             base_url: API base URL
         """
-        selected_provider = provider or os.environ.get('CODE2LOGIC_DEFAULT_PROVIDER', 'ollama')
+        selected_provider = provider or os.environ.get(
+            "CODE2LOGIC_DEFAULT_PROVIDER", "ollama"
+        )
 
         # Keep legacy defaults for local usage
         if model is None:
-            model = os.environ.get('OLLAMA_MODEL', 'qwen2.5-coder:7b')
+            model = os.environ.get("OLLAMA_MODEL", "qwen2.5-coder:7b")
         if base_url is None:
-            base_url = os.environ.get('OLLAMA_HOST', 'http://localhost:11434')
+            base_url = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
 
         # Prefer unified clients + allow optional overrides
         if selected_provider in ("auto", "AUTO"):
             # In auto mode, model/base_url/api_key may not apply uniformly; let get_client decide.
-            self.client = get_client('auto')
+            self.client = get_client("auto")
         elif selected_provider == "openrouter":
             self.client = OpenRouterClient(api_key=api_key, model=model)
         elif selected_provider == "ollama":
@@ -105,7 +108,7 @@ Be specific, practical, and provide code examples when helpful."""
             model=model,
             base_url=base_url,
             api_key=api_key,
-            **kwargs
+            **kwargs,
         )
 
     def is_available(self) -> bool:
@@ -126,12 +129,12 @@ Be specific, practical, and provide code examples when helpful."""
 
         # Generate compact representation
         csv_gen = CSVGenerator()
-        csv_data = csv_gen.generate(project, detail='full')
+        csv_data = csv_gen.generate(project, detail="full")
 
         # Truncate if too long
         if len(csv_data) > 8000:
-            lines = csv_data.split('\n')
-            csv_data = '\n'.join(lines[:100]) + f"\n... ({len(lines)-100} more lines)"
+            lines = csv_data.split("\n")
+            csv_data = "\n".join(lines[:100]) + f"\n... ({len(lines) - 100} more lines)"
 
         prompt = f"""Analyze this codebase and suggest refactoring improvements:
 
@@ -153,8 +156,8 @@ Format as JSON array."""
         # Try to parse JSON from response
         try:
             # Find JSON in response
-            start = response.find('[')
-            end = response.rfind(']') + 1
+            start = response.find("[")
+            end = response.rfind("]") + 1
             if start >= 0 and end > start:
                 return json.loads(response[start:end])
         except json.JSONDecodeError:
@@ -177,20 +180,24 @@ Format as JSON array."""
         functions = []
         for m in project.modules:
             for f in m.functions:
-                functions.append({
-                    'path': m.path,
-                    'name': f.name,
-                    'signature': self._build_signature(f),
-                    'intent': f.intent or '',
-                })
+                functions.append(
+                    {
+                        "path": m.path,
+                        "name": f.name,
+                        "signature": self._build_signature(f),
+                        "intent": f.intent or "",
+                    }
+                )
             for c in m.classes:
                 for method in c.methods:
-                    functions.append({
-                        'path': m.path,
-                        'name': f"{c.name}.{method.name}",
-                        'signature': self._build_signature(method),
-                        'intent': method.intent or '',
-                    })
+                    functions.append(
+                        {
+                            "path": m.path,
+                            "name": f"{c.name}.{method.name}",
+                            "signature": self._build_signature(method),
+                            "intent": method.intent or "",
+                        }
+                    )
 
         if len(functions) > 50:
             functions = functions[:50]
@@ -214,8 +221,8 @@ Format as JSON array of groups."""
         response = self.client.generate(prompt, system=self.SYSTEM_PROMPT)
 
         try:
-            start = response.find('[')
-            end = response.rfind(']') + 1
+            start = response.find("[")
+            end = response.rfind("]") + 1
             if start >= 0 and end > start:
                 return json.loads(response[start:end])
         except json.JSONDecodeError:
@@ -224,10 +231,7 @@ Format as JSON array of groups."""
         return [{"raw_response": response}]
 
     def generate_code(
-        self,
-        project,
-        target_lang: str,
-        module_filter: Optional[str] = None
+        self, project, target_lang: str, module_filter: Optional[str] = None
     ) -> dict[str, str]:
         """
         Generate code in target language from project analysis.
@@ -260,14 +264,18 @@ Format as JSON array of groups."""
                 for c in module.classes[:5]:
                     spec_lines.append(f"  class {c.name}({', '.join(c.bases)})")
                     for m in c.methods[:10]:
-                        spec_lines.append(f"    - {m.name}{self._build_signature(m)}: {m.intent}")
+                        spec_lines.append(
+                            f"    - {m.name}{self._build_signature(m)}: {m.intent}"
+                        )
 
             if module.functions:
                 spec_lines.append("\nFunctions:")
                 for f in module.functions[:10]:
-                    spec_lines.append(f"  - {f.name}{self._build_signature(f)}: {f.intent}")
+                    spec_lines.append(
+                        f"  - {f.name}{self._build_signature(f)}: {f.intent}"
+                    )
 
-            spec = '\n'.join(spec_lines)
+            spec = "\n".join(spec_lines)
 
             prompt = f"""Generate {target_lang} code from this specification:
 
@@ -288,12 +296,7 @@ Output only the code."""
         return results
 
     def translate_function(
-        self,
-        name: str,
-        signature: str,
-        intent: str,
-        source_lang: str,
-        target_lang: str
+        self, name: str, signature: str, intent: str, source_lang: str, target_lang: str
     ) -> str:
         """
         Translate a single function to another language.
@@ -325,48 +328,54 @@ Output only the code."""
 
     def _build_signature(self, f) -> str:
         """Build compact signature."""
-        params = ','.join(f.params[:4])
+        params = ",".join(f.params[:4])
         if len(f.params) > 4:
-            params += '...'
+            params += "..."
         ret = f"->{f.return_type}" if f.return_type else ""
         return f"({params}){ret}"
 
 
 def get_available_backends() -> dict[str, bool]:
     """Get availability status of LLM backends."""
-    httpx_available = find_spec('httpx') is not None
-    litellm_available = find_spec('litellm') is not None
+    httpx_available = find_spec("httpx") is not None
+    litellm_available = find_spec("litellm") is not None
 
     status = {
         # Backward-compatible keys
-        'httpx': httpx_available,
-        'litellm': litellm_available,
-        'ollama': False,
+        "httpx": httpx_available,
+        "litellm": litellm_available,
+        "ollama": False,
         # Extended provider keys
-        'auto': False,
-        'openrouter': False,
-        'litellm_provider': False,
+        "auto": False,
+        "openrouter": False,
+        "litellm_provider": False,
     }
 
     try:
-        status['auto'] = bool(get_client('auto'))
+        status["auto"] = bool(get_client("auto"))
     except Exception:
         pass
 
     try:
-        status['openrouter'] = bool(getattr(OpenRouterClient(), 'is_available', lambda: False)())
+        status["openrouter"] = bool(
+            getattr(OpenRouterClient(), "is_available", lambda: False)()
+        )
     except Exception:
         pass
 
     try:
         if httpx_available:
-            status['ollama'] = bool(getattr(OllamaLocalClient(), 'is_available', lambda: False)())
+            status["ollama"] = bool(
+                getattr(OllamaLocalClient(), "is_available", lambda: False)()
+            )
     except Exception:
         pass
 
     try:
         if litellm_available:
-            status['litellm_provider'] = bool(getattr(LiteLLMClient(), 'is_available', lambda: False)())
+            status["litellm_provider"] = bool(
+                getattr(LiteLLMClient(), "is_available", lambda: False)()
+            )
     except Exception:
         pass
 

@@ -30,6 +30,7 @@ from .llm_clients import BaseLLMClient, get_client
 @dataclass
 class DuplicateGroup:
     """Group of duplicate functions."""
+
     hash: str
     functions: List[str]
     suggestion: str
@@ -39,6 +40,7 @@ class DuplicateGroup:
 @dataclass
 class RefactoringSuggestion:
     """Single refactoring suggestion."""
+
     type: str
     severity: str
     location: str
@@ -50,6 +52,7 @@ class RefactoringSuggestion:
 @dataclass
 class RefactoringReport:
     """Complete refactoring analysis report."""
+
     project_path: str
     total_files: int
     total_functions: int
@@ -102,7 +105,7 @@ class RefactoringReport:
                 lines.append(f"- 🔒 **{issue.type}** at `{issue.location}`")
             lines.append("")
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
 
 def find_duplicates(
@@ -124,40 +127,47 @@ def find_duplicates(
     functions = []
     for module in project.modules:
         for func in module.functions:
-            functions.append({
-                'name': func.name,
-                'path': module.path,
-                'signature': f"{func.name}({', '.join(func.params)})",
-                'full_name': f"{module.path}::{func.name}",
-            })
+            functions.append(
+                {
+                    "name": func.name,
+                    "path": module.path,
+                    "signature": f"{func.name}({', '.join(func.params)})",
+                    "full_name": f"{module.path}::{func.name}",
+                }
+            )
         for cls in module.classes:
             for method in cls.methods:
-                functions.append({
-                    'name': method.name,
-                    'path': module.path,
-                    'signature': f"{method.name}({', '.join(method.params)})",
-                    'full_name': f"{module.path}::{cls.name}.{method.name}",
-                })
+                functions.append(
+                    {
+                        "name": method.name,
+                        "path": module.path,
+                        "signature": f"{method.name}({', '.join(method.params)})",
+                        "full_name": f"{module.path}::{cls.name}.{method.name}",
+                    }
+                )
 
     # Find duplicates by signature
     signature_groups = {}
     for func in functions:
-        sig = func['signature']
+        sig = func["signature"]
         if sig not in signature_groups:
             signature_groups[sig] = []
-        signature_groups[sig].append(func['full_name'])
+        signature_groups[sig].append(func["full_name"])
 
     duplicates = []
     for sig, funcs in signature_groups.items():
         if len(funcs) > 1:
             import hashlib
+
             hash_ = hashlib.md5(sig.encode()).hexdigest()[:8]
-            duplicates.append(DuplicateGroup(
-                hash=hash_,
-                functions=funcs,
-                suggestion="Extract to shared utility function",
-                effort="low" if len(funcs) <= 3 else "medium",
-            ))
+            duplicates.append(
+                DuplicateGroup(
+                    hash=hash_,
+                    functions=funcs,
+                    suggestion="Extract to shared utility function",
+                    effort="low" if len(funcs) <= 3 else "medium",
+                )
+            )
 
     return duplicates
 
@@ -198,28 +208,32 @@ def analyze_quality(
     quality = analyze_code_quality(project)
     for category, issues in quality.items():
         for issue in issues:
-            report.quality_issues.append(RefactoringSuggestion(
-                type=category,
-                severity=issue.get('severity', 'medium'),
-                location=f"{issue.get('path', '')}::{issue.get('name', '')}",
-                description=f"{category}: {issue.get('complexity', issue.get('lines', ''))}",
-                suggestion=f"Refactor to reduce {category}",
-                effort="medium",
-            ))
+            report.quality_issues.append(
+                RefactoringSuggestion(
+                    type=category,
+                    severity=issue.get("severity", "medium"),
+                    location=f"{issue.get('path', '')}::{issue.get('name', '')}",
+                    description=f"{category}: {issue.get('complexity', issue.get('lines', ''))}",
+                    suggestion=f"Refactor to reduce {category}",
+                    effort="medium",
+                )
+            )
 
     # Security issues
     if include_security:
         security = check_security_issues(project)
         for category, issues in security.items():
             for issue in issues:
-                report.security_issues.append(RefactoringSuggestion(
-                    type=category,
-                    severity=issue.get('severity', 'high'),
-                    location=f"{issue.get('path', '')}::{issue.get('name', '')}",
-                    description=f"Potential {category}",
-                    suggestion=f"Review and fix {category}",
-                    effort="medium",
-                ))
+                report.security_issues.append(
+                    RefactoringSuggestion(
+                        type=category,
+                        severity=issue.get("severity", "high"),
+                        location=f"{issue.get('path', '')}::{issue.get('name', '')}",
+                        description=f"Potential {category}",
+                        suggestion=f"Review and fix {category}",
+                        effort="medium",
+                    )
+                )
 
     return report
 
@@ -274,14 +288,16 @@ Provide actionable suggestions with:
             )
 
             # Parse suggestions (simplified)
-            report.suggestions.append(RefactoringSuggestion(
-                type="llm_suggestion",
-                severity="info",
-                location="project-wide",
-                description="LLM-generated suggestions",
-                suggestion=response[:500],
-                effort="varies",
-            ))
+            report.suggestions.append(
+                RefactoringSuggestion(
+                    type="llm_suggestion",
+                    severity="info",
+                    location="project-wide",
+                    description="LLM-generated suggestions",
+                    suggestion=response[:500],
+                    effort="varies",
+                )
+            )
 
         except Exception:
             pass
@@ -327,21 +343,21 @@ def compare_codebases(
     similarity = len(common) / max(len(e1 | e2), 1) * 100
 
     return {
-        'project1': {
-            'path': project1,
-            'files': p1.total_files,
-            'elements': len(e1),
+        "project1": {
+            "path": project1,
+            "files": p1.total_files,
+            "elements": len(e1),
         },
-        'project2': {
-            'path': project2,
-            'files': p2.total_files,
-            'elements': len(e2),
+        "project2": {
+            "path": project2,
+            "files": p2.total_files,
+            "elements": len(e2),
         },
-        'similarity_percent': round(similarity, 1),
-        'common_elements': len(common),
-        'only_in_project1': len(only_in_1),
-        'only_in_project2': len(only_in_2),
-        'common': list(common)[:20],
+        "similarity_percent": round(similarity, 1),
+        "common_elements": len(common),
+        "only_in_project1": len(only_in_1),
+        "only_in_project2": len(only_in_2),
+        "common": list(common)[:20],
     }
 
 
@@ -359,10 +375,7 @@ def quick_analyze(project_path: str) -> Dict[str, Any]:
     # Count elements
     total_classes = sum(len(m.classes) for m in project.modules)
     total_functions = sum(len(m.functions) for m in project.modules)
-    total_methods = sum(
-        sum(len(c.methods) for c in m.classes)
-        for m in project.modules
-    )
+    total_methods = sum(sum(len(c.methods) for c in m.classes) for m in project.modules)
 
     # Find complex functions
     complex_funcs = []
@@ -372,12 +385,12 @@ def quick_analyze(project_path: str) -> Dict[str, Any]:
                 complex_funcs.append(f"{module.path}::{func.name}")
 
     return {
-        'project': project.name,
-        'files': project.total_files,
-        'lines': project.total_lines,
-        'classes': total_classes,
-        'functions': total_functions,
-        'methods': total_methods,
-        'languages': project.languages,
-        'complex_functions': complex_funcs[:10],
+        "project": project.name,
+        "files": project.total_files,
+        "lines": project.total_lines,
+        "classes": total_classes,
+        "functions": total_functions,
+        "methods": total_methods,
+        "languages": project.languages,
+        "complex_functions": complex_funcs[:10],
     }

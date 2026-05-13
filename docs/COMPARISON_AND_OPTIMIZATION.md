@@ -1,7 +1,3 @@
-# code2flow: Porównanie Podejść i Optymalizacja dla Dużych Projektów
-
-## Porównanie: Standard code2flow vs llm-context
-
 ### Metryki dla nlp2cmd (197 modułów, ~3500 funkcji)
 
 | Aspekt | Standard code2flow | llm-context | Różnica |
@@ -12,9 +8,6 @@
 | **Czytelność** | Maszyna | Człowiek/LLM | Przyjazne LLM |
 | **Struktura** | Strukturalna | Funkcjonalna | Logiczna |
 
-### Co Zawiera Standard code2flow
-
-```yaml
 # analysis.yaml - 13MB, strukturalny
 modules:
   adapter.kubernetes:
@@ -40,23 +33,15 @@ modules:
 - ❌ Brak kontekstu "co to robi" i "jak to działa"
 - ❌ Nie nadaje się do analizy architektury
 
-### Co Zawiera llm-context
-
-```markdown
-# System Architecture Analysis
-
-## Architecture by Module
 ### generation.template_generator
 - **Functions**: 128
 - **Classes**: 2
 - **File**: `template_generator.py`
 
-## Key Entry Points
 ### pipeline_runner_plans.PlanExecutionMixin._execute_plan_step
 > Execute a single ActionPlan step. Returns extracted value or None.
 - **Calls**: _resolve_plan_variables, Console, print, page.goto
 
-## Process Flows
 ### Flow 1: _execute_plan_step
 _execute_plan_step
   → _resolve_plan_variables
@@ -81,19 +66,12 @@ graph TD
 
 ---
 
-## Optymalizacja dla Dużych Projektów
-
 ### Problem: Skalowalność
 
 Dla projektu z 10,000+ funkcji:
 - Standard: 40MB+ YAML, czas: 5-10 minut, pamięć: 2GB+
 - llm-context: 100KB, czas: 10s, pamięć: 200MB
 
-### Strategie Optymalizacji
-
-#### 1. **Strategie Analizy (Quick/Standard/Deep)**
-
-```python
 # Szybka analiza - dla pierwszego przeglądu
 FAST_CONFIG = Config(
     performance=PerformanceConfig(
@@ -120,9 +98,6 @@ DEEP_CONFIG = Config(
 )
 ```
 
-#### 2. **Priorytetyzacja Plików**
-
-```python
 # Pliki są sortowane według ważności:
 priority_score = (
     entry_point_bonus * 100 +      # __main__, cli.py
@@ -131,13 +106,6 @@ priority_score = (
     -size_penalty * 0.1             # Kara za duży rozmiar
 )
 
-# Efekt: ważne pliki analizowane pierwsze
-# Jeśli przerwiesz analizę, masz już kluczowe komponenty
-```
-
-#### 3. **Streaming Analysis**
-
-```python
 # Zamiast ładować wszystko do pamięci:
 analyzer = StreamingAnalyzer(strategy=STRATEGY_QUICK)
 
@@ -157,9 +125,6 @@ for update in analyzer.analyze_streaming('/path/to/project'):
 - Możliwość przerwania i wznowienia
 - Natura rzeczywista (real-time)
 
-#### 4. **Incremental Analysis**
-
-```python
 # Tylko zmienione pliki od ostatniej analizy
 analyzer = StreamingAnalyzer(
     strategy=STRATEGY_QUICK,
@@ -167,7 +132,6 @@ analyzer = StreamingAnalyzer(
     cache_dir='./.code2flow_cache'
 )
 
-# Pierwszy raz: analizuje wszystko (3s)
 # Kolejne: tylko zmienione (0.1s)
 ```
 
@@ -197,8 +161,6 @@ def parse_file_cached(file_path: str) -> ast.Module:
 ```
 
 ---
-
-## Funkcjonalny Podział Projektu (Refaktoryzacja)
 
 ### Obecny Strukturalny Podział (nlp2cmd)
 
@@ -324,11 +286,6 @@ class SchemaValidator:
 
 ---
 
-## Przykłady Użycia
-
-### 1. Szybki Przegląd Projektu
-
-```bash
 # Generuj kontekst (3s zamiast 60s)
 code2flow llm-context /path/to/project -o ./context.md
 
@@ -342,9 +299,6 @@ cat ./context.md | llm "What does this project do?"
 > command generation (templates, matching), automation (planning, validation),
 > and web interaction (scraping, browser control)."
 
-### 2. Znajdowanie Błędu
-
-```bash
 # Generuj kontekst
 code2flow llm-context . -o ./context.md
 
@@ -363,9 +317,6 @@ and suggest fixes.
 > 
 > Suggested fix: Add configurable timeout parameter to BrowserExecutionMixin..."
 
-### 3. Refaktoryzacja
-
-```bash
 # Porównaj obecny stan z proponowanym
 code2flow llm-context . -o ./current.md
 
@@ -389,9 +340,6 @@ using functional domain separation.
 > 2. `domain/command_generation/matching/` - fuzzy matching
 > 3. `infrastructure/parsing/validation/` - schema validation"
 
-### 4. Onboarding Nowego Developera
-
-```bash
 # Generuj kontekst dla nowego developera
 code2flow llm-context . -o ./onboarding.md
 
@@ -410,9 +358,6 @@ I'm new to this project. Based on the Key Entry Points and Process Flows:
 > 2. Follow the process flow: run → execute_action_plan → _execute_plan_step
 > 3. Key modules: generation (templates), automation (planning), web_schema (scraping)"
 
-### 5. Dokumentacja API
-
-```bash
 # Generuj kontekst
 code2flow llm-context . -o ./api_docs.md
 
@@ -428,28 +373,10 @@ including:
 
 ---
 
-## Test na nlp2cmd: Porównanie w Praktyce
-
-### Test 1: Czas Generacji
-
-```bash
 # Standard code2flow
 time code2flow ../src/nlp2cmd -v -o ./output
-# real    0m58.234s
-# user    0m52.891s
-# sys     0m5.112s
-# Output: 13MB
-
 # llm-context
 time code2flow llm-context ../src/nlp2cmd -o ./context.md
-# real    0m2.891s
-# user    0m2.543s
-# sys     0m0.312s
-# Output: 35KB
-
-# Przyspieszenie: 20x
-```
-
 ### Test 2: Użyteczność dla LLM
 
 **Standard output (13MB YAML):**
@@ -488,8 +415,6 @@ _run_dom_multi_action
 ```
 
 ---
-
-## Podsumowanie i Rekomendacje
 
 ### Kiedy Używać Standard code2flow?
 

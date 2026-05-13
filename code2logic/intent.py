@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 
 class IntentType(Enum):
     """Types of user intents for code analysis."""
+
     REFACTOR = auto()
     ANALYZE = auto()
     OPTIMIZE = auto()
@@ -27,22 +28,26 @@ class IntentType(Enum):
 @dataclass
 class Intent:
     """Represents a detected user intent."""
+
     type: IntentType
     confidence: float
     target: str
     description: str
     suggestions: List[str] = field(default_factory=list)
 
+
 # Optional NLP imports with graceful degradation
 try:
     import nltk
     from nltk.stem import WordNetLemmatizer
+
     NLTK_AVAILABLE = True
 except ImportError:
     NLTK_AVAILABLE = False
 
 try:
     import spacy
+
     SPACY_AVAILABLE = True
 except ImportError:
     SPACY_AVAILABLE = False
@@ -66,69 +71,73 @@ class EnhancedIntentGenerator:
     # Extended verb patterns (PL + EN)
     VERB_PATTERNS: dict[tuple[str, ...], tuple[str, str]] = {
         # CRUD operations
-        ('get', 'fetch', 'retrieve', 'load', 'find', 'query', 'read', 'select'):
-            ('pobiera', 'retrieves'),
-        ('set', 'update', 'modify', 'change', 'edit', 'put', 'patch'):
-            ('aktualizuje', 'updates'),
-        ('create', 'make', 'build', 'generate', 'new', 'add', 'insert', 'post', 'init'):
-            ('tworzy', 'creates'),
-        ('delete', 'remove', 'clear', 'destroy', 'drop', 'erase'):
-            ('usuwa', 'deletes'),
-
+        ("get", "fetch", "retrieve", "load", "find", "query", "read", "select"): (
+            "pobiera",
+            "retrieves",
+        ),
+        ("set", "update", "modify", "change", "edit", "put", "patch"): (
+            "aktualizuje",
+            "updates",
+        ),
+        (
+            "create",
+            "make",
+            "build",
+            "generate",
+            "new",
+            "add",
+            "insert",
+            "post",
+            "init",
+        ): ("tworzy", "creates"),
+        ("delete", "remove", "clear", "destroy", "drop", "erase"): ("usuwa", "deletes"),
         # Validation
-        ('is', 'has', 'can', 'should', 'check', 'test', 'assert'):
-            ('sprawdza', 'checks'),
-        ('validate', 'verify', 'confirm', 'authenticate'):
-            ('waliduje', 'validates'),
-
+        ("is", "has", "can", "should", "check", "test", "assert"): (
+            "sprawdza",
+            "checks",
+        ),
+        ("validate", "verify", "confirm", "authenticate"): ("waliduje", "validates"),
         # Transformation
-        ('convert', 'transform', 'map', 'translate', 'cast', 'to'):
-            ('konwertuje', 'converts'),
-        ('parse', 'extract', 'decode', 'deserialize'):
-            ('parsuje', 'parses'),
-        ('format', 'render', 'serialize', 'encode', 'stringify'):
-            ('formatuje', 'formats'),
-
+        ("convert", "transform", "map", "translate", "cast", "to"): (
+            "konwertuje",
+            "converts",
+        ),
+        ("parse", "extract", "decode", "deserialize"): ("parsuje", "parses"),
+        ("format", "render", "serialize", "encode", "stringify"): (
+            "formatuje",
+            "formats",
+        ),
         # Communication
-        ('send', 'emit', 'dispatch', 'publish', 'notify', 'push'):
-            ('wysyła', 'sends'),
-        ('receive', 'listen', 'subscribe', 'on', 'handle'):
-            ('obsługuje', 'handles'),
-
+        ("send", "emit", "dispatch", "publish", "notify", "push"): ("wysyła", "sends"),
+        ("receive", "listen", "subscribe", "on", "handle"): ("obsługuje", "handles"),
         # Lifecycle
-        ('init', 'initialize', 'setup', 'configure', 'bootstrap'):
-            ('inicjalizuje', 'initializes'),
-        ('start', 'run', 'execute', 'launch', 'begin', 'open'):
-            ('uruchamia', 'starts'),
-        ('stop', 'end', 'finish', 'close', 'shutdown', 'terminate'):
-            ('kończy', 'stops'),
-
+        ("init", "initialize", "setup", "configure", "bootstrap"): (
+            "inicjalizuje",
+            "initializes",
+        ),
+        ("start", "run", "execute", "launch", "begin", "open"): ("uruchamia", "starts"),
+        ("stop", "end", "finish", "close", "shutdown", "terminate"): (
+            "kończy",
+            "stops",
+        ),
         # Data operations
-        ('process', 'compute', 'calculate', 'evaluate', 'analyze'):
-            ('przetwarza', 'processes'),
-        ('filter', 'search', 'match', 'lookup'):
-            ('filtruje', 'filters'),
-        ('sort', 'order', 'arrange', 'rank'):
-            ('sortuje', 'sorts'),
-        ('merge', 'combine', 'join', 'concat'):
-            ('łączy', 'merges'),
-        ('split', 'divide', 'separate', 'partition'):
-            ('dzieli', 'splits'),
-
+        ("process", "compute", "calculate", "evaluate", "analyze"): (
+            "przetwarza",
+            "processes",
+        ),
+        ("filter", "search", "match", "lookup"): ("filtruje", "filters"),
+        ("sort", "order", "arrange", "rank"): ("sortuje", "sorts"),
+        ("merge", "combine", "join", "concat"): ("łączy", "merges"),
+        ("split", "divide", "separate", "partition"): ("dzieli", "splits"),
         # Logging
-        ('log', 'print', 'write', 'output', 'display'):
-            ('loguje', 'logs'),
-
+        ("log", "print", "write", "output", "display"): ("loguje", "logs"),
         # Registration
-        ('register', 'bind', 'attach', 'connect', 'hook'):
-            ('rejestruje', 'registers'),
-
+        ("register", "bind", "attach", "connect", "hook"): ("rejestruje", "registers"),
         # Caching
-        ('cache', 'memoize', 'store', 'save', 'persist'):
-            ('cachuje', 'caches'),
+        ("cache", "memoize", "store", "save", "persist"): ("cachuje", "caches"),
     }
 
-    def __init__(self, lang: str = 'en'):
+    def __init__(self, lang: str = "en"):
         """
         Initialize the intent generator.
 
@@ -142,11 +151,11 @@ class EnhancedIntentGenerator:
         # Initialize NLTK lemmatizer if available
         if NLTK_AVAILABLE:
             try:
-                nltk.data.find('corpora/wordnet')
+                nltk.data.find("corpora/wordnet")
                 self.lemmatizer = WordNetLemmatizer()
             except LookupError:
                 try:
-                    nltk.download('wordnet', quiet=True)
+                    nltk.download("wordnet", quiet=True)
                     self.lemmatizer = WordNetLemmatizer()
                 except Exception:
                     pass
@@ -154,11 +163,11 @@ class EnhancedIntentGenerator:
         # Initialize spaCy if available (for more advanced NLP)
         if SPACY_AVAILABLE:
             try:
-                model = 'pl_core_news_sm' if lang == 'pl' else 'en_core_web_sm'
+                model = "pl_core_news_sm" if lang == "pl" else "en_core_web_sm"
                 self.nlp = spacy.load(model)
             except OSError:
                 try:
-                    self.nlp = spacy.load('en_core_web_sm')
+                    self.nlp = spacy.load("en_core_web_sm")
                 except OSError:
                     pass
 
@@ -190,41 +199,51 @@ class EnhancedIntentGenerator:
             return name
 
         first_word = words[0].lower()
-        rest = ' '.join(words[1:]).lower() if len(words) > 1 else ''
+        rest = " ".join(words[1:]).lower() if len(words) > 1 else ""
 
         # Lemmatize if available
         if self.lemmatizer:
             try:
-                first_word = self.lemmatizer.lemmatize(first_word, pos='v')
+                first_word = self.lemmatizer.lemmatize(first_word, pos="v")
             except Exception:
                 pass
 
         # Match against verb patterns
-        intent_idx = 0 if self.lang == 'pl' else 1
+        intent_idx = 0 if self.lang == "pl" else 1
         for verbs, intents in self.VERB_PATTERNS.items():
             if first_word in verbs:
                 intent = intents[intent_idx]
                 return f"{intent} {rest}" if rest else intent
 
         # Fallback - join words
-        return ' '.join(words).lower()
+        return " ".join(words).lower()
 
     def _extract_from_docstring(self, docstring: str) -> Optional[str]:
         """Extract intent from docstring's first line."""
         if not docstring:
             return None
 
-        first_line = docstring.split('\n')[0].strip()
+        first_line = docstring.split("\n")[0].strip()
 
         # Remove common prefixes
         prefixes = [
-            'Returns', 'Return', 'Gets', 'Get', 'Sets', 'Set',
-            'Creates', 'Create', 'Deletes', 'Delete',
-            'The', 'A', 'An'
+            "Returns",
+            "Return",
+            "Gets",
+            "Get",
+            "Sets",
+            "Set",
+            "Creates",
+            "Create",
+            "Deletes",
+            "Delete",
+            "The",
+            "A",
+            "An",
         ]
         for prefix in prefixes:
-            if first_line.startswith(prefix + ' '):
-                first_line = first_line[len(prefix)+1:]
+            if first_line.startswith(prefix + " "):
+                first_line = first_line[len(prefix) + 1 :]
                 break
 
         return first_line[:80] if first_line else None
@@ -241,19 +260,19 @@ class EnhancedIntentGenerator:
         - ACRONYMS (e.g., XMLParser -> XML Parser)
         """
         # Remove private prefixes
-        name = name.lstrip('_').lstrip('#')
+        name = name.lstrip("_").lstrip("#")
 
         # Handle kebab-case
-        name = name.replace('-', '_')
+        name = name.replace("-", "_")
 
         # snake_case
-        if '_' in name:
-            return [w for w in name.split('_') if w]
+        if "_" in name:
+            return [w for w in name.split("_") if w]
 
         # camelCase/PascalCase with acronym support
         # XMLParser -> XML Parser, parseXML -> parse XML
-        words = re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1 \2', name)
-        words = re.sub(r'([a-z\d])([A-Z])', r'\1 \2', words)
+        words = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1 \2", name)
+        words = re.sub(r"([a-z\d])([A-Z])", r"\1 \2", words)
 
         return [w.strip() for w in words.split() if w.strip()]
 
@@ -266,8 +285,8 @@ class EnhancedIntentGenerator:
             Dict with feature names and availability status
         """
         return {
-            'nltk_lemmatizer': NLTK_AVAILABLE,
-            'spacy': SPACY_AVAILABLE,
+            "nltk_lemmatizer": NLTK_AVAILABLE,
+            "spacy": SPACY_AVAILABLE,
         }
 
 
@@ -282,28 +301,72 @@ class IntentAnalyzer:
     def __init__(self):
         """Initialize the intent analyzer with patterns."""
         self.intent_patterns = {
-            IntentType.REFACTOR: ['refactor', 'restructure', 'improve', 'clean', 'reorganize', 'simplify'],
-            IntentType.ANALYZE: ['analyze', 'explain', 'understand', 'describe', 'show', 'structure'],
-            IntentType.OPTIMIZE: ['optimize', 'performance', 'speed', 'fast', 'efficient', 'memory'],
-            IntentType.DEBUG: ['debug', 'fix', 'bug', 'error', 'issue', 'problem'],
-            IntentType.DOCUMENT: ['document', 'comment', 'docstring', 'readme', 'documentation'],
-            IntentType.TEST: ['test', 'coverage', 'unittest', 'pytest', 'testing'],
+            IntentType.REFACTOR: [
+                "refactor",
+                "restructure",
+                "improve",
+                "clean",
+                "reorganize",
+                "simplify",
+            ],
+            IntentType.ANALYZE: [
+                "analyze",
+                "explain",
+                "understand",
+                "describe",
+                "show",
+                "structure",
+            ],
+            IntentType.OPTIMIZE: [
+                "optimize",
+                "performance",
+                "speed",
+                "fast",
+                "efficient",
+                "memory",
+            ],
+            IntentType.DEBUG: ["debug", "fix", "bug", "error", "issue", "problem"],
+            IntentType.DOCUMENT: [
+                "document",
+                "comment",
+                "docstring",
+                "readme",
+                "documentation",
+            ],
+            IntentType.TEST: ["test", "coverage", "unittest", "pytest", "testing"],
         }
         self.code_smell_patterns = {
-            'long_module': 500,
-            'complex_function': 10,
-            'large_class': 15,
-            'too_many_imports': 20,
+            "long_module": 500,
+            "complex_function": 10,
+            "large_class": 15,
+            "too_many_imports": 20,
         }
 
     def _extract_keywords(self, query: str) -> List[str]:
         """Extract keywords from a query string."""
         # Simple word extraction, filtering common stop words
-        stop_words = {'the', 'a', 'an', 'to', 'and', 'or', 'in', 'of', 'for', 'is', 'it', 'this', 'that', 'i'}
-        words = re.findall(r'\b\w+\b', query.lower())
+        stop_words = {
+            "the",
+            "a",
+            "an",
+            "to",
+            "and",
+            "or",
+            "in",
+            "of",
+            "for",
+            "is",
+            "it",
+            "this",
+            "that",
+            "i",
+        }
+        words = re.findall(r"\b\w+\b", query.lower())
         return [w for w in words if w not in stop_words]
 
-    def _calculate_intent_confidence(self, keywords: List[str], patterns: List[str]) -> float:
+    def _calculate_intent_confidence(
+        self, keywords: List[str], patterns: List[str]
+    ) -> float:
         """Calculate confidence score based on keyword matches."""
         if not patterns:
             return 0.0
@@ -316,7 +379,9 @@ class IntentAnalyzer:
 
         # Check for module names
         for module in project.modules:
-            module_name = getattr(module, 'name', None) or module.path.split('/')[-1].replace('.py', '')
+            module_name = getattr(module, "name", None) or module.path.split("/")[
+                -1
+            ].replace(".py", "")
             if module_name.lower() in query_lower:
                 # Check for function within module
                 for func in module.functions:
@@ -342,7 +407,9 @@ class IntentAnalyzer:
         }
         return descriptions.get(intent_type, f"Analysis of {target}")
 
-    def _generate_suggestions(self, intent_type: IntentType, target: str, project: Any) -> List[str]:
+    def _generate_suggestions(
+        self, intent_type: IntentType, target: str, project: Any
+    ) -> List[str]:
         """Generate suggestions based on intent type."""
         suggestions = {
             IntentType.REFACTOR: [
@@ -398,13 +465,15 @@ class IntentAnalyzer:
             if confidence > 0:
                 description = self._generate_description(intent_type, target)
                 suggestions = self._generate_suggestions(intent_type, target, project)
-                intents.append(Intent(
-                    type=intent_type,
-                    confidence=confidence,
-                    target=target,
-                    description=description,
-                    suggestions=suggestions,
-                ))
+                intents.append(
+                    Intent(
+                        type=intent_type,
+                        confidence=confidence,
+                        target=target,
+                        description=description,
+                        suggestions=suggestions,
+                    )
+                )
 
         # Sort by confidence descending
         intents.sort(key=lambda x: x.confidence, reverse=True)
@@ -423,43 +492,55 @@ class IntentAnalyzer:
         smells = []
 
         for module in project.modules:
-            module_name = getattr(module, 'name', None) or module.path.split('/')[-1].replace('.py', '')
-            lines = getattr(module, 'lines_of_code', None) or getattr(module, 'lines_total', 0)
+            module_name = getattr(module, "name", None) or module.path.split("/")[
+                -1
+            ].replace(".py", "")
+            lines = getattr(module, "lines_of_code", None) or getattr(
+                module, "lines_total", 0
+            )
 
             # Check for long module
-            if lines > self.code_smell_patterns['long_module']:
-                smells.append({
-                    'type': 'long_module',
-                    'target': module_name,
-                    'message': f"Module has {lines} lines (threshold: {self.code_smell_patterns['long_module']})",
-                })
+            if lines > self.code_smell_patterns["long_module"]:
+                smells.append(
+                    {
+                        "type": "long_module",
+                        "target": module_name,
+                        "message": f"Module has {lines} lines (threshold: {self.code_smell_patterns['long_module']})",
+                    }
+                )
 
             # Check for too many imports
-            if len(module.imports) > self.code_smell_patterns['too_many_imports']:
-                smells.append({
-                    'type': 'too_many_imports',
-                    'target': module_name,
-                    'message': f"Module has {len(module.imports)} imports",
-                })
+            if len(module.imports) > self.code_smell_patterns["too_many_imports"]:
+                smells.append(
+                    {
+                        "type": "too_many_imports",
+                        "target": module_name,
+                        "message": f"Module has {len(module.imports)} imports",
+                    }
+                )
 
             # Check functions
             for func in module.functions:
-                complexity = getattr(func, 'complexity', 1)
-                if complexity > self.code_smell_patterns['complex_function']:
-                    smells.append({
-                        'type': 'complex_function',
-                        'target': f"{module_name}.{func.name}",
-                        'message': f"Function has complexity {complexity}",
-                    })
+                complexity = getattr(func, "complexity", 1)
+                if complexity > self.code_smell_patterns["complex_function"]:
+                    smells.append(
+                        {
+                            "type": "complex_function",
+                            "target": f"{module_name}.{func.name}",
+                            "message": f"Function has complexity {complexity}",
+                        }
+                    )
 
             # Check classes
             for cls in module.classes:
-                if len(cls.methods) > self.code_smell_patterns['large_class']:
-                    smells.append({
-                        'type': 'large_class',
-                        'target': f"{module_name}.{cls.name}",
-                        'message': f"Class has {len(cls.methods)} methods",
-                    })
+                if len(cls.methods) > self.code_smell_patterns["large_class"]:
+                    smells.append(
+                        {
+                            "type": "large_class",
+                            "target": f"{module_name}.{cls.name}",
+                            "message": f"Class has {len(cls.methods)} methods",
+                        }
+                    )
 
         return smells
 
@@ -479,21 +560,23 @@ class IntentAnalyzer:
             return ["Target not found"]
 
         # Check object type and delegate
-        if hasattr(obj, 'functions') and hasattr(obj, 'classes'):
+        if hasattr(obj, "functions") and hasattr(obj, "classes"):
             return self._suggest_module_refactoring(obj)
-        elif hasattr(obj, 'methods'):
+        elif hasattr(obj, "methods"):
             return self._suggest_class_refactoring(obj)
-        elif hasattr(obj, 'complexity'):
+        elif hasattr(obj, "complexity"):
             return self._suggest_function_refactoring(obj)
 
         return []
 
     def _find_target_object(self, target: str, project: Any) -> Any:
         """Find the object referenced by target string."""
-        parts = target.split('.')
+        parts = target.split(".")
 
         for module in project.modules:
-            module_name = getattr(module, 'name', None) or module.path.split('/')[-1].replace('.py', '')
+            module_name = getattr(module, "name", None) or module.path.split("/")[
+                -1
+            ].replace(".py", "")
             if module_name == parts[0]:
                 if len(parts) == 1:
                     return module
@@ -511,14 +594,20 @@ class IntentAnalyzer:
         suggestions = []
 
         if len(module.functions) > 20:
-            suggestions.append("Consider splitting this module into smaller, focused modules")
+            suggestions.append(
+                "Consider splitting this module into smaller, focused modules"
+            )
 
         if len(module.imports) > 15:
             suggestions.append("Review imports and consider consolidating dependencies")
 
-        lines = getattr(module, 'lines_of_code', None) or getattr(module, 'lines_total', 0)
+        lines = getattr(module, "lines_of_code", None) or getattr(
+            module, "lines_total", 0
+        )
         if lines > 400:
-            suggestions.append("Module is large; consider extracting related functions into submodules")
+            suggestions.append(
+                "Module is large; consider extracting related functions into submodules"
+            )
 
         return suggestions or ["Module structure looks reasonable"]
 
@@ -527,11 +616,15 @@ class IntentAnalyzer:
         suggestions = []
 
         if len(cls.methods) > 15:
-            suggestions.append("Consider splitting class into smaller classes with focused responsibilities")
+            suggestions.append(
+                "Consider splitting class into smaller classes with focused responsibilities"
+            )
 
-        bases = getattr(cls, 'base_classes', []) or getattr(cls, 'bases', [])
+        bases = getattr(cls, "base_classes", []) or getattr(cls, "bases", [])
         if len(bases) > 3:
-            suggestions.append("Consider using composition over inheritance to reduce coupling")
+            suggestions.append(
+                "Consider using composition over inheritance to reduce coupling"
+            )
 
         return suggestions or ["Class structure looks reasonable"]
 
@@ -539,19 +632,25 @@ class IntentAnalyzer:
         """Generate refactoring suggestions for a function."""
         suggestions = []
 
-        lines = getattr(func, 'lines_of_code', None) or getattr(func, 'lines', 0)
+        lines = getattr(func, "lines_of_code", None) or getattr(func, "lines", 0)
         if lines > 50:
-            suggestions.append("Consider breaking this function into smaller helper functions")
+            suggestions.append(
+                "Consider breaking this function into smaller helper functions"
+            )
 
-        complexity = getattr(func, 'complexity', 1)
+        complexity = getattr(func, "complexity", 1)
         if complexity > 10:
-            suggestions.append("High cyclomatic complexity; consider simplifying control flow")
+            suggestions.append(
+                "High cyclomatic complexity; consider simplifying control flow"
+            )
 
-        params = getattr(func, 'parameters', []) or getattr(func, 'params', [])
+        params = getattr(func, "parameters", []) or getattr(func, "params", [])
         if len(params) > 5:
-            suggestions.append("Many parameters; consider using a parameter object or builder pattern")
+            suggestions.append(
+                "Many parameters; consider using a parameter object or builder pattern"
+            )
 
-        if not getattr(func, 'docstring', None):
+        if not getattr(func, "docstring", None):
             suggestions.append("Add a docstring to document the function's purpose")
 
         return suggestions or ["Function structure looks reasonable"]

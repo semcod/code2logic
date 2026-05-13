@@ -12,8 +12,6 @@
 | similarity.py | nemotron-3-nano | 13.69% | 50.0% | ✓ Good |
 | dependency.py | llama-3.3-70b | 17.88% | 33.33% | ✓ Good |
 
-## Key Findings
-
 ### Problem Identified
 The original issue was that **Gherkin was generated for the entire `code2logic/` folder** instead of just the target file. This caused the LLM to generate code for Config, Logger, and other unrelated classes.
 
@@ -23,8 +21,6 @@ Fixed `analyze_to_gherkin()` to generate file-specific Gherkin that captures:
 - Class names and attributes
 - Method signatures
 - Dataclass fields
-
-### Results After Fix
 
 #### models.py (Dataclasses only)
 - **Before fix:** 0% similarity, wrong code generated
@@ -79,9 +75,6 @@ The **similarity metric compares exact text**, not semantic equivalence:
 2. **For reproduction:** Include type hints in Gherkin specification
 3. **For accuracy:** Use code-specific models (Qwen Coder, DeepSeek Coder)
 
-## How to Run Tests
-
-```bash
 # Run file benchmark (provider/model selected via environment variables)
 CODE2LOGIC_DEFAULT_PROVIDER=openrouter \
 OPENROUTER_MODEL="meta-llama/llama-3.3-70b-instruct:free" \

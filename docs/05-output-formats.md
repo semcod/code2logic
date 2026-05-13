@@ -203,10 +203,6 @@ code2logic /path/to/project -f markdown -o analysis.md
 
 **Files:** 30 | **Lines:** 10,835
 
-## analyzer.py
-
-### Classes
-
 #### ProjectAnalyzer
 
 **Methods:**

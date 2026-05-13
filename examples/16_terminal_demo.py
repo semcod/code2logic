@@ -15,7 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from code2logic.terminal import render, ShellRenderer, get_renderer, set_renderer
+from code2logic.terminal import render, ShellRenderer, set_renderer
 
 
 def demo_headings():
@@ -28,9 +28,11 @@ def demo_headings():
 def demo_codeblocks():
     """Demo syntax-highlighted code blocks."""
     render.heading(2, "Code Blocks with Syntax Highlighting")
-    
+
     # YAML
-    render.codeblock("yaml", """# Configuration file
+    render.codeblock(
+        "yaml",
+        """# Configuration file
 name: code2logic
 version: 1.0.0
 settings:
@@ -39,18 +41,24 @@ settings:
   formats:
     - yaml
     - json
-    - gherkin""")
-    
+    - gherkin""",
+    )
+
     # JSON
-    render.codeblock("json", """{
+    render.codeblock(
+        "json",
+        """{
   "name": "benchmark",
   "score": 95.5,
   "passed": true,
   "items": null
-}""")
-    
+}""",
+    )
+
     # Python
-    render.codeblock("python", """from dataclasses import dataclass
+    render.codeblock(
+        "python",
+        """from dataclasses import dataclass
 from typing import List, Optional
 
 @dataclass
@@ -61,28 +69,35 @@ class BenchmarkResult:
     
     def is_success(self) -> bool:
         # Check if score is above threshold
-        return self.score > 50.0""")
-    
+        return self.score > 50.0""",
+    )
+
     # Gherkin
-    render.codeblock("gherkin", """Feature: Code Reproduction
+    render.codeblock(
+        "gherkin",
+        """Feature: Code Reproduction
   @benchmark
   Scenario: Reproduce Python file
     Given a Python source file "models.py"
     When I generate a YAML specification
     And I reproduce code from the spec
-    Then the similarity should be above 80%""")
-    
+    Then the similarity should be above 80%""",
+    )
+
     # Bash
-    render.codeblock("bash", """# Run benchmarks
+    render.codeblock(
+        "bash",
+        """# Run benchmarks
 cd ~/projects/code2logic
 python -m pytest tests/ -v
-code2logic analyze --format yaml""")
+code2logic analyze --format yaml""",
+    )
 
 
 def demo_status_messages():
     """Demo status messages."""
     render.heading(2, "Status Messages")
-    
+
     render.codeblock(
         "log",
         "\n".join(
@@ -99,7 +114,7 @@ def demo_status_messages():
 def demo_progress():
     """Demo progress bars."""
     render.heading(2, "Progress Bars")
-    
+
     render.codeblock(
         "log",
         "\n".join(
@@ -116,7 +131,7 @@ def demo_progress():
 def demo_tasks():
     """Demo task status."""
     render.heading(2, "Task Status")
-    
+
     render.codeblock(
         "log",
         "\n".join(
@@ -135,7 +150,7 @@ def demo_tasks():
 def demo_key_value():
     """Demo key-value pairs."""
     render.heading(2, "Key-Value Pairs")
-    
+
     render.kv("Files", 15)
     render.kv("Formats", "yaml, json, gherkin")
     render.kv("Score", 95.5)
@@ -146,7 +161,7 @@ def demo_key_value():
 def demo_tables():
     """Demo table output."""
     render.heading(2, "Tables")
-    
+
     headers = ["Format", "Score", "Syntax", "Status"]
     rows = [
         ["yaml", "95.5%", "✓", "passed"],
@@ -160,7 +175,7 @@ def demo_tables():
 def demo_markdown():
     """Demo full markdown rendering."""
     render.heading(2, "Full Markdown Rendering")
-    
+
     markdown_text = """## Benchmark Results
 
 The following formats were tested:
@@ -188,8 +203,10 @@ All tests **passed** successfully.
 def demo_log_highlighting():
     """Demo log message highlighting."""
     render.heading(2, "Log Message Highlighting")
-    
-    render.codeblock("log", """✅ All tests passed
+
+    render.codeblock(
+        "log",
+        """✅ All tests passed
 ❌ Error: Connection refused
 ⚠️ Warning: Rate limit approaching
 ℹ️ Info: Using fallback provider
@@ -197,47 +214,50 @@ def demo_log_highlighting():
 📦 Installing dependencies...
 📊 Progress: 5/10 done
 → Processing file: models.py
-💬 Generating specification...""")
+💬 Generating specification...""",
+    )
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Terminal Rendering Demo')
-    parser.add_argument('--no-color', action='store_true', help='Disable colors')
-    parser.add_argument('--folder', '-f', default=None, help='Ignored (kept for CLI compatibility)')
+    parser = argparse.ArgumentParser(description="Terminal Rendering Demo")
+    parser.add_argument("--no-color", action="store_true", help="Disable colors")
+    parser.add_argument(
+        "--folder", "-f", default=None, help="Ignored (kept for CLI compatibility)"
+    )
     args = parser.parse_args()
-    
+
     if args.no_color:
         set_renderer(ShellRenderer(use_colors=False))
-    
+
     demo_headings()
     render.separator()
-    
+
     demo_codeblocks()
     render.separator()
-    
+
     demo_status_messages()
     render.separator()
-    
+
     demo_progress()
     render.separator()
-    
+
     demo_tasks()
     render.separator()
-    
+
     demo_key_value()
     render.separator()
-    
+
     demo_tables()
     render.separator()
-    
+
     demo_log_highlighting()
     render.separator()
-    
+
     demo_markdown()
-    
+
     render.heading(2, "Demo Complete")
     render.success("Terminal rendering demo finished!")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

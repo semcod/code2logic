@@ -10,7 +10,7 @@ from .exceptions import ValidationError, ProcessingError
 
 __all__ = [
     "User",
-    "Order", 
+    "Order",
     "Product",
     "process_data",
     "validate_input",

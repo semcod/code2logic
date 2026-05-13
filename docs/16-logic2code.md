@@ -1,5 +1,3 @@
-# Logic2Code - Code Generation from Code2Logic Output
-
 ## Overview
 
 `logic2code` is a companion package that generates source code from Code2Logic output files (YAML, Hybrid YAML, TOON). It reads the logical representation and produces working code scaffolds.
@@ -12,11 +10,6 @@ The package is included with code2logic:
 pip install code2logic
 ```
 
-## Quick Start
-
-### Command Line
-
-```bash
 # Show what can be generated
 python -m logic2code out/code2logic/project.c2l.yaml --summary
 
@@ -51,8 +44,6 @@ print(f"Generated {result.files_generated} files")
 code = generator.generate_module('analyzer.py')
 print(code)
 ```
-
-## Features
 
 ### Class Generation
 
@@ -138,16 +129,8 @@ optional arguments:
   -v, --verbose         Verbose output
 ```
 
-## Workflow
-
-### Code → Logic → Code
-
-```bash
 # 1. Analyze original code
 code2logic src/ -f yaml -o out/code2logic/project.c2l.yaml
-
-# 2. Modify logic file (add new functions, change signatures)
-# Edit out/code2logic/project.c2l.yaml
 
 # 3. Generate new code from modified logic
 python -m logic2code out/code2logic/project.c2l.yaml -o out/logic2code/new_src/

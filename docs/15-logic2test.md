@@ -1,5 +1,3 @@
-# Logic2Test - Test Generation from Code2Logic Output
-
 ## Overview
 
 `logic2test` is a companion package that generates test files from Code2Logic output files (YAML, Hybrid YAML, TOON). It reads the logical representation of your codebase and produces pytest-compatible test scaffolds.
@@ -12,11 +10,6 @@ The package is included with code2logic:
 pip install code2logic
 ```
 
-## Quick Start
-
-### Command Line
-
-```bash
 # Show what can be generated
 python -m logic2test out/code2logic/project.c2l.yaml --summary
 
@@ -53,8 +46,6 @@ result = generator.generate_integration_tests('tests/integration/')
 # Generate property-based tests (Hypothesis)
 result = generator.generate_property_tests('tests/property/')
 ```
-
-## Test Types
 
 ### Unit Tests
 

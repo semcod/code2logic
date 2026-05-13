@@ -1,0 +1,10 @@
+pipeline:
+  name: code2logic-quality
+  profile: python-minimal
+
+  metrics:
+    cc_max: 15
+    critical_max: 0
+
+  env:
+    LLM_MODEL: openrouter/qwen/qwen3-coder-next

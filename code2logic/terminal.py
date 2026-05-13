@@ -29,7 +29,6 @@ COLORS = {
     "dim": "\033[2m",
     "italic": "\033[3m",
     "underline": "\033[4m",
-
     # Foreground
     "black": "\033[30m",
     "red": "\033[31m",
@@ -40,7 +39,6 @@ COLORS = {
     "cyan": "\033[36m",
     "white": "\033[37m",
     "gray": "\033[90m",
-
     # Bright foreground
     "bright_red": "\033[91m",
     "bright_green": "\033[92m",
@@ -48,7 +46,6 @@ COLORS = {
     "bright_blue": "\033[94m",
     "bright_magenta": "\033[95m",
     "bright_cyan": "\033[96m",
-
     # Background
     "bg_black": "\033[40m",
     "bg_red": "\033[41m",
@@ -59,9 +56,24 @@ COLORS = {
 }
 
 Language = Literal[
-    "yaml", "yml", "json", "python", "py", "bash", "sh",
-    "typescript", "ts", "javascript", "js", "markdown", "md",
-    "log", "text", "txt", "gherkin", "feature"
+    "yaml",
+    "yml",
+    "json",
+    "python",
+    "py",
+    "bash",
+    "sh",
+    "typescript",
+    "ts",
+    "javascript",
+    "js",
+    "markdown",
+    "md",
+    "log",
+    "text",
+    "txt",
+    "gherkin",
+    "feature",
 ]
 
 
@@ -135,7 +147,7 @@ class ShellRenderer:
         print(text)
         if self.log_enabled:
             # Strip ANSI codes for clean markdown
-            clean = re.sub(r'\033\[[0-9;]*m', '', text)
+            clean = re.sub(r"\033\[[0-9;]*m", "", text)
             self.log_buffer.append(clean)
 
     def _c(self, color: str, text: str) -> str:
@@ -181,7 +193,7 @@ class ShellRenderer:
             trimmed = line.rstrip()
 
             # Check for fence markers
-            match = re.match(r'^(`{3,})(.*)$', trimmed)
+            match = re.match(r"^(`{3,})(.*)$", trimmed)
 
             if not in_fence:
                 if match:
@@ -227,14 +239,18 @@ class ShellRenderer:
         """Print info message."""
         self._log(f"{self._c('cyan', 'ℹ️')} {self._c('cyan', message)}")
 
-    def status(self, icon: str, message: str,
-               type: Literal["info", "success", "warning", "error"] = "info") -> None:
+    def status(
+        self,
+        icon: str,
+        message: str,
+        type: Literal["info", "success", "warning", "error"] = "info",
+    ) -> None:
         """Print status message with icon."""
         color_map = {
             "info": "blue",
             "success": "green",
             "warning": "yellow",
-            "error": "red"
+            "error": "red",
         }
         self._log(f"{icon} {self._c(color_map[type], message)}")
 
@@ -261,12 +277,18 @@ class ShellRenderer:
         """Print separator line."""
         self._log(self._c("gray", char * width))
 
-    def table(self, headers: List[str], rows: List[List[Any]],
-              widths: Optional[List[int]] = None) -> None:
+    def table(
+        self,
+        headers: List[str],
+        rows: List[List[Any]],
+        widths: Optional[List[int]] = None,
+    ) -> None:
         """Print a simple table."""
         if not widths:
-            widths = [max(len(str(h)), max(len(str(r[i])) for r in rows) if rows else 0) + 2
-                      for i, h in enumerate(headers)]
+            widths = [
+                max(len(str(h)), max(len(str(r[i])) for r in rows) if rows else 0) + 2
+                for i, h in enumerate(headers)
+            ]
 
         # Header
         header_line = "".join(
@@ -277,26 +299,22 @@ class ShellRenderer:
 
         # Rows
         for row in rows:
-            row_line = "".join(
-                str(v).ljust(w) for v, w in zip(row, widths)
-            )
+            row_line = "".join(str(v).ljust(w) for v, w in zip(row, widths))
             self._log(row_line)
 
-    def task(self, name: str,
-             status: Literal["pending", "running", "done", "failed"],
-             duration: Optional[float] = None) -> None:
+    def task(
+        self,
+        name: str,
+        status: Literal["pending", "running", "done", "failed"],
+        duration: Optional[float] = None,
+    ) -> None:
         """Print task status."""
-        icons = {
-            "pending": "⏳",
-            "running": "🔄",
-            "done": "✅",
-            "failed": "❌"
-        }
+        icons = {"pending": "⏳", "running": "🔄", "done": "✅", "failed": "❌"}
         colors = {
             "pending": "gray",
             "running": "yellow",
             "done": "green",
-            "failed": "red"
+            "failed": "red",
         }
 
         duration_str = f" ({duration:.1f}s)" if duration is not None else ""
@@ -351,13 +369,13 @@ class ShellRenderer:
             return self._c("gray", line)
 
         # Key: value
-        match = re.match(r'^(\s*)([^:]+)(:)(.*)$', line)
+        match = re.match(r"^(\s*)([^:]+)(:)(.*)$", line)
         if match:
             indent, key, colon, value = match.groups()
 
             # Color value based on type
             trimmed = value.strip()
-            if trimmed.isdigit() or re.match(r'^-?\d+\.?\d*$', trimmed):
+            if trimmed.isdigit() or re.match(r"^-?\d+\.?\d*$", trimmed):
                 value_colored = self._c("magenta", value)
             elif trimmed.lower() in ("true", "false", "yes", "no", "null", "none", "~"):
                 value_colored = self._c("yellow", value)
@@ -372,7 +390,7 @@ class ShellRenderer:
 
         # List item
         if line.strip().startswith("-"):
-            match = re.match(r'^(\s*)(-)(.*)$', line)
+            match = re.match(r"^(\s*)(-)(.*)$", line)
             if match:
                 indent, dash, rest = match.groups()
                 return f"{indent}{self._c('white', dash)}{self._c('green', rest)}"
@@ -386,20 +404,26 @@ class ShellRenderer:
         # Keys
         def color_key(m):
             return self._c("cyan", '"' + m.group(1) + '"') + ": "
+
         result = re.sub(r'"([^"]+)"\s*:', color_key, result)
+
         # String values
         def color_str(m):
             return ": " + self._c("green", '"' + m.group(1) + '"')
+
         result = re.sub(r':\s*"([^"]*)"', color_str, result)
+
         # Numbers
         def color_num(m):
             return ": " + self._c("magenta", m.group(1))
-        result = re.sub(r':\s*(-?\d+\.?\d*)', color_num, result)
+
+        result = re.sub(r":\s*(-?\d+\.?\d*)", color_num, result)
 
         # Booleans/null
         def color_bool(m):
             return ": " + self._c("yellow", m.group(1))
-        result = re.sub(r':\s*(true|false|null)', color_bool, result)
+
+        result = re.sub(r":\s*(true|false|null)", color_bool, result)
 
         return result
 
@@ -413,26 +437,47 @@ class ShellRenderer:
 
         # Keywords
         keywords = [
-            "def", "class", "import", "from", "return", "if", "elif", "else",
-            "for", "while", "try", "except", "finally", "with", "as", "yield",
-            "async", "await", "lambda", "pass", "break", "continue", "raise",
-            "True", "False", "None", "and", "or", "not", "in", "is"
+            "def",
+            "class",
+            "import",
+            "from",
+            "return",
+            "if",
+            "elif",
+            "else",
+            "for",
+            "while",
+            "try",
+            "except",
+            "finally",
+            "with",
+            "as",
+            "yield",
+            "async",
+            "await",
+            "lambda",
+            "pass",
+            "break",
+            "continue",
+            "raise",
+            "True",
+            "False",
+            "None",
+            "and",
+            "or",
+            "not",
+            "in",
+            "is",
         ]
         for kw in keywords:
-            result = re.sub(
-                rf'\b{kw}\b',
-                self._c("magenta", kw),
-                result
-            )
+            result = re.sub(rf"\b{kw}\b", self._c("magenta", kw), result)
 
         # Decorators
-        result = re.sub(r'(@\w+)', self._c("yellow", r'\1'), result)
+        result = re.sub(r"(@\w+)", self._c("yellow", r"\1"), result)
 
         # Strings
         result = re.sub(
-            r'(["\'])(?:(?!\1).)*\1',
-            lambda m: self._c("green", m.group(0)),
-            result
+            r'(["\'])(?:(?!\1).)*\1', lambda m: self._c("green", m.group(0)), result
         )
 
         return result
@@ -445,8 +490,19 @@ class ShellRenderer:
 
         # Commands at start of line
         commands = [
-            "cd", "npm", "node", "python", "pip", "git", "docker",
-            "code2logic", "pytest", "make", "echo", "export", "source"
+            "cd",
+            "npm",
+            "node",
+            "python",
+            "pip",
+            "git",
+            "docker",
+            "code2logic",
+            "pytest",
+            "make",
+            "echo",
+            "export",
+            "source",
         ]
         for cmd in commands:
             if line.strip().startswith(cmd):
@@ -467,22 +523,32 @@ class ShellRenderer:
 
         # Keywords
         keywords = [
-            "const", "let", "var", "function", "async", "await", "return",
-            "if", "else", "for", "while", "import", "export", "from",
-            "class", "interface", "type", "extends", "implements"
+            "const",
+            "let",
+            "var",
+            "function",
+            "async",
+            "await",
+            "return",
+            "if",
+            "else",
+            "for",
+            "while",
+            "import",
+            "export",
+            "from",
+            "class",
+            "interface",
+            "type",
+            "extends",
+            "implements",
         ]
         for kw in keywords:
-            result = re.sub(
-                rf'\b{kw}\b',
-                self._c("magenta", kw),
-                result
-            )
+            result = re.sub(rf"\b{kw}\b", self._c("magenta", kw), result)
 
         # Strings
         result = re.sub(
-            r'(["\'])(?:(?!\1).)*\1',
-            lambda m: self._c("green", m.group(0)),
-            result
+            r'(["\'])(?:(?!\1).)*\1', lambda m: self._c("green", m.group(0)), result
         )
 
         return result
@@ -537,27 +603,32 @@ class ShellRenderer:
     def _highlight_markdown(self, line: str) -> str:
         """Highlight Markdown syntax."""
         # Headers
-        if re.match(r'^#{1,6}\s', line):
+        if re.match(r"^#{1,6}\s", line):
             return self._c("cyan", line)
         # Bold
         if "**" in line:
-            line = re.sub(r'\*\*([^*]+)\*\*', self._c("bold", r'\1'), line)
+            line = re.sub(r"\*\*([^*]+)\*\*", self._c("bold", r"\1"), line)
         # Links
         if "[" in line:
             line = re.sub(
-                r'\[([^\]]+)\]\(([^)]+)\)',
-                lambda m: f'{self._c("blue", f"[{m.group(1)}]")}({self._c("gray", m.group(2))})',
-                line
+                r"\[([^\]]+)\]\(([^)]+)\)",
+                lambda m: (
+                    f"{self._c('blue', f'[{m.group(1)}]')}({self._c('gray', m.group(2))})"
+                ),
+                line,
             )
         # Inline code
         if "`" in line:
-            line = re.sub(r'`([^`]+)`', lambda m: self._c("cyan", f"`{m.group(1)}`"), line)
+            line = re.sub(
+                r"`([^`]+)`", lambda m: self._c("cyan", f"`{m.group(1)}`"), line
+            )
 
         return line
 
     def save_log(self, filepath: str) -> None:
         """Save log buffer to file as markdown."""
         import os
+
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
         with open(filepath, "w") as f:
             f.write(self.get_log())
@@ -620,8 +691,11 @@ class RenderAPI:
         get_renderer().info(message)
 
     @staticmethod
-    def status(icon: str, message: str,
-               type: Literal["info", "success", "warning", "error"] = "info") -> None:
+    def status(
+        icon: str,
+        message: str,
+        type: Literal["info", "success", "warning", "error"] = "info",
+    ) -> None:
         get_renderer().status(icon, message, type)
 
     @staticmethod
@@ -637,14 +711,17 @@ class RenderAPI:
         get_renderer().separator(char, width)
 
     @staticmethod
-    def table(headers: List[str], rows: List[List[Any]],
-              widths: Optional[List[int]] = None) -> None:
+    def table(
+        headers: List[str], rows: List[List[Any]], widths: Optional[List[int]] = None
+    ) -> None:
         get_renderer().table(headers, rows, widths)
 
     @staticmethod
-    def task(name: str,
-             status: Literal["pending", "running", "done", "failed"],
-             duration: Optional[float] = None) -> None:
+    def task(
+        name: str,
+        status: Literal["pending", "running", "done", "failed"],
+        duration: Optional[float] = None,
+    ) -> None:
         get_renderer().task(name, status, duration)
 
     @staticmethod

@@ -1,0 +1,5739 @@
+name: Code Quality Improvement
+project_name: ''
+project_type: prefactoring
+domain: dev-tools
+goal: Improve code quality using prefact
+goals:
+- Fix all prefact-detected issues
+- Improve code maintainability
+- Ensure consistent code style
+quality_gates:
+- metric: Prefact Issues
+  threshold: '0'
+sprints:
+- id: sprint-1
+  name: Code Quality Improvements
+  duration: 2 weeks
+  objectives:
+  - Fix code quality issues
+  task_patterns:
+  - id: ticket-f9a2c2fe
+    name: Fix smart-return-type issues
+    description: Resolve 7 smart-return-type issues in advanced_yaml_optimizer.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - advanced_yaml_optimizer.py
+    rule_id: smart-return-type
+    count: 7
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-aeb6b0d6
+    name: Fix string-concat issues
+    description: Resolve 3 string-concat issues in advanced_yaml_optimizer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - advanced_yaml_optimizer.py
+    rule_id: string-concat
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f06dc70b
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in advanced_yaml_optimizer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - advanced_yaml_optimizer.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-db7ee45d
+    name: Fix magic-numbers issues
+    description: Resolve 7 magic-numbers issues in advanced_yaml_optimizer.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - advanced_yaml_optimizer.py
+    rule_id: magic-numbers
+    count: 7
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7a21a1ee
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in advanced_yaml_optimizer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - advanced_yaml_optimizer.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7d1b05fa
+    name: Fix smart-return-type issues
+    description: Resolve 2 smart-return-type issues in benchmarks/benchmark_performance.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - benchmarks/benchmark_performance.py
+    rule_id: smart-return-type
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-750e0a23
+    name: Fix string-concat issues
+    description: Resolve 9 string-concat issues in benchmarks/benchmark_performance.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - benchmarks/benchmark_performance.py
+    rule_id: string-concat
+    count: 9
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1de3d821
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in benchmarks/benchmark_performance.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - benchmarks/benchmark_performance.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0ee7874f
+    name: Fix ai-boilerplate issues
+    description: Resolve 3 ai-boilerplate issues in benchmarks/benchmark_performance.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - benchmarks/benchmark_performance.py
+    rule_id: ai-boilerplate
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e0596205
+    name: Fix relative-imports issues
+    description: Resolve 2 relative-imports issues in code2logic/__main__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/__main__.py
+    rule_id: relative-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-18b25efa
+    name: Fix duplicate-imports issues
+    description: Resolve 1 duplicate-imports issues in code2logic/__main__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/__main__.py
+    rule_id: duplicate-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-dd320419
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in code2logic/__main__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/__main__.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-127c14b9
+    name: Fix relative-imports issues
+    description: Resolve 74 relative-imports issues in code2logic/__init__.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/__init__.py
+    rule_id: relative-imports
+    count: 74
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-076f9e73
+    name: Fix smart-return-type issues
+    description: Resolve 3 smart-return-type issues in code2logic/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/__init__.py
+    rule_id: smart-return-type
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ab6600ce
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in code2logic/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/__init__.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-078417e9
+    name: Fix smart-return-type issues
+    description: Resolve 6 smart-return-type issues in benchmarks/test_performance.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - benchmarks/test_performance.py
+    rule_id: smart-return-type
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2d449422
+    name: Fix unused-imports issues
+    description: Resolve 12 unused-imports issues in benchmarks/test_performance.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - benchmarks/test_performance.py
+    rule_id: unused-imports
+    count: 12
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3cf43ff0
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in benchmarks/test_performance.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - benchmarks/test_performance.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3d42d621
+    name: Fix relative-imports issues
+    description: Resolve 6 relative-imports issues in code2logic/adaptive.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/adaptive.py
+    rule_id: relative-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-fcdedbec
+    name: Fix string-concat issues
+    description: Resolve 5 string-concat issues in code2logic/adaptive.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/adaptive.py
+    rule_id: string-concat
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-80e9faac
+    name: Fix magic-numbers issues
+    description: Resolve 16 magic-numbers issues in code2logic/adaptive.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/adaptive.py
+    rule_id: magic-numbers
+    count: 16
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d22eb79a
+    name: Fix llm-generated-code issues
+    description: Resolve 7 llm-generated-code issues in code2logic/adaptive.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/adaptive.py
+    rule_id: llm-generated-code
+    count: 7
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e8c7356a
+    name: Fix smart-return-type issues
+    description: Resolve 7 smart-return-type issues in code2logic/base.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/base.py
+    rule_id: smart-return-type
+    count: 7
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7a2041a8
+    name: Fix relative-imports issues
+    description: Resolve 10 relative-imports issues in code2logic/analyzer.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/analyzer.py
+    rule_id: relative-imports
+    count: 10
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7fab227e
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in code2logic/analyzer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/analyzer.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-77f53215
+    name: Fix llm-generated-code issues
+    description: Resolve 6 llm-generated-code issues in code2logic/analyzer.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/analyzer.py
+    rule_id: llm-generated-code
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2ebe33b3
+    name: Fix relative-imports issues
+    description: Resolve 2 relative-imports issues in code2logic/base_generator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/base_generator.py
+    rule_id: relative-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c553880f
+    name: Fix relative-imports issues
+    description: Resolve 12 relative-imports issues in code2logic/benchmark.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/benchmark.py
+    rule_id: relative-imports
+    count: 12
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d12ac877
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in code2logic/benchmark.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/benchmark.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c7dd6125
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in code2logic/benchmark.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/benchmark.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d6403c15
+    name: Fix llm-generated-code issues
+    description: Resolve 6 llm-generated-code issues in code2logic/benchmark.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/benchmark.py
+    rule_id: llm-generated-code
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0bc74c4e
+    name: Fix smart-return-type issues
+    description: Resolve 2 smart-return-type issues in advanced_data_analyzer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - advanced_data_analyzer.py
+    rule_id: smart-return-type
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7c8bf5a2
+    name: Fix string-concat issues
+    description: Resolve 9 string-concat issues in advanced_data_analyzer.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - advanced_data_analyzer.py
+    rule_id: string-concat
+    count: 9
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-364dd6ed
+    name: Fix unused-imports issues
+    description: Resolve 12 unused-imports issues in advanced_data_analyzer.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - advanced_data_analyzer.py
+    rule_id: unused-imports
+    count: 12
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-57c2a15f
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in advanced_data_analyzer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - advanced_data_analyzer.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e92bb41a
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in advanced_data_analyzer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - advanced_data_analyzer.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-bf747b1d
+    name: Fix relative-imports issues
+    description: Resolve 6 relative-imports issues in code2logic/benchmarks/__init__.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/benchmarks/__init__.py
+    rule_id: relative-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d27f5e1f
+    name: Fix relative-imports issues
+    description: Resolve 14 relative-imports issues in code2logic/benchmarks/common.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/benchmarks/common.py
+    rule_id: relative-imports
+    count: 14
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-df57bf9b
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in code2logic/benchmarks/common.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/benchmarks/common.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c8adc678
+    name: Fix magic-numbers issues
+    description: Resolve 14 magic-numbers issues in code2logic/benchmarks/common.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/benchmarks/common.py
+    rule_id: magic-numbers
+    count: 14
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b4136f25
+    name: Fix relative-imports issues
+    description: Resolve 18 relative-imports issues in code2logic/benchmarks/runner.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/benchmarks/runner.py
+    rule_id: relative-imports
+    count: 18
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7ea3eaa4
+    name: Fix string-concat issues
+    description: Resolve 17 string-concat issues in code2logic/benchmarks/runner.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/benchmarks/runner.py
+    rule_id: string-concat
+    count: 17
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4d409950
+    name: Fix unused-imports issues
+    description: Resolve 8 unused-imports issues in code2logic/benchmarks/runner.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/benchmarks/runner.py
+    rule_id: unused-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-81ea597a
+    name: Fix duplicate-imports issues
+    description: Resolve 1 duplicate-imports issues in code2logic/benchmarks/runner.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/benchmarks/runner.py
+    rule_id: duplicate-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-590547aa
+    name: Fix magic-numbers issues
+    description: Resolve 15 magic-numbers issues in code2logic/benchmarks/runner.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/benchmarks/runner.py
+    rule_id: magic-numbers
+    count: 15
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-eb5f39e5
+    name: Fix llm-generated-code issues
+    description: Resolve 6 llm-generated-code issues in code2logic/benchmarks/runner.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/benchmarks/runner.py
+    rule_id: llm-generated-code
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f582e248
+    name: Fix smart-return-type issues
+    description: Resolve 2 smart-return-type issues in code2logic/benchmarks/results.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/benchmarks/results.py
+    rule_id: smart-return-type
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-21b9430e
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in code2logic/benchmarks/results.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/benchmarks/results.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b3543aed
+    name: Fix relative-imports issues
+    description: Resolve 4 relative-imports issues in code2logic/chunked_reproduction.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/chunked_reproduction.py
+    rule_id: relative-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-6607d4d1
+    name: Fix string-concat issues
+    description: Resolve 7 string-concat issues in code2logic/chunked_reproduction.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/chunked_reproduction.py
+    rule_id: string-concat
+    count: 7
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b97226fa
+    name: Fix magic-numbers issues
+    description: Resolve 19 magic-numbers issues in code2logic/chunked_reproduction.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/chunked_reproduction.py
+    rule_id: magic-numbers
+    count: 19
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-22e43d4f
+    name: Fix llm-generated-code issues
+    description: Resolve 1 llm-generated-code issues in code2logic/chunked_reproduction.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/chunked_reproduction.py
+    rule_id: llm-generated-code
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4fc955f6
+    name: Fix relative-imports issues
+    description: Resolve 28 relative-imports issues in code2logic/cli.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/cli.py
+    rule_id: relative-imports
+    count: 28
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7cacac82
+    name: Fix smart-return-type issues
+    description: Resolve 12 smart-return-type issues in code2logic/cli.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/cli.py
+    rule_id: smart-return-type
+    count: 12
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a59feaa7
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in code2logic/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/cli.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-59d03074
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in code2logic/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/cli.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e4ae259b
+    name: Fix duplicate-imports issues
+    description: Resolve 2 duplicate-imports issues in code2logic/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/cli.py
+    rule_id: duplicate-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b3e42e31
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in code2logic/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/cli.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4354bab4
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in code2logic/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/cli.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4fe89172
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in code2logic/code_review.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/code_review.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-11f80c9d
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in code2logic/code_review.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/code_review.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9f04b742
+    name: Fix llm-generated-code issues
+    description: Resolve 6 llm-generated-code issues in code2logic/code_review.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/code_review.py
+    rule_id: llm-generated-code
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f74a8b5e
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in code2logic/config.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/config.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4ff63cce
+    name: Fix duplicate-imports issues
+    description: Resolve 1 duplicate-imports issues in code2logic/config.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/config.py
+    rule_id: duplicate-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7f319485
+    name: Fix llm-generated-code issues
+    description: Resolve 4 llm-generated-code issues in code2logic/config.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/config.py
+    rule_id: llm-generated-code
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d553fd05
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in code2logic/config.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/config.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-87f45219
+    name: Fix relative-imports issues
+    description: Resolve 8 relative-imports issues in code2logic/core/__init__.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/core/__init__.py
+    rule_id: relative-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-22974565
+    name: Fix magic-numbers issues
+    description: Resolve 8 magic-numbers issues in code2logic/file_formats.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/file_formats.py
+    rule_id: magic-numbers
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-6c9490d8
+    name: Fix llm-generated-code issues
+    description: Resolve 4 llm-generated-code issues in code2logic/file_formats.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/file_formats.py
+    rule_id: llm-generated-code
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f71d6104
+    name: Fix relative-imports issues
+    description: Resolve 12 relative-imports issues in code2logic/formats/__init__.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/formats/__init__.py
+    rule_id: relative-imports
+    count: 12
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-40abdf39
+    name: Fix smart-return-type issues
+    description: Resolve 2 smart-return-type issues in code2logic/errors.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/errors.py
+    rule_id: smart-return-type
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b3f995a5
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in code2logic/errors.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/errors.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d3d2945e
+    name: Fix llm-generated-code issues
+    description: Resolve 4 llm-generated-code issues in code2logic/errors.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/errors.py
+    rule_id: llm-generated-code
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d28242ac
+    name: Fix relative-imports issues
+    description: Resolve 6 relative-imports issues in code2logic/function_logic.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/function_logic.py
+    rule_id: relative-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-81428f80
+    name: Fix string-concat issues
+    description: Resolve 3 string-concat issues in code2logic/function_logic.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/function_logic.py
+    rule_id: string-concat
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-318e94d2
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in code2logic/function_logic.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/function_logic.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-77c41af8
+    name: Fix duplicate-imports issues
+    description: Resolve 1 duplicate-imports issues in code2logic/function_logic.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/function_logic.py
+    rule_id: duplicate-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3b1713fc
+    name: Fix magic-numbers issues
+    description: Resolve 10 magic-numbers issues in code2logic/function_logic.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/function_logic.py
+    rule_id: magic-numbers
+    count: 10
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0bff1879
+    name: Fix llm-generated-code issues
+    description: Resolve 1 llm-generated-code issues in code2logic/function_logic.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/function_logic.py
+    rule_id: llm-generated-code
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-25ef14c4
+    name: Fix relative-imports issues
+    description: Resolve 4 relative-imports issues in code2logic/generators.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/generators.py
+    rule_id: relative-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-87b95d50
+    name: Fix string-concat issues
+    description: Resolve 8 string-concat issues in code2logic/generators.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/generators.py
+    rule_id: string-concat
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-079f9643
+    name: Fix duplicate-imports issues
+    description: Resolve 4 duplicate-imports issues in code2logic/generators.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/generators.py
+    rule_id: duplicate-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-48795ee8
+    name: Fix magic-numbers issues
+    description: Resolve 42 magic-numbers issues in code2logic/generators.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/generators.py
+    rule_id: magic-numbers
+    count: 42
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-51ca18e4
+    name: Fix llm-generated-code issues
+    description: Resolve 11 llm-generated-code issues in code2logic/generators.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/generators.py
+    rule_id: llm-generated-code
+    count: 11
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2ad02e99
+    name: Fix relative-imports issues
+    description: Resolve 2 relative-imports issues in code2logic/integrations/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/integrations/__init__.py
+    rule_id: relative-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-59ceb07e
+    name: Fix relative-imports issues
+    description: Resolve 2 relative-imports issues in code2logic/dependency.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/dependency.py
+    rule_id: relative-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e1fd9244
+    name: Fix llm-generated-code issues
+    description: Resolve 8 llm-generated-code issues in code2logic/dependency.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/dependency.py
+    rule_id: llm-generated-code
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2686a1c4
+    name: Fix relative-imports issues
+    description: Resolve 4 relative-imports issues in code2logic/llm/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/llm/__init__.py
+    rule_id: relative-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-306aaa9e
+    name: Fix relative-imports issues
+    description: Resolve 2 relative-imports issues in code2logic/gherkin.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/gherkin.py
+    rule_id: relative-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-6503b88b
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in code2logic/gherkin.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/gherkin.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-fef73528
+    name: Fix magic-numbers issues
+    description: Resolve 15 magic-numbers issues in code2logic/gherkin.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/gherkin.py
+    rule_id: magic-numbers
+    count: 15
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d4d96294
+    name: Fix llm-generated-code issues
+    description: Resolve 5 llm-generated-code issues in code2logic/gherkin.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/gherkin.py
+    rule_id: llm-generated-code
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-af91318e
+    name: Fix relative-imports issues
+    description: Resolve 4 relative-imports issues in code2logic/llm.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/llm.py
+    rule_id: relative-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-152099b7
+    name: Fix string-concat issues
+    description: Resolve 3 string-concat issues in code2logic/llm.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/llm.py
+    rule_id: string-concat
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8b6c938c
+    name: Fix magic-numbers issues
+    description: Resolve 7 magic-numbers issues in code2logic/llm.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/llm.py
+    rule_id: magic-numbers
+    count: 7
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2c39a794
+    name: Fix llm-generated-code issues
+    description: Resolve 6 llm-generated-code issues in code2logic/llm.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/llm.py
+    rule_id: llm-generated-code
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-72bb768d
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in code2logic/llm_clients.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/llm_clients.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d0988abb
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in code2logic/llm_clients.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/llm_clients.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ac176b55
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in code2logic/llm_clients.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/llm_clients.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-5a25280f
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in code2logic/intent.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/intent.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c0e18359
+    name: Fix magic-numbers issues
+    description: Resolve 15 magic-numbers issues in code2logic/intent.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/intent.py
+    rule_id: magic-numbers
+    count: 15
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-abf7e138
+    name: Fix llm-generated-code issues
+    description: Resolve 7 llm-generated-code issues in code2logic/intent.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/intent.py
+    rule_id: llm-generated-code
+    count: 7
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b66bd59c
+    name: Fix relative-imports issues
+    description: Resolve 2 relative-imports issues in code2logic/llm_profiler.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/llm_profiler.py
+    rule_id: relative-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7005e544
+    name: Fix string-concat issues
+    description: Resolve 4 string-concat issues in code2logic/llm_profiler.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/llm_profiler.py
+    rule_id: string-concat
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-acc60fde
+    name: Fix magic-numbers issues
+    description: Resolve 23 magic-numbers issues in code2logic/llm_profiler.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/llm_profiler.py
+    rule_id: magic-numbers
+    count: 23
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-88645a6d
+    name: Fix llm-generated-code issues
+    description: Resolve 5 llm-generated-code issues in code2logic/llm_profiler.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/llm_profiler.py
+    rule_id: llm-generated-code
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-bde616c3
+    name: Fix relative-imports issues
+    description: Resolve 4 relative-imports issues in code2logic/logicml.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/logicml.py
+    rule_id: relative-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-567623c8
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in code2logic/logicml.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/logicml.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ed967467
+    name: Fix magic-numbers issues
+    description: Resolve 5 magic-numbers issues in code2logic/logicml.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/logicml.py
+    rule_id: magic-numbers
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-dd029842
+    name: Fix llm-generated-code issues
+    description: Resolve 2 llm-generated-code issues in code2logic/logicml.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/logicml.py
+    rule_id: llm-generated-code
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c9b2947e
+    name: Fix relative-imports issues
+    description: Resolve 6 relative-imports issues in code2logic/mcp_server.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/mcp_server.py
+    rule_id: relative-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-77569a40
+    name: Fix smart-return-type issues
+    description: Resolve 2 smart-return-type issues in code2logic/mcp_server.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/mcp_server.py
+    rule_id: smart-return-type
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d35a01d6
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in code2logic/mcp_server.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/mcp_server.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-69b433b2
+    name: Fix duplicate-imports issues
+    description: Resolve 2 duplicate-imports issues in code2logic/mcp_server.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/mcp_server.py
+    rule_id: duplicate-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ec7e49f7
+    name: Fix magic-numbers issues
+    description: Resolve 8 magic-numbers issues in code2logic/mcp_server.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/mcp_server.py
+    rule_id: magic-numbers
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ed64a60d
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in code2logic/mcp_server.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/mcp_server.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3d183ae7
+    name: Fix relative-imports issues
+    description: Resolve 8 relative-imports issues in code2logic/markdown_format.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/markdown_format.py
+    rule_id: relative-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-59a3a776
+    name: Fix magic-numbers issues
+    description: Resolve 5 magic-numbers issues in code2logic/markdown_format.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/markdown_format.py
+    rule_id: magic-numbers
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-33cba9aa
+    name: Fix string-concat issues
+    description: Resolve 11 string-concat issues in code2logic/metrics.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/metrics.py
+    rule_id: string-concat
+    count: 11
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-24a3dee0
+    name: Fix magic-numbers issues
+    description: Resolve 17 magic-numbers issues in code2logic/metrics.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/metrics.py
+    rule_id: magic-numbers
+    count: 17
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-da8923f5
+    name: Fix llm-generated-code issues
+    description: Resolve 3 llm-generated-code issues in code2logic/metrics.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/metrics.py
+    rule_id: llm-generated-code
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-6b0730f3
+    name: Fix magic-numbers issues
+    description: Resolve 5 magic-numbers issues in code2logic/prompts.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/prompts.py
+    rule_id: magic-numbers
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-842daabe
+    name: Fix llm-generated-code issues
+    description: Resolve 3 llm-generated-code issues in code2logic/prompts.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/prompts.py
+    rule_id: llm-generated-code
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-bec726a1
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in code2logic/models.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/models.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2c79c9aa
+    name: Fix relative-imports issues
+    description: Resolve 4 relative-imports issues in code2logic/project_reproducer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/project_reproducer.py
+    rule_id: relative-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4a232a28
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in code2logic/project_reproducer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/project_reproducer.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0bb368b6
+    name: Fix llm-generated-code issues
+    description: Resolve 5 llm-generated-code issues in code2logic/project_reproducer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/project_reproducer.py
+    rule_id: llm-generated-code
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c15ccd14
+    name: Fix relative-imports issues
+    description: Resolve 2 relative-imports issues in code2logic/quality.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/quality.py
+    rule_id: relative-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4368e65f
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in code2logic/quality.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/quality.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8b7f385c
+    name: Fix llm-generated-code issues
+    description: Resolve 3 llm-generated-code issues in code2logic/quality.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/quality.py
+    rule_id: llm-generated-code
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9f22403a
+    name: Fix relative-imports issues
+    description: Resolve 2 relative-imports issues in code2logic/reproduction.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/reproduction.py
+    rule_id: relative-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-18dda078
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in code2logic/reproduction.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/reproduction.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1b56fdd3
+    name: Fix magic-numbers issues
+    description: Resolve 6 magic-numbers issues in code2logic/reproduction.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/reproduction.py
+    rule_id: magic-numbers
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-33ab17b7
+    name: Fix llm-generated-code issues
+    description: Resolve 6 llm-generated-code issues in code2logic/reproduction.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/reproduction.py
+    rule_id: llm-generated-code
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e3987ba3
+    name: Fix relative-imports issues
+    description: Resolve 6 relative-imports issues in code2logic/refactor.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/refactor.py
+    rule_id: relative-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7a7c904c
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in code2logic/refactor.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/refactor.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-db31f6ce
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in code2logic/refactor.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/refactor.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-229cc164
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in code2logic/refactor.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/refactor.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-745cd8b3
+    name: Fix llm-generated-code issues
+    description: Resolve 5 llm-generated-code issues in code2logic/refactor.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/refactor.py
+    rule_id: llm-generated-code
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-96d61aa8
+    name: Fix relative-imports issues
+    description: Resolve 8 relative-imports issues in code2logic/schemas/__init__.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/schemas/__init__.py
+    rule_id: relative-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-569adaee
+    name: Fix string-concat issues
+    description: Resolve 7 string-concat issues in code2logic/reproducer.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/reproducer.py
+    rule_id: string-concat
+    count: 7
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-52f3482f
+    name: Fix llm-hallucinations issues
+    description: Resolve 3 llm-hallucinations issues in code2logic/reproducer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/reproducer.py
+    rule_id: llm-hallucinations
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7ed98696
+    name: Fix magic-numbers issues
+    description: Resolve 5 magic-numbers issues in code2logic/reproducer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/reproducer.py
+    rule_id: magic-numbers
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c18b73bf
+    name: Fix llm-generated-code issues
+    description: Resolve 4 llm-generated-code issues in code2logic/reproducer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/reproducer.py
+    rule_id: llm-generated-code
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-867fc0db
+    name: Fix string-concat issues
+    description: Resolve 3 string-concat issues in code2logic/schemas/logicml_schema.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/schemas/logicml_schema.py
+    rule_id: string-concat
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0247b4f6
+    name: Fix llm-generated-code issues
+    description: Resolve 1 llm-generated-code issues in code2logic/schemas/logicml_schema.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/schemas/logicml_schema.py
+    rule_id: llm-generated-code
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-82dfcab2
+    name: Fix llm-generated-code issues
+    description: Resolve 2 llm-generated-code issues in code2logic/schemas/json_schema.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/schemas/json_schema.py
+    rule_id: llm-generated-code
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-637b1e65
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in code2logic/schemas/markdown_schema.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/schemas/markdown_schema.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-5ef8c57f
+    name: Fix llm-generated-code issues
+    description: Resolve 1 llm-generated-code issues in code2logic/schemas/markdown_schema.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/schemas/markdown_schema.py
+    rule_id: llm-generated-code
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-fc1bef04
+    name: Fix llm-generated-code issues
+    description: Resolve 1 llm-generated-code issues in code2logic/schemas/yaml_schema.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/schemas/yaml_schema.py
+    rule_id: llm-generated-code
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f8e83e45
+    name: Fix string-concat issues
+    description: Resolve 3 string-concat issues in code2logic/shared_utils.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/shared_utils.py
+    rule_id: string-concat
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e63f34e7
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in code2logic/shared_utils.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/shared_utils.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a5bf2a69
+    name: Fix llm-generated-code issues
+    description: Resolve 12 llm-generated-code issues in code2logic/shared_utils.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/shared_utils.py
+    rule_id: llm-generated-code
+    count: 12
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f58c898e
+    name: Fix relative-imports issues
+    description: Resolve 2 relative-imports issues in code2logic/similarity.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/similarity.py
+    rule_id: relative-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e71a220c
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in code2logic/similarity.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/similarity.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-dad9ca05
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in code2logic/similarity.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/similarity.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-85154f30
+    name: Fix llm-generated-code issues
+    description: Resolve 5 llm-generated-code issues in code2logic/similarity.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/similarity.py
+    rule_id: llm-generated-code
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-59f16fca
+    name: Fix relative-imports issues
+    description: Resolve 8 relative-imports issues in code2logic/tools/__init__.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/tools/__init__.py
+    rule_id: relative-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f4b204fc
+    name: Fix smart-return-type issues
+    description: Resolve 4 smart-return-type issues in code2logic/terminal.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/terminal.py
+    rule_id: smart-return-type
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-92725f4a
+    name: Fix string-concat issues
+    description: Resolve 10 string-concat issues in code2logic/terminal.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/terminal.py
+    rule_id: string-concat
+    count: 10
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-89890563
+    name: Fix duplicate-imports issues
+    description: Resolve 1 duplicate-imports issues in code2logic/terminal.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/terminal.py
+    rule_id: duplicate-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-234a67ce
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in code2logic/terminal.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/terminal.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-932cbb8f
+    name: Fix llm-generated-code issues
+    description: Resolve 1 llm-generated-code issues in code2logic/terminal.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/terminal.py
+    rule_id: llm-generated-code
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9729c93c
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in code2logic/utils.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/utils.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-195bd5ce
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in code2logic/utils.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/utils.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-596a9820
+    name: Fix relative-imports issues
+    description: Resolve 8 relative-imports issues in code2logic/toon_format.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/toon_format.py
+    rule_id: relative-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2d1b76c5
+    name: Fix string-concat issues
+    description: Resolve 4 string-concat issues in code2logic/toon_format.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/toon_format.py
+    rule_id: string-concat
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e59a7dea
+    name: Fix magic-numbers issues
+    description: Resolve 12 magic-numbers issues in code2logic/toon_format.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/toon_format.py
+    rule_id: magic-numbers
+    count: 12
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-12991e65
+    name: Fix llm-generated-code issues
+    description: Resolve 5 llm-generated-code issues in code2logic/toon_format.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/toon_format.py
+    rule_id: llm-generated-code
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4ce8d7a1
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in examples/01_quick_start.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/01_quick_start.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c4acd64c
+    name: Fix magic-numbers issues
+    description: Resolve 8 magic-numbers issues in examples/01_quick_start.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - examples/01_quick_start.py
+    rule_id: magic-numbers
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-76bd54aa
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/01_quick_start.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/01_quick_start.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0cdfc50e
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in examples/02_refactoring.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/02_refactoring.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-cc869703
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in examples/02_refactoring.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - examples/02_refactoring.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-81b2d38f
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in examples/02_refactoring.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/02_refactoring.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4a9c372c
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/02_refactoring.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/02_refactoring.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-83729969
+    name: Fix relative-imports issues
+    description: Resolve 4 relative-imports issues in code2logic/universal.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/universal.py
+    rule_id: relative-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-378f3e07
+    name: Fix string-concat issues
+    description: Resolve 6 string-concat issues in code2logic/universal.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - code2logic/universal.py
+    rule_id: string-concat
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-206307ba
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in code2logic/universal.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/universal.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e84ef21f
+    name: Fix llm-generated-code issues
+    description: Resolve 2 llm-generated-code issues in code2logic/universal.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/universal.py
+    rule_id: llm-generated-code
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d137a032
+    name: Fix smart-return-type issues
+    description: Resolve 4 smart-return-type issues in complexity_reduction_examples.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - complexity_reduction_examples.py
+    rule_id: smart-return-type
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e82eab8e
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in complexity_reduction_examples.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - complexity_reduction_examples.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b05a4312
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in complexity_reduction_examples.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - complexity_reduction_examples.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a60d6aca
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in examples/03_reproduction.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/03_reproduction.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-dcfa780c
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in examples/03_reproduction.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - examples/03_reproduction.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e1e76bdf
+    name: Fix magic-numbers issues
+    description: Resolve 5 magic-numbers issues in examples/03_reproduction.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - examples/03_reproduction.py
+    rule_id: magic-numbers
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a215fd9c
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/03_reproduction.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/03_reproduction.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c7b84638
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in examples/04_project.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/04_project.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1355f77e
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/04_project.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/04_project.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-353acc10
+    name: Fix smart-return-type issues
+    description: Resolve 2 smart-return-type issues in examples/06_metrics.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/06_metrics.py
+    rule_id: smart-return-type
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-737a4ca0
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in examples/06_metrics.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/06_metrics.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-aa6d5b1a
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/06_metrics.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/06_metrics.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-eacf1771
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in examples/05_llm_integration.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/05_llm_integration.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-53f5fef6
+    name: Fix unused-imports issues
+    description: Resolve 8 unused-imports issues in examples/05_llm_integration.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - examples/05_llm_integration.py
+    rule_id: unused-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-73914a53
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in examples/05_llm_integration.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/05_llm_integration.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-71efbf17
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/05_llm_integration.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/05_llm_integration.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e8524c87
+    name: Fix smart-return-type issues
+    description: Resolve 2 smart-return-type issues in examples/09_async_benchmark.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/09_async_benchmark.py
+    rule_id: smart-return-type
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-340c592c
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in examples/09_async_benchmark.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/09_async_benchmark.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-56c4c15c
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/09_async_benchmark.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/09_async_benchmark.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ed662007
+    name: Fix smart-return-type issues
+    description: Resolve 3 smart-return-type issues in examples/08_format_benchmark.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/08_format_benchmark.py
+    rule_id: smart-return-type
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-42aceada
+    name: Fix magic-numbers issues
+    description: Resolve 6 magic-numbers issues in examples/08_format_benchmark.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - examples/08_format_benchmark.py
+    rule_id: magic-numbers
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-bdd2e1e4
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/08_format_benchmark.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/08_format_benchmark.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7581bb74
+    name: Fix smart-return-type issues
+    description: Resolve 2 smart-return-type issues in examples/11_token_benchmark.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/11_token_benchmark.py
+    rule_id: smart-return-type
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-37fb1780
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in examples/11_token_benchmark.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/11_token_benchmark.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-265577cf
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/11_token_benchmark.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/11_token_benchmark.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8cbc7c1c
+    name: Fix smart-return-type issues
+    description: Resolve 2 smart-return-type issues in examples/10_function_reproduction.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/10_function_reproduction.py
+    rule_id: smart-return-type
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-76fc1d29
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in examples/10_function_reproduction.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/10_function_reproduction.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c900a90c
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/10_function_reproduction.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/10_function_reproduction.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-40b75c4b
+    name: Fix smart-return-type issues
+    description: Resolve 2 smart-return-type issues in examples/12_comprehensive_analysis.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/12_comprehensive_analysis.py
+    rule_id: smart-return-type
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1e0c9974
+    name: Fix magic-numbers issues
+    description: Resolve 5 magic-numbers issues in examples/12_comprehensive_analysis.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - examples/12_comprehensive_analysis.py
+    rule_id: magic-numbers
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-27f99402
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/12_comprehensive_analysis.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/12_comprehensive_analysis.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-26a8aa93
+    name: Fix smart-return-type issues
+    description: Resolve 2 smart-return-type issues in examples/13_project_benchmark.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/13_project_benchmark.py
+    rule_id: smart-return-type
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9b16b6ad
+    name: Fix magic-numbers issues
+    description: Resolve 6 magic-numbers issues in examples/13_project_benchmark.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - examples/13_project_benchmark.py
+    rule_id: magic-numbers
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8519111d
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/13_project_benchmark.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/13_project_benchmark.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0e1ca62f
+    name: Fix smart-return-type issues
+    description: Resolve 4 smart-return-type issues in examples/15_unified_benchmark.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - examples/15_unified_benchmark.py
+    rule_id: smart-return-type
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c9b9b93a
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in examples/15_unified_benchmark.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - examples/15_unified_benchmark.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4cf1be59
+    name: Fix magic-numbers issues
+    description: Resolve 4 magic-numbers issues in examples/15_unified_benchmark.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - examples/15_unified_benchmark.py
+    rule_id: magic-numbers
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0390b745
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/15_unified_benchmark.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/15_unified_benchmark.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8a8fce5f
+    name: Fix smart-return-type issues
+    description: Resolve 10 smart-return-type issues in examples/16_terminal_demo.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - examples/16_terminal_demo.py
+    rule_id: smart-return-type
+    count: 10
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4a5af576
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in examples/16_terminal_demo.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - examples/16_terminal_demo.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9faf824b
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in examples/16_terminal_demo.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/16_terminal_demo.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2391077b
+    name: Fix llm-generated-code issues
+    description: Resolve 9 llm-generated-code issues in examples/16_terminal_demo.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - examples/16_terminal_demo.py
+    rule_id: llm-generated-code
+    count: 9
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-30b3c512
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/16_terminal_demo.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/16_terminal_demo.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8971ce29
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in examples/benchmark_summary.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/benchmark_summary.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-6665d379
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in examples/benchmark_summary.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/benchmark_summary.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b83e3eaf
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/benchmark_summary.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/benchmark_summary.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-23960484
+    name: Fix smart-return-type issues
+    description: Resolve 3 smart-return-type issues in examples/14_repeatability_test.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/14_repeatability_test.py
+    rule_id: smart-return-type
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f88385f0
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in examples/14_repeatability_test.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/14_repeatability_test.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-95266fd6
+    name: Fix unused-imports issues
+    description: Resolve 16 unused-imports issues in examples/14_repeatability_test.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - examples/14_repeatability_test.py
+    rule_id: unused-imports
+    count: 16
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-bca4446c
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/14_repeatability_test.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/14_repeatability_test.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-78918944
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in examples/benchmark_report.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/benchmark_report.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-18825d73
+    name: Fix unused-imports issues
+    description: Resolve 6 unused-imports issues in examples/benchmark_report.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - examples/benchmark_report.py
+    rule_id: unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f4e4ea4e
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/benchmark_report.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/benchmark_report.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-bbbb8497
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in examples/behavioral_benchmark.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/behavioral_benchmark.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2480fe99
+    name: Fix unused-imports issues
+    description: Resolve 6 unused-imports issues in examples/behavioral_benchmark.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - examples/behavioral_benchmark.py
+    rule_id: unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a117547f
+    name: Fix magic-numbers issues
+    description: Resolve 6 magic-numbers issues in examples/behavioral_benchmark.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - examples/behavioral_benchmark.py
+    rule_id: magic-numbers
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b66039b0
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/behavioral_benchmark.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/behavioral_benchmark.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-eba3b619
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in examples/code2logic/sample_project/calculator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/code2logic/sample_project/calculator.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3362f2cf
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in examples/code2logic/sample_project/calculator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/code2logic/sample_project/calculator.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e50e6719
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in examples/code2logic/sample_project/api/client.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/code2logic/sample_project/api/client.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c1e274ca
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in examples/code2logic/sample_project/api/client.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/code2logic/sample_project/api/client.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-603e280d
+    name: Fix wildcard-imports issues
+    description: Resolve 27 wildcard-imports issues in examples/functional_refactoring_example.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - examples/functional_refactoring_example.py
+    rule_id: wildcard-imports
+    count: 27
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-36ad6116
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in examples/code2logic/sample_project/models/user.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/code2logic/sample_project/models/user.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-bb6ea3b4
+    name: Fix smart-return-type issues
+    description: Resolve 5 smart-return-type issues in fast_analysis.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - fast_analysis.py
+    rule_id: smart-return-type
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b577a815
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in fast_analysis.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - fast_analysis.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0d17f634
+    name: Fix magic-numbers issues
+    description: Resolve 6 magic-numbers issues in fast_analysis.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - fast_analysis.py
+    rule_id: magic-numbers
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-af6e33df
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in fast_analysis.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - fast_analysis.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a9350611
+    name: Fix smart-return-type issues
+    description: Resolve 2 smart-return-type issues in fixed_refactoring_implementation_executor.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - fixed_refactoring_implementation_executor.py
+    rule_id: smart-return-type
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1d86deed
+    name: Fix unused-imports issues
+    description: Resolve 8 unused-imports issues in fixed_refactoring_implementation_executor.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - fixed_refactoring_implementation_executor.py
+    rule_id: unused-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-6579e68c
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in fixed_refactoring_implementation_executor.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - fixed_refactoring_implementation_executor.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d730d321
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in fixed_refactoring_implementation_executor.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - fixed_refactoring_implementation_executor.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-559c15a8
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in general_refactoring_template.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - general_refactoring_template.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-dcb2d6a5
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in general_refactoring_template.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - general_refactoring_template.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-dc203183
+    name: Fix smart-return-type issues
+    description: Resolve 5 smart-return-type issues in generate_graph_viewer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - generate_graph_viewer.py
+    rule_id: smart-return-type
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-525cc522
+    name: Fix string-concat issues
+    description: Resolve 4 string-concat issues in generate_graph_viewer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - generate_graph_viewer.py
+    rule_id: string-concat
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-acdec777
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in generate_graph_viewer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - generate_graph_viewer.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e53e76a4
+    name: Fix magic-numbers issues
+    description: Resolve 8 magic-numbers issues in generate_graph_viewer.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - generate_graph_viewer.py
+    rule_id: magic-numbers
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-be8a0588
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in generate_graph_viewer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - generate_graph_viewer.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8fdf2876
+    name: Fix smart-return-type issues
+    description: Resolve 2 smart-return-type issues in fixed_advanced_data_analyzer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - fixed_advanced_data_analyzer.py
+    rule_id: smart-return-type
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-214bafd0
+    name: Fix string-concat issues
+    description: Resolve 9 string-concat issues in fixed_advanced_data_analyzer.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - fixed_advanced_data_analyzer.py
+    rule_id: string-concat
+    count: 9
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-59e9bf18
+    name: Fix unused-imports issues
+    description: Resolve 12 unused-imports issues in fixed_advanced_data_analyzer.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - fixed_advanced_data_analyzer.py
+    rule_id: unused-imports
+    count: 12
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-5c126b5e
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in fixed_advanced_data_analyzer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - fixed_advanced_data_analyzer.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-dd911924
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in fixed_advanced_data_analyzer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - fixed_advanced_data_analyzer.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-99d4f74e
+    name: Fix smart-return-type issues
+    description: Resolve 2 smart-return-type issues in final_advanced_data_analyzer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - final_advanced_data_analyzer.py
+    rule_id: smart-return-type
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-df8de471
+    name: Fix string-concat issues
+    description: Resolve 9 string-concat issues in final_advanced_data_analyzer.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - final_advanced_data_analyzer.py
+    rule_id: string-concat
+    count: 9
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e3d3be0c
+    name: Fix unused-imports issues
+    description: Resolve 12 unused-imports issues in final_advanced_data_analyzer.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - final_advanced_data_analyzer.py
+    rule_id: unused-imports
+    count: 12
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-61ebe5b3
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in final_advanced_data_analyzer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - final_advanced_data_analyzer.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-93a7927c
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in final_advanced_data_analyzer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - final_advanced_data_analyzer.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-89cb18fc
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in generate_index_html.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - generate_index_html.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-5c832103
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in generate_index_html.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - generate_index_html.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c1c3f54d
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in generate_index_html.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - generate_index_html.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2ca7e55a
+    name: Fix relative-imports issues
+    description: Resolve 6 relative-imports issues in generated_code/__init__.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - generated_code/__init__.py
+    rule_id: relative-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f9948236
+    name: Fix unused-imports issues
+    description: Resolve 6 unused-imports issues in generated_code/analyzer.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - generated_code/analyzer.py
+    rule_id: unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d70b3758
+    name: Fix llm-hallucinations issues
+    description: Resolve 8 llm-hallucinations issues in generated_code/analyzer.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - generated_code/analyzer.py
+    rule_id: llm-hallucinations
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-39540b13
+    name: Fix smart-return-type issues
+    description: Resolve 7 smart-return-type issues in hybrid_export.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - hybrid_export.py
+    rule_id: smart-return-type
+    count: 7
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8fa9ce2b
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in hybrid_export.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - hybrid_export.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3b618777
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in hybrid_export.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - hybrid_export.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-463baf27
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in hybrid_export.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - hybrid_export.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-23a84b47
+    name: Fix smart-return-type issues
+    description: Resolve 13 smart-return-type issues in flow.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - flow.py
+    rule_id: smart-return-type
+    count: 13
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0be2dc1a
+    name: Fix string-concat issues
+    description: Resolve 14 string-concat issues in flow.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - flow.py
+    rule_id: string-concat
+    count: 14
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2481b465
+    name: Fix unused-imports issues
+    description: Resolve 32 unused-imports issues in flow.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - flow.py
+    rule_id: unused-imports
+    count: 32
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a6c3a36a
+    name: Fix magic-numbers issues
+    description: Resolve 9 magic-numbers issues in flow.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - flow.py
+    rule_id: magic-numbers
+    count: 9
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b899521f
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in flow.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - flow.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8103d9d6
+    name: Fix smart-return-type issues
+    description: Resolve 2 smart-return-type issues in llm_refactoring_executor.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - llm_refactoring_executor.py
+    rule_id: smart-return-type
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-64241c1e
+    name: Fix unused-imports issues
+    description: Resolve 8 unused-imports issues in llm_refactoring_executor.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - llm_refactoring_executor.py
+    rule_id: unused-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d1fdc980
+    name: Fix magic-numbers issues
+    description: Resolve 5 magic-numbers issues in llm_refactoring_executor.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - llm_refactoring_executor.py
+    rule_id: magic-numbers
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-fbdd1ff9
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in llm_refactoring_executor.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - llm_refactoring_executor.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1eeebd54
+    name: Fix relative-imports issues
+    description: Resolve 2 relative-imports issues in logic2code/__main__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2code/__main__.py
+    rule_id: relative-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3537ec6a
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in logic2code/__main__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2code/__main__.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d40e0639
+    name: Fix relative-imports issues
+    description: Resolve 4 relative-imports issues in logic2code/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - logic2code/__init__.py
+    rule_id: relative-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f451c2db
+    name: Fix relative-imports issues
+    description: Resolve 2 relative-imports issues in logic2code/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2code/cli.py
+    rule_id: relative-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-524abc67
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in logic2code/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2code/cli.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9d92b006
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in logic2code/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - logic2code/cli.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3b3a765f
+    name: Fix magic-numbers issues
+    description: Resolve 4 magic-numbers issues in logic2code/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - logic2code/cli.py
+    rule_id: magic-numbers
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3fd596ca
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in logic2code/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2code/cli.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f898fa3a
+    name: Fix smart-return-type issues
+    description: Resolve 4 smart-return-type issues in logic2code/examples/01_quickstart.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - logic2code/examples/01_quickstart.py
+    rule_id: smart-return-type
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1cbcde7a
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in logic2code/examples/01_quickstart.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2code/examples/01_quickstart.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-88fb1362
+    name: Fix llm-hallucinations issues
+    description: Resolve 4 llm-hallucinations issues in logic2code/examples/01_quickstart.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - logic2code/examples/01_quickstart.py
+    rule_id: llm-hallucinations
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a99ec5a8
+    name: Fix magic-numbers issues
+    description: Resolve 4 magic-numbers issues in logic2code/examples/01_quickstart.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - logic2code/examples/01_quickstart.py
+    rule_id: magic-numbers
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-47bdc106
+    name: Fix llm-generated-code issues
+    description: Resolve 4 llm-generated-code issues in logic2code/examples/01_quickstart.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - logic2code/examples/01_quickstart.py
+    rule_id: llm-generated-code
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-16191938
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in logic2code/examples/01_quickstart.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2code/examples/01_quickstart.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-05ac1ec6
+    name: Fix smart-return-type issues
+    description: Resolve 3 smart-return-type issues in logic2code/examples/02_llm_enhanced.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2code/examples/02_llm_enhanced.py
+    rule_id: smart-return-type
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c7ae92d5
+    name: Fix llm-hallucinations issues
+    description: Resolve 3 llm-hallucinations issues in logic2code/examples/02_llm_enhanced.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2code/examples/02_llm_enhanced.py
+    rule_id: llm-hallucinations
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-cecd0d30
+    name: Fix magic-numbers issues
+    description: Resolve 4 magic-numbers issues in logic2code/examples/02_llm_enhanced.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - logic2code/examples/02_llm_enhanced.py
+    rule_id: magic-numbers
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-924f108f
+    name: Fix llm-generated-code issues
+    description: Resolve 3 llm-generated-code issues in logic2code/examples/02_llm_enhanced.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2code/examples/02_llm_enhanced.py
+    rule_id: llm-generated-code
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0c6a19e5
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in logic2code/examples/02_llm_enhanced.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2code/examples/02_llm_enhanced.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-66019e72
+    name: Fix relative-imports issues
+    description: Resolve 6 relative-imports issues in logic2test/__init__.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - logic2test/__init__.py
+    rule_id: relative-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-eabba098
+    name: Fix relative-imports issues
+    description: Resolve 2 relative-imports issues in logic2test/__main__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2test/__main__.py
+    rule_id: relative-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-67aaae36
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in logic2test/__main__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2test/__main__.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-75234efa
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in logic2code/renderers.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - logic2code/renderers.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0a940256
+    name: Fix llm-hallucinations issues
+    description: Resolve 1 llm-hallucinations issues in logic2code/renderers.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2code/renderers.py
+    rule_id: llm-hallucinations
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d8ef12c8
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in logic2code/renderers.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2code/renderers.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-286ed12b
+    name: Fix relative-imports issues
+    description: Resolve 2 relative-imports issues in logic2code/generator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2code/generator.py
+    rule_id: relative-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-72c5b726
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in logic2code/generator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - logic2code/generator.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-246a9c07
+    name: Fix llm-generated-code issues
+    description: Resolve 5 llm-generated-code issues in logic2code/generator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - logic2code/generator.py
+    rule_id: llm-generated-code
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f4412e36
+    name: Fix relative-imports issues
+    description: Resolve 2 relative-imports issues in logic2test/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2test/cli.py
+    rule_id: relative-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-6ec75684
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in logic2test/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2test/cli.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e7be0ca9
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in logic2test/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2test/cli.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-788de562
+    name: Fix smart-return-type issues
+    description: Resolve 3 smart-return-type issues in logic2test/examples/01_quickstart.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2test/examples/01_quickstart.py
+    rule_id: smart-return-type
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-53d1306e
+    name: Fix llm-hallucinations issues
+    description: Resolve 3 llm-hallucinations issues in logic2test/examples/01_quickstart.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2test/examples/01_quickstart.py
+    rule_id: llm-hallucinations
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-03895524
+    name: Fix llm-generated-code issues
+    description: Resolve 3 llm-generated-code issues in logic2test/examples/01_quickstart.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2test/examples/01_quickstart.py
+    rule_id: llm-generated-code
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e1d40920
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in logic2test/examples/01_quickstart.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2test/examples/01_quickstart.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d3ff489b
+    name: Fix llm-hallucinations issues
+    description: Resolve 2 llm-hallucinations issues in logic2test/templates.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2test/templates.py
+    rule_id: llm-hallucinations
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1887f174
+    name: Fix smart-return-type issues
+    description: Resolve 4 smart-return-type issues in logic2test/examples/02_custom_templates.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - logic2test/examples/02_custom_templates.py
+    rule_id: smart-return-type
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-88acd602
+    name: Fix llm-hallucinations issues
+    description: Resolve 4 llm-hallucinations issues in logic2test/examples/02_custom_templates.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - logic2test/examples/02_custom_templates.py
+    rule_id: llm-hallucinations
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1ab800dc
+    name: Fix llm-generated-code issues
+    description: Resolve 4 llm-generated-code issues in logic2test/examples/02_custom_templates.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - logic2test/examples/02_custom_templates.py
+    rule_id: llm-generated-code
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-bfb32c2a
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in logic2test/examples/02_custom_templates.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2test/examples/02_custom_templates.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b14a0a8d
+    name: Fix relative-imports issues
+    description: Resolve 4 relative-imports issues in logic2test/generator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - logic2test/generator.py
+    rule_id: relative-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ebad1e10
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in logic2test/generator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2test/generator.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c9dd3281
+    name: Fix llm-generated-code issues
+    description: Resolve 4 llm-generated-code issues in logic2test/generator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - logic2test/generator.py
+    rule_id: llm-generated-code
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-43c20c0c
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in logic2test/parsers.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - logic2test/parsers.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3161a41e
+    name: Fix relative-imports issues
+    description: Resolve 12 relative-imports issues in lolm/__init__.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - lolm/__init__.py
+    rule_id: relative-imports
+    count: 12
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e6eb3801
+    name: Fix relative-imports issues
+    description: Resolve 2 relative-imports issues in lolm/__main__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - lolm/__main__.py
+    rule_id: relative-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-60403afd
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in lolm/__main__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - lolm/__main__.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-fe55d22b
+    name: Fix relative-imports issues
+    description: Resolve 6 relative-imports issues in lolm/cli.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - lolm/cli.py
+    rule_id: relative-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a044a90d
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in lolm/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - lolm/cli.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-6543632c
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in lolm/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - lolm/cli.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9a111fa0
+    name: Fix unused-imports issues
+    description: Resolve 20 unused-imports issues in lolm/cli.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - lolm/cli.py
+    rule_id: unused-imports
+    count: 20
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b5e0d793
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in lolm/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - lolm/cli.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0da36a3d
+    name: Fix smart-return-type issues
+    description: Resolve 4 smart-return-type issues in lolm/examples/01_quickstart.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - lolm/examples/01_quickstart.py
+    rule_id: smart-return-type
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ff37922d
+    name: Fix llm-hallucinations issues
+    description: Resolve 4 llm-hallucinations issues in lolm/examples/01_quickstart.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - lolm/examples/01_quickstart.py
+    rule_id: llm-hallucinations
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8419cb0e
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in lolm/examples/01_quickstart.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - lolm/examples/01_quickstart.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-63ff5077
+    name: Fix llm-generated-code issues
+    description: Resolve 4 llm-generated-code issues in lolm/examples/01_quickstart.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - lolm/examples/01_quickstart.py
+    rule_id: llm-generated-code
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4c534302
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in lolm/examples/01_quickstart.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - lolm/examples/01_quickstart.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e3c5a1f1
+    name: Fix relative-imports issues
+    description: Resolve 4 relative-imports issues in lolm/clients.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - lolm/clients.py
+    rule_id: relative-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f4ff4c61
+    name: Fix unused-imports issues
+    description: Resolve 16 unused-imports issues in lolm/clients.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - lolm/clients.py
+    rule_id: unused-imports
+    count: 16
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-bb65d321
+    name: Fix magic-numbers issues
+    description: Resolve 22 magic-numbers issues in lolm/clients.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - lolm/clients.py
+    rule_id: magic-numbers
+    count: 22
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0bf12c8f
+    name: Fix llm-generated-code issues
+    description: Resolve 3 llm-generated-code issues in lolm/clients.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - lolm/clients.py
+    rule_id: llm-generated-code
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-44051c08
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in lolm/examples/03_code_generation.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - lolm/examples/03_code_generation.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-cdc077ae
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in lolm/examples/03_code_generation.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - lolm/examples/03_code_generation.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-90cc74bb
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in lolm/examples/03_code_generation.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - lolm/examples/03_code_generation.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-74e28fac
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in lolm/config.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - lolm/config.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-54756194
+    name: Fix magic-numbers issues
+    description: Resolve 5 magic-numbers issues in lolm/config.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - lolm/config.py
+    rule_id: magic-numbers
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b0015d44
+    name: Fix smart-return-type issues
+    description: Resolve 5 smart-return-type issues in lolm/examples/02_configuration.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - lolm/examples/02_configuration.py
+    rule_id: smart-return-type
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2821f2ab
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in lolm/examples/02_configuration.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - lolm/examples/02_configuration.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-fb7a3eee
+    name: Fix unused-imports issues
+    description: Resolve 16 unused-imports issues in lolm/examples/02_configuration.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - lolm/examples/02_configuration.py
+    rule_id: unused-imports
+    count: 16
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1560487a
+    name: Fix llm-hallucinations issues
+    description: Resolve 1 llm-hallucinations issues in lolm/examples/02_configuration.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - lolm/examples/02_configuration.py
+    rule_id: llm-hallucinations
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d6ed1a8f
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in lolm/examples/02_configuration.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - lolm/examples/02_configuration.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7178c19e
+    name: Fix llm-generated-code issues
+    description: Resolve 1 llm-generated-code issues in lolm/examples/02_configuration.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - lolm/examples/02_configuration.py
+    rule_id: llm-generated-code
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f1dbdd0d
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in lolm/examples/02_configuration.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - lolm/examples/02_configuration.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ac983ab0
+    name: Fix relative-imports issues
+    description: Resolve 8 relative-imports issues in lolm/manager.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - lolm/manager.py
+    rule_id: relative-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a19491c9
+    name: Fix unused-imports issues
+    description: Resolve 28 unused-imports issues in lolm/manager.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - lolm/manager.py
+    rule_id: unused-imports
+    count: 28
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2b54ae91
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in lolm/manager.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - lolm/manager.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1b1b490f
+    name: Fix llm-generated-code issues
+    description: Resolve 5 llm-generated-code issues in lolm/manager.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - lolm/manager.py
+    rule_id: llm-generated-code
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3676a637
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in lolm/provider.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - lolm/provider.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-74ba4659
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in lolm/provider.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - lolm/provider.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-50c1e937
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in mermaid_to_png.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - mermaid_to_png.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-61e75e11
+    name: Fix unused-imports issues
+    description: Resolve 8 unused-imports issues in mermaid_to_png.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - mermaid_to_png.py
+    rule_id: unused-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2f17958f
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in mermaid_to_png.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - mermaid_to_png.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7b3bcce0
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in optimize_llm_prompt.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - optimize_llm_prompt.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c3761dcc
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in optimize_llm_prompt.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - optimize_llm_prompt.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-016d3e9c
+    name: Fix unused-imports issues
+    description: Resolve 8 unused-imports issues in optimize_llm_prompt.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - optimize_llm_prompt.py
+    rule_id: unused-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7b6f5807
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in optimize_llm_prompt.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - optimize_llm_prompt.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-30edf2ef
+    name: Fix string-concat issues
+    description: Resolve 10 string-concat issues in lolm/rotation.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - lolm/rotation.py
+    rule_id: string-concat
+    count: 10
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-feaa2d31
+    name: Fix unused-imports issues
+    description: Resolve 8 unused-imports issues in lolm/rotation.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - lolm/rotation.py
+    rule_id: unused-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-69b3988a
+    name: Fix magic-numbers issues
+    description: Resolve 10 magic-numbers issues in lolm/rotation.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - lolm/rotation.py
+    rule_id: magic-numbers
+    count: 10
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2da75e41
+    name: Fix llm-generated-code issues
+    description: Resolve 2 llm-generated-code issues in lolm/rotation.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - lolm/rotation.py
+    rule_id: llm-generated-code
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1c2e160e
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in optimize_llm_prompt_fixed.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - optimize_llm_prompt_fixed.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4b80372f
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in optimize_llm_prompt_fixed.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - optimize_llm_prompt_fixed.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4b604c70
+    name: Fix unused-imports issues
+    description: Resolve 12 unused-imports issues in optimize_llm_prompt_fixed.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - optimize_llm_prompt_fixed.py
+    rule_id: unused-imports
+    count: 12
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7d7c9090
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in optimize_llm_prompt_fixed.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - optimize_llm_prompt_fixed.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-481fd0be
+    name: Fix smart-return-type issues
+    description: Resolve 3 smart-return-type issues in pipeline_runner_utils_improved.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pipeline_runner_utils_improved.py
+    rule_id: smart-return-type
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d2c93176
+    name: Fix smart-return-type issues
+    description: Resolve 3 smart-return-type issues in performance_optimizations.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - performance_optimizations.py
+    rule_id: smart-return-type
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e08851cd
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in performance_optimizations.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - performance_optimizations.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a5ac6ed7
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in performance_optimizations.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - performance_optimizations.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-291c133d
+    name: Fix magic-numbers issues
+    description: Resolve 5 magic-numbers issues in performance_optimizations.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - performance_optimizations.py
+    rule_id: magic-numbers
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0b1d3be7
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in performance_optimizations.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - performance_optimizations.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-38beec3e
+    name: Fix smart-return-type issues
+    description: Resolve 2 smart-return-type issues in project_summary_generator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - project_summary_generator.py
+    rule_id: smart-return-type
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2da7aae1
+    name: Fix unused-imports issues
+    description: Resolve 8 unused-imports issues in project_summary_generator.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - project_summary_generator.py
+    rule_id: unused-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-08f19585
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in project_summary_generator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - project_summary_generator.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9bce5c2e
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in project_summary_generator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - project_summary_generator.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-bcaf2ffc
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in refactoring_implementation_executor.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - refactoring_implementation_executor.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1c2a5cf0
+    name: Fix wildcard-imports issues
+    description: Resolve 2 wildcard-imports issues in refactoring_implementation_executor.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - refactoring_implementation_executor.py
+    rule_id: wildcard-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-65a7b2c6
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in refactoring_implementation_executor.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - refactoring_implementation_executor.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-46d09122
+    name: Fix smart-return-type issues
+    description: Resolve 2 smart-return-type issues in refactoring_validator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - refactoring_validator.py
+    rule_id: smart-return-type
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c3992065
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in refactoring_validator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - refactoring_validator.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-12d2d224
+    name: Fix unused-imports issues
+    description: Resolve 12 unused-imports issues in refactoring_validator.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - refactoring_validator.py
+    rule_id: unused-imports
+    count: 12
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ed30abfb
+    name: Fix magic-numbers issues
+    description: Resolve 19 magic-numbers issues in refactoring_validator.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - refactoring_validator.py
+    rule_id: magic-numbers
+    count: 19
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-82c99fef
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in refactoring_validator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - refactoring_validator.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-46f7a3bd
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in setup.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - setup.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-edbd3c11
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in split_yaml.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - split_yaml.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-40ac927f
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in split_yaml.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - split_yaml.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-66eb84b5
+    name: Fix smart-return-type issues
+    description: Resolve 6 smart-return-type issues in test_analyzer.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - test_analyzer.py
+    rule_id: smart-return-type
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-83187c0f
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in test_analyzer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - test_analyzer.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-cf6bc6bc
+    name: Fix unused-imports issues
+    description: Resolve 8 unused-imports issues in test_analyzer.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - test_analyzer.py
+    rule_id: unused-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-25c22d99
+    name: Fix duplicate-imports issues
+    description: Resolve 3 duplicate-imports issues in test_analyzer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - test_analyzer.py
+    rule_id: duplicate-imports
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-90db2b48
+    name: Fix ai-boilerplate issues
+    description: Resolve 3 ai-boilerplate issues in test_analyzer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - test_analyzer.py
+    rule_id: ai-boilerplate
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3402ea89
+    name: Fix smart-return-type issues
+    description: Resolve 3 smart-return-type issues in scripts/configure_llm.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/configure_llm.py
+    rule_id: smart-return-type
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e4610e96
+    name: Fix string-concat issues
+    description: Resolve 7 string-concat issues in scripts/configure_llm.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - scripts/configure_llm.py
+    rule_id: string-concat
+    count: 7
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-07aa384c
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in scripts/configure_llm.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - scripts/configure_llm.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-87cb2843
+    name: Fix magic-numbers issues
+    description: Resolve 18 magic-numbers issues in scripts/configure_llm.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - scripts/configure_llm.py
+    rule_id: magic-numbers
+    count: 18
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-5e3ab94c
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in scripts/configure_llm.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/configure_llm.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-587c5f91
+    name: Fix smart-return-type issues
+    description: Resolve 3 smart-return-type issues in test_graph_viewer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - test_graph_viewer.py
+    rule_id: smart-return-type
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4e35ea8e
+    name: Fix string-concat issues
+    description: Resolve 4 string-concat issues in test_graph_viewer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - test_graph_viewer.py
+    rule_id: string-concat
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c3b60adb
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in test_graph_viewer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - test_graph_viewer.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d0479f73
+    name: Fix smart-return-type issues
+    description: Resolve 7 smart-return-type issues in ultimate_yaml_optimizer.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - ultimate_yaml_optimizer.py
+    rule_id: smart-return-type
+    count: 7
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-005c45fe
+    name: Fix string-concat issues
+    description: Resolve 8 string-concat issues in ultimate_yaml_optimizer.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - ultimate_yaml_optimizer.py
+    rule_id: string-concat
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4fa13b27
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in ultimate_yaml_optimizer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - ultimate_yaml_optimizer.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4f2e2188
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in ultimate_yaml_optimizer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - ultimate_yaml_optimizer.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-719bdd30
+    name: Fix smart-return-type issues
+    description: Resolve 2 smart-return-type issues in ultimate_advanced_data_analyzer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - ultimate_advanced_data_analyzer.py
+    rule_id: smart-return-type
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-77bd1d5f
+    name: Fix string-concat issues
+    description: Resolve 9 string-concat issues in ultimate_advanced_data_analyzer.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - ultimate_advanced_data_analyzer.py
+    rule_id: string-concat
+    count: 9
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-40676979
+    name: Fix unused-imports issues
+    description: Resolve 12 unused-imports issues in ultimate_advanced_data_analyzer.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - ultimate_advanced_data_analyzer.py
+    rule_id: unused-imports
+    count: 12
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3ce60038
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in ultimate_advanced_data_analyzer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - ultimate_advanced_data_analyzer.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-49f71804
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in ultimate_advanced_data_analyzer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - ultimate_advanced_data_analyzer.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-fe57848b
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in code2logic/benchmarks/runner.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/benchmarks/runner.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-205bc33f
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in code2logic/gherkin.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/gherkin.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-34bef531
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in code2logic/generators.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/generators.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8999860a
+    name: Fix relative-imports issues
+    description: Resolve 4 relative-imports issues in code2logic/parsers.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/parsers.py
+    rule_id: relative-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0f63a1e3
+    name: Fix string-concat issues
+    description: Resolve 4 string-concat issues in code2logic/parsers.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/parsers.py
+    rule_id: string-concat
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0e92c0ad
+    name: Fix duplicate-imports issues
+    description: Resolve 2 duplicate-imports issues in code2logic/parsers.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/parsers.py
+    rule_id: duplicate-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e8cddc7b
+    name: Fix magic-numbers issues
+    description: Resolve 48 magic-numbers issues in code2logic/parsers.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - code2logic/parsers.py
+    rule_id: magic-numbers
+    count: 48
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e8a5ab21
+    name: Fix llm-generated-code issues
+    description: Resolve 5 llm-generated-code issues in code2logic/parsers.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - code2logic/parsers.py
+    rule_id: llm-generated-code
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-db4ef1ba
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in code2logic/parsers.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/parsers.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3e6a0643
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in code2logic/reproducer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/reproducer.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-200dc94b
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in code2logic/toon_format.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/toon_format.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8d2a9254
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in code2logic/universal.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/universal.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e6da86e5
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in lolm/rotation.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - lolm/rotation.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-5bffe6eb
+    name: Fix outdated-dependency issues
+    description: Resolve 1 outdated-dependency issues in pyproject.toml
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyproject.toml
+    rule_id: outdated-dependency
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-92fb1af2
+    name: Fix wildcard-imports issues
+    description: Resolve 1 wildcard-imports issues in code2logic/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/cli.py
+    rule_id: wildcard-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-bc7a49ce
+    name: Fix wildcard-imports issues
+    description: Resolve 3 wildcard-imports issues in code2logic/reproducer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - code2logic/reproducer.py
+    rule_id: wildcard-imports
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced

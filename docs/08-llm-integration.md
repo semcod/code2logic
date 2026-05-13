@@ -31,9 +31,6 @@ code2logic llm set-model openrouter nvidia/nemotron-3-nano-30b-a3b:free
 
 Best for accessing multiple models through one API.
 
-### Setup
-
-```bash
 # Get API key from https://openrouter.ai/keys
 export OPENROUTER_API_KEY="sk-or-v1-your-key"
 export OPENROUTER_MODEL="qwen/qwen-2.5-coder-32b-instruct"
@@ -85,18 +82,11 @@ print(response.json()['choices'][0]['message']['content'])
 
 Best for local, private, and free LLM usage.
 
-### Setup
-
-```bash
 # Install Ollama
 curl -fsSL https://ollama.com/install.sh | sh
 
 # Pull code-optimized model
 ollama pull qwen2.5-coder:14b
-
-# Start server
-ollama serve
-```
 
 ### Configuration
 
@@ -107,8 +97,6 @@ export OLLAMA_MODEL="qwen2.5-coder:14b"
 # Or configure via CLI (.env)
 code2logic llm set-model ollama qwen2.5-coder:14b
 ```
-
-## Provider selection and priorities
 
 ### Default provider
 
@@ -179,15 +167,10 @@ response = client.generate(
 print(response)
 ```
 
-### CLI Integration
-
-```bash
 # Generate analysis and pipe to Ollama
 code2logic ./my_project -f gherkin -d minimal | \
   ollama run qwen2.5-coder:7b "Generate unit tests for this code"
 ```
-
-## OpenAI
 
 ### Setup
 
@@ -216,8 +199,6 @@ response = client.chat.completions.create(
 )
 print(response.choices[0].message.content)
 ```
-
-## Anthropic
 
 ### Setup
 
@@ -313,12 +294,6 @@ Output complete, working code."""
 
 response = llm_client.generate(prompt)
 
-# Step 3: Compare
-# Use BenchmarkRunner results (examples/15_unified_benchmark.py) for full comparison
-```
-
-## Best Practices
-
 ### Token Efficiency
 
 | Format | Tokens | Accuracy | When to Use |
@@ -327,9 +302,6 @@ response = llm_client.generate(prompt)
 | CSV minimal | ~8K | 70% | Analysis |
 | Compact | ~200 | 50% | Quick overview |
 
-### Prompt Engineering
-
-```python
 # Good: Specific task with context
 prompt = f"""Given this code structure:
 {gherkin}

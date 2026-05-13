@@ -23,8 +23,6 @@ from code2logic import (
 )
 ```
 
-## Core Functions
-
 ### analyze_project
 
 Main entry point for project analysis.
@@ -129,9 +127,6 @@ from code2logic import MarkdownGenerator
 
 gen = MarkdownGenerator()
 output = gen.generate(project, detail='standard')
-# detail: 'minimal', 'standard', 'full'
-```
-
 ### JSONGenerator
 
 ```python
@@ -139,9 +134,6 @@ from code2logic import JSONGenerator
 
 gen = JSONGenerator()
 output = gen.generate(project, flat=False, detail='standard')
-# flat=True for RAG-friendly format
-```
-
 ### YAMLGenerator
 
 ```python
@@ -178,9 +170,6 @@ schema = gen.generate_schema('ultra_compact')  # or 'standard'
 with open('toon-schema.json', 'w') as f:
     f.write(schema)
 
-# TOON: Token-Oriented Object Notation (6x smaller than JSON)
-```
-
 ### LogicMLGenerator
 
 ```python
@@ -207,9 +196,6 @@ from code2logic import CompactGenerator
 
 gen = CompactGenerator()
 output = gen.generate(project)
-# No detail parameter - always ultra-compact
-```
-
 ### GherkinGenerator
 
 ```python
@@ -226,9 +212,6 @@ from code2logic import StepDefinitionGenerator
 
 gen = StepDefinitionGenerator()
 output = gen.generate(project)
-# Generates pytest-bdd step definitions
-```
-
 ## LLM Clients
 
 All LLM clients are available from `code2logic`:
@@ -314,8 +297,6 @@ suggestions = analyzer.suggest_refactoring(code_string)
 docs = analyzer.generate_documentation(code_string)
 ```
 
-## Configuration
-
 ### Config Class
 
 ```python
@@ -331,8 +312,6 @@ model = config.get_model('ollama')
 
 # List providers
 providers = config.list_configured_providers()
-# {'openrouter': True, 'openai': False, 'ollama': True, ...}
-
 # Export config
 config_dict = config.to_dict()
 ```
@@ -342,15 +321,10 @@ config_dict = config.to_dict()
 ```python
 from code2logic.config import load_env, get_api_key, get_model
 
-# Load .env file
-load_env()
-
 # Get specific values
 key = get_api_key('openrouter')
 model = get_model('ollama')
 ```
-
-## Parsers
 
 ### TreeSitterParser
 
@@ -361,9 +335,6 @@ parser = TreeSitterParser(verbose=False)
 
 # Parse file
 result = parser.parse_file("/path/to/file.py")
-# Returns: ModuleInfo
-```
-
 ### UniversalParser
 
 Fallback parser when Tree-sitter unavailable:
@@ -374,8 +345,6 @@ from code2logic.parsers import UniversalParser
 parser = UniversalParser(verbose=False)
 result = parser.parse_file("/path/to/file.py")
 ```
-
-## Analyzers
 
 ### ProjectAnalyzer
 
@@ -400,9 +369,6 @@ from code2logic.dependency import DependencyAnalyzer
 
 analyzer = DependencyAnalyzer(verbose=False)
 deps = analyzer.analyze(project)
-# Returns dependency graph
-```
-
 ### SimilarityDetector
 
 ```python

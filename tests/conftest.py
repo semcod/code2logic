@@ -5,7 +5,6 @@ Pytest configuration and fixtures for code2logic tests.
 import pytest
 import tempfile
 from pathlib import Path
-from typing import Dict, Any
 
 from code2logic.models import ProjectInfo, ModuleInfo, FunctionInfo, ClassInfo
 
@@ -58,7 +57,7 @@ class Calculator:
 @pytest.fixture
 def sample_javascript_code() -> str:
     """Sample JavaScript code for testing."""
-    return '''
+    return """
 const os = require('os');
 const fs = require('fs');
 
@@ -100,13 +99,13 @@ class Calculator {
 }
 
 module.exports = { calculateSum, fibonacci, Calculator };
-'''
+"""
 
 
 @pytest.fixture
 def sample_java_code() -> str:
     """Sample Java code for testing."""
-    return '''
+    return """
 import java.util.ArrayList;
 import java.util.List;
 
@@ -140,7 +139,7 @@ public class Calculator {
         return fibonacci(n - 1) + fibonacci(n - 2);
     }
 }
-'''
+"""
 
 
 @pytest.fixture
@@ -156,7 +155,7 @@ def sample_project(temp_project_dir, sample_python_code):
     # Create main module
     main_file = temp_project_dir / "main.py"
     main_file.write_text(sample_python_code)
-    
+
     # Create utils module
     utils_file = temp_project_dir / "utils.py"
     utils_file.write_text('''
@@ -170,11 +169,11 @@ class HelperClass:
     def method(self):
         return "method result"
 ''')
-    
+
     # Create __init__.py
     init_file = temp_project_dir / "__init__.py"
     init_file.write_text("")
-    
+
     return temp_project_dir
 
 
@@ -197,10 +196,10 @@ def sample_module():
             is_private=False,
             intent="Test function",
             start_line=1,
-            end_line=10
+            end_line=10,
         )
     ]
-    
+
     classes = [
         ClassInfo(
             name="TestClass",
@@ -222,16 +221,16 @@ def sample_module():
                     is_private=False,
                     intent="Method 1",
                     start_line=1,
-                    end_line=5
+                    end_line=5,
                 )
             ],
             properties=[],
             is_interface=False,
             is_abstract=False,
-            generic_params=[]
+            generic_params=[],
         )
     ]
-    
+
     return ModuleInfo(
         path="/test/test_module.py",
         language="python",
@@ -243,7 +242,7 @@ def sample_module():
         constants=[],
         docstring=None,
         lines_total=50,
-        lines_code=40
+        lines_code=40,
     )
 
 
@@ -272,16 +271,16 @@ def sample_project_model():
                 is_private=False,
                 intent="",
                 start_line=1,
-                end_line=5
+                end_line=5,
             )
         ],
         types=[],
         constants=[],
         docstring=None,
         lines_total=10,
-        lines_code=8
+        lines_code=8,
     )
-    
+
     module2 = ModuleInfo(
         path="/test/module2.py",
         language="python",
@@ -304,16 +303,16 @@ def sample_project_model():
                 is_private=False,
                 intent="",
                 start_line=1,
-                end_line=8
+                end_line=8,
             )
         ],
         types=[],
         constants=[],
         docstring=None,
         lines_total=15,
-        lines_code=12
+        lines_code=12,
     )
-    
+
     return ProjectInfo(
         name="test_project",
         root_path="/test",
@@ -325,7 +324,7 @@ def sample_project_model():
         similar_functions={},
         total_files=2,
         total_lines=25,
-        generated_at="2026-01-03T12:00:00Z"
+        generated_at="2026-01-03T12:00:00Z",
     )
 
 
@@ -337,7 +336,7 @@ def mock_llm_config():
         "model": "test-model",
         "api_key": "test-key",
         "temperature": 0.7,
-        "max_tokens": 1000
+        "max_tokens": 1000,
     }
 
 
@@ -355,13 +354,13 @@ def sample_analysis_result():
         similar_functions={},
         total_files=0,
         total_lines=0,
-        generated_at="2026-01-03T12:00:00Z"
+        generated_at="2026-01-03T12:00:00Z",
     )
-    
+
     return {
         "project": project,
         "analysis_time": 1.5,
         "parser_used": "tree_sitter",
         "errors": [],
-        "warnings": ["Minor warning"]
+        "warnings": ["Minor warning"],
     }

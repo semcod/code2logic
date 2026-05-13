@@ -4,8 +4,6 @@
 
 [← README](../README.md) | [← Index](00-index.md) | [Configuration →](02-configuration.md)
 
-## Installation
-
 ### From PyPI
 
 ```bash
@@ -25,9 +23,6 @@ poetry install -E full
 make install-full
 ```
 
-### With Optional Dependencies
-
-```bash
 # All optional dependencies (recommended)
 pip install code2logic[full]
 
@@ -35,11 +30,6 @@ pip install code2logic[full]
 poetry install --with dev -E full
 ```
 
-## Quick Start
-
-### CLI Usage
-
-```bash
 # Basic analysis (Markdown output)
 code2logic /path/to/project
 
@@ -86,11 +76,6 @@ for module in project.modules:
 | Gherkin | `-f gherkin` | LLM code gen (95%) |
 | Compact | `-f compact` | Quick overview |
 
-## LLM Integration
-
-### With Ollama (Local, Free)
-
-```bash
 # Install Ollama
 curl -fsSL https://ollama.com/install.sh | sh
 
@@ -101,9 +86,6 @@ ollama pull qwen2.5-coder:7b
 code2logic ./my_project -f gherkin | ollama run qwen2.5-coder:7b "Review this"
 ```
 
-### With OpenRouter (Cloud)
-
-```bash
 # Set API key
 export OPENROUTER_API_KEY="sk-or-v1-your-key"
 
@@ -111,20 +93,12 @@ export OPENROUTER_API_KEY="sk-or-v1-your-key"
 python examples/15_unified_benchmark.py --type file --file ./my_project/some_file.py
 ```
 
-## Configuration
-
-### Environment Variables
-
-```bash
 # Set in shell
 export OPENROUTER_API_KEY="sk-or-v1-..."
 export OLLAMA_HOST="http://localhost:11434"
 
 # Or create .env file
 cp .env.example .env
-# Edit .env with your keys
-```
-
 ### Makefile Commands
 
 ```bash

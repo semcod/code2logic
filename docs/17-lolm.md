@@ -1,5 +1,3 @@
-# LOLM - Lightweight Orchestrated LLM Manager
-
 ## Overview
 
 `lolm` is a reusable LLM configuration and management package that provides:
@@ -17,11 +15,6 @@ The package is included with code2logic:
 pip install code2logic
 ```
 
-## Quick Start
-
-### CLI Usage
-
-```bash
 # Show provider status
 python -m lolm status
 
@@ -69,8 +62,6 @@ response = manager.generate_with_fallback(
 )
 ```
 
-## Configuration
-
 ### Environment Variables
 
 Create a `.env` file in your project root:
@@ -80,9 +71,6 @@ Create a `.env` file in your project root:
 OPENROUTER_API_KEY=sk-or-v1-...
 GROQ_API_KEY=gsk_...
 TOGETHER_API_KEY=...
-
-# Default provider (auto, openrouter, ollama, groq, together, litellm)
-LLM_PROVIDER=auto
 
 # Model overrides
 OPENROUTER_MODEL=nvidia/nemotron-3-nano-30b-a3b:free
@@ -196,8 +184,6 @@ result = generator.generate('out/logic2code/generated_code/')
 
 ```
 $ python -m lolm status
-
-## 🤖 LLM Configuration
 
 ## LLM Provider Status
 

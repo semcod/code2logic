@@ -66,8 +66,6 @@ Each format captures different levels of detail:
 | Hybrid | ✓ | ✓ | ✓ | ✓ | ~85% |
 | Ideal | ✓ | ✓ | ✓ | ✓ | ~90% |
 
-## Language-Specific Recommendations
-
 ### Python
 
 - Add `dataclasses` section with fields
@@ -93,12 +91,6 @@ Each format captures different levels of detail:
 
 - Add `traits` section (critical for this language)
 - Ensure all signatures have type annotations
-
-## Running Reproduction Tests
-
-```bash
-# Run the project analysis script
-bash project.sh
 
 # Or run individual format tests
 code2logic . -f yaml -o out/code2logic/project.c2l.yaml

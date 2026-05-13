@@ -21,6 +21,7 @@ import time
 # Load .env file
 try:
     from dotenv import load_dotenv
+
     load_dotenv()
 except ImportError:
     pass
@@ -45,6 +46,7 @@ from .reproduction import compare_code, extract_code_block, generate_file_gherki
 @dataclass
 class FormatResult:
     """Result for a single format test."""
+
     format_name: str
     spec_chars: int
     spec_tokens: int
@@ -60,6 +62,7 @@ class FormatResult:
 @dataclass
 class BenchmarkResult:
     """Complete benchmark result."""
+
     source_file: str
     source_chars: int
     source_classes: int
@@ -73,7 +76,7 @@ class BenchmarkResult:
 
 # Prompts optimized for each format
 FORMAT_PROMPTS = {
-    'gherkin': """Generate Python code from this Gherkin/BDD specification.
+    "gherkin": """Generate Python code from this Gherkin/BDD specification.
 The specification describes dataclasses, classes, and functions.
 Generate ONLY the Python code, wrapped in ```python ... ``` blocks.
 
@@ -84,8 +87,7 @@ Rules:
 2. Include all attributes with correct types
 3. Include default values where specified
 4. Add docstrings to all classes""",
-
-    'csv': """Generate Python code from this CSV analysis.
+    "csv": """Generate Python code from this CSV analysis.
 Each row describes a code element (class, function, attribute).
 Generate ONLY the Python code, wrapped in ```python ... ``` blocks.
 
@@ -96,8 +98,7 @@ Rules:
 2. Add attributes based on rows with type='attribute'
 3. Add methods based on rows with type='method'
 4. Include proper type hints""",
-
-    'json': """Generate Python code from this JSON structure analysis.
+    "json": """Generate Python code from this JSON structure analysis.
 Generate ONLY the Python code, wrapped in ```python ... ``` blocks.
 
 {spec}
@@ -107,8 +108,7 @@ Rules:
 2. Add all attributes with their types
 3. Add all methods with their signatures
 4. Use dataclasses where appropriate""",
-
-    'yaml': """Generate Python code from this YAML structure analysis.
+    "yaml": """Generate Python code from this YAML structure analysis.
 Generate ONLY the Python code, wrapped in ```python ... ``` blocks.
 
 {spec}
@@ -118,8 +118,7 @@ Rules:
 2. Use proper Python type hints
 3. Add docstrings based on descriptions
 4. Use dataclasses for data containers""",
-
-    'markdown': """Generate Python code from this Markdown documentation.
+    "markdown": """Generate Python code from this Markdown documentation.
 Generate ONLY the Python code, wrapped in ```python ... ``` blocks.
 
 {spec}
@@ -143,14 +142,16 @@ class ReproductionBenchmark:
         """
         self.client = client or get_client()
         self.generators = {
-            'gherkin': GherkinGenerator(),
-            'csv': CSVGenerator(),
-            'json': JSONGenerator(),
-            'yaml': YAMLGenerator(),
-            'markdown': MarkdownGenerator(),
+            "gherkin": GherkinGenerator(),
+            "csv": CSVGenerator(),
+            "json": JSONGenerator(),
+            "yaml": YAMLGenerator(),
+            "markdown": MarkdownGenerator(),
         }
 
-    def generate_spec(self, file_path: Path, format_name: str, detail: str = 'full') -> str:
+    def generate_spec(
+        self, file_path: Path, format_name: str, detail: str = "full"
+    ) -> str:
         """Generate specification in given format.
 
         Args:
@@ -162,13 +163,13 @@ class ReproductionBenchmark:
             Specification string
         """
         # Use file-specific generators for better reproduction
-        if format_name == 'gherkin':
+        if format_name == "gherkin":
             return generate_file_gherkin(file_path)
-        elif format_name == 'csv':
+        elif format_name == "csv":
             return generate_file_csv(file_path)
-        elif format_name == 'json':
+        elif format_name == "json":
             return generate_file_json(file_path)
-        elif format_name == 'yaml':
+        elif format_name == "yaml":
             return generate_file_yaml(file_path)
 
         # For markdown, use project-level analysis
@@ -206,7 +207,7 @@ class ReproductionBenchmark:
                 spec = spec[:max_spec] + "\n... (truncated)"
 
             # Generate code from spec
-            prompt = FORMAT_PROMPTS.get(format_name, FORMAT_PROMPTS['gherkin'])
+            prompt = FORMAT_PROMPTS.get(format_name, FORMAT_PROMPTS["gherkin"])
             prompt = prompt.format(spec=spec)
 
             system = "You are an expert Python developer. Generate clean, production-ready code."
@@ -218,18 +219,18 @@ class ReproductionBenchmark:
             comparison = compare_code(original_code, generated)
 
             # Check structural elements
-            orig_classes = original_code.count('class ')
-            gen_classes = generated.count('class ')
-            orig_funcs = original_code.count('def ')
-            gen_funcs = generated.count('def ')
+            orig_classes = original_code.count("class ")
+            gen_classes = generated.count("class ")
+            orig_funcs = original_code.count("def ")
+            gen_funcs = generated.count("def ")
 
             return FormatResult(
                 format_name=format_name,
                 spec_chars=spec_chars,
                 spec_tokens=spec_tokens,
                 generated_chars=len(generated),
-                similarity=comparison['similarity_percent'],
-                structural_score=comparison['structural_score'],
+                similarity=comparison["similarity_percent"],
+                structural_score=comparison["structural_score"],
                 classes_match=(orig_classes == gen_classes),
                 functions_match=(orig_funcs == gen_funcs),
                 generation_time=time.time() - start_time,
@@ -265,8 +266,8 @@ class ReproductionBenchmark:
         formats = formats or list(self.generators.keys())
 
         # Count source elements
-        source_classes = original_code.count('class ')
-        source_functions = original_code.count('def ')
+        source_classes = original_code.count("class ")
+        source_functions = original_code.count("def ")
 
         results = []
         for fmt in formats:
@@ -295,7 +296,7 @@ class ReproductionBenchmark:
             source_classes=source_classes,
             source_functions=source_functions,
             timestamp=datetime.now().isoformat(),
-            model=getattr(self.client, 'model', 'unknown'),
+            model=getattr(self.client, "model", "unknown"),
             formats=results,
             best_format=best_format,
             best_similarity=best_similarity,
@@ -313,9 +314,9 @@ class ReproductionBenchmark:
         """
         all_results = []
 
-        print("="*60)
+        print("=" * 60)
         print("REPRODUCTION BENCHMARK")
-        print("="*60)
+        print("=" * 60)
 
         for file_path in files:
             print(f"\nBenchmarking: {file_path}")
@@ -330,8 +331,8 @@ class ReproductionBenchmark:
             self._save_results(Path(output_dir), all_results, summary)
 
         return {
-            'results': [asdict(r) for r in all_results],
-            'summary': summary,
+            "results": [asdict(r) for r in all_results],
+            "summary": summary,
         }
 
     def _generate_summary(self, results: List[BenchmarkResult]) -> Dict[str, Any]:
@@ -350,29 +351,33 @@ class ReproductionBenchmark:
             for fmt, scores in format_scores.items()
         }
 
-        best_format = max(avg_scores.items(), key=lambda x: x[1])[0] if avg_scores else "none"
+        best_format = (
+            max(avg_scores.items(), key=lambda x: x[1])[0] if avg_scores else "none"
+        )
 
         return {
-            'total_files': len(results),
-            'average_by_format': avg_scores,
-            'best_format': best_format,
-            'best_average': avg_scores.get(best_format, 0),
+            "total_files": len(results),
+            "average_by_format": avg_scores,
+            "best_format": best_format,
+            "best_average": avg_scores.get(best_format, 0),
         }
 
-    def _save_results(self, output_dir: Path, results: List[BenchmarkResult], summary: Dict):
+    def _save_results(
+        self, output_dir: Path, results: List[BenchmarkResult], summary: Dict
+    ):
         """Save benchmark results."""
         output_dir.mkdir(parents=True, exist_ok=True)
 
         # Save JSON results
         data = {
-            'results': [asdict(r) for r in results],
-            'summary': summary,
+            "results": [asdict(r) for r in results],
+            "summary": summary,
         }
-        (output_dir / 'benchmark_results.json').write_text(json.dumps(data, indent=2))
+        (output_dir / "benchmark_results.json").write_text(json.dumps(data, indent=2))
 
         # Generate markdown report
         report = self._generate_report(results, summary)
-        (output_dir / 'BENCHMARK_REPORT.md').write_text(report)
+        (output_dir / "BENCHMARK_REPORT.md").write_text(report)
 
         print(f"\nResults saved to: {output_dir}")
 
@@ -394,7 +399,9 @@ class ReproductionBenchmark:
             "|--------|----------------|",
         ]
 
-        for fmt, score in sorted(summary['average_by_format'].items(), key=lambda x: -x[1]):
+        for fmt, score in sorted(
+            summary["average_by_format"].items(), key=lambda x: -x[1]
+        ):
             lines.append(f"| {fmt} | {score:.1f}% |")
 
         lines.extend(["", "## Detailed Results", ""])
@@ -404,7 +411,9 @@ class ReproductionBenchmark:
             lines.append("")
             lines.append(f"- **Classes:** {result.source_classes}")
             lines.append(f"- **Functions:** {result.source_functions}")
-            lines.append(f"- **Best:** {result.best_format} ({result.best_similarity:.1f}%)")
+            lines.append(
+                f"- **Best:** {result.best_format} ({result.best_similarity:.1f}%)"
+            )
             lines.append("")
             lines.append("| Format | Similarity | Structural | Classes | Functions |")
             lines.append("|--------|------------|------------|---------|-----------|")
@@ -422,7 +431,7 @@ class ReproductionBenchmark:
 
             lines.append("")
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
 
 def run_benchmark(

@@ -10,8 +10,6 @@ Generate LLM context for your project:
 code2flow llm-context /path/to/project -o ./context.md
 ```
 
-## Example LLM Queries
-
 ### 1. Architecture Understanding
 
 **Query:**
@@ -109,8 +107,6 @@ Generate documentation for the [module] module including usage examples.
 - Usage examples
 - Integration patterns
 
-## Best Practices
-
 ### 1. Context Size Management
 
 The LLM context is optimized for size:
@@ -140,8 +136,6 @@ here's the actual code: [code snippet]
 
 Can you suggest improvements?
 ```
-
-## Advanced Usage
 
 ### Custom Queries
 
@@ -187,8 +181,6 @@ curl -X POST https://api.openai.com/v1/chat/completions \
   }'
 ```
 
-## Tips for Effective Queries
-
 ### 1. Be Specific
 
 ❌ **Vague:** "Tell me about this code"
@@ -227,8 +219,6 @@ Traceback shows it's in pipeline_runner.execute_action
 What could be causing this?
 ```
 
-## Troubleshooting
-
 ### Context Too Long
 
 If context exceeds LLM limits:
@@ -253,9 +243,6 @@ If LLM gives incorrect responses:
 2. Include actual code snippets alongside context
 3. Break complex queries into simpler steps
 
-## Example Session
-
-```bash
 # Generate context
 $ code2flow llm-context ../src/nlp2cmd -o context.md -v
 Generating LLM context for: ../src/nlp2cmd
@@ -279,8 +266,6 @@ The codebase follows several architectural patterns:
 3. **Pipeline Pattern**: The pipeline_runner modules process actions
    through sequential stages...
 ```
-
-## Integration Examples
 
 ### With VS Code
 

@@ -6,14 +6,13 @@ can accurately reproduce data model definitions.
 """
 
 from dataclasses import dataclass, field
-from typing import Optional, List, Dict
-from datetime import datetime
+from typing import List, Dict
 
 
 @dataclass
 class User:
     """Represents a user in the system.
-    
+
     Attributes:
         id: Unique user identifier
         name: User's full name
@@ -21,6 +20,7 @@ class User:
         is_active: Whether user is active
         created_at: Account creation timestamp
     """
+
     id: int
     name: str
     email: str
@@ -31,7 +31,7 @@ class User:
 @dataclass
 class Product:
     """Represents a product in the catalog.
-    
+
     Attributes:
         sku: Stock keeping unit
         name: Product name
@@ -39,6 +39,7 @@ class Product:
         quantity: Available quantity
         tags: List of product tags
     """
+
     sku: str
     name: str
     price: int
@@ -49,7 +50,7 @@ class Product:
 @dataclass
 class Order:
     """Represents a customer order.
-    
+
     Attributes:
         order_id: Unique order identifier
         user_id: ID of the ordering user
@@ -58,6 +59,7 @@ class Order:
         status: Order status
         metadata: Additional order data
     """
+
     order_id: str
     user_id: int
     items: List[str]
@@ -69,13 +71,14 @@ class Order:
 @dataclass
 class Address:
     """Represents a shipping address.
-    
+
     Attributes:
         street: Street address
         city: City name
         country: Country code
         postal_code: Postal/ZIP code
     """
+
     street: str
     city: str
     country: str

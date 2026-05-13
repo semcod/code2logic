@@ -10,8 +10,6 @@ This document focuses on running Code2Logic benchmarks **with an LLM enabled**, 
 - **High scores are not proof of runtime equivalence.** Runtime equivalence is validated only by tests / behavioral checks.
 - `--no-llm` is a **pipeline/sanity mode** (template fallback), not meaningful for comparing LLM quality.
 
-## Key artifacts
-
 ### `project.toon`
 
 Project-level TOON (structure of modules/classes/functions). Good for “big picture”.
@@ -26,8 +24,6 @@ code2logic ./ -f toon --compact --no-repeat-module \
 ```
 
 Schema (optional): `function-schema.json`.
-
-## Quickstart: run the repo benchmarks
 
 ### Offline (no API calls)
 
@@ -85,8 +81,6 @@ python examples/15_unified_benchmark.py \
   --provider litellm \
   --model anthropic/claude-3.5-sonnet
 ```
-
-## Speed & cost knobs
 
 ### Concurrency
 

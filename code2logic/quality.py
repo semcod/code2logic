@@ -13,6 +13,7 @@ from .models import ModuleInfo, ProjectInfo
 @dataclass
 class QualityIssue:
     """Represents a code quality issue."""
+
     type: str
     severity: str  # 'high', 'medium', 'low'
     file: str
@@ -25,6 +26,7 @@ class QualityIssue:
 @dataclass
 class QualityReport:
     """Complete quality analysis report."""
+
     issues: List[QualityIssue] = field(default_factory=list)
     metrics: Dict[str, Any] = field(default_factory=dict)
     score: float = 100.0
@@ -32,21 +34,21 @@ class QualityReport:
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         return {
-            'score': self.score,
-            'issues_count': len(self.issues),
-            'issues': [
+            "score": self.score,
+            "issues_count": len(self.issues),
+            "issues": [
                 {
-                    'type': i.type,
-                    'severity': i.severity,
-                    'file': i.file,
-                    'name': i.name,
-                    'value': i.value,
-                    'threshold': i.threshold,
-                    'recommendation': i.recommendation,
+                    "type": i.type,
+                    "severity": i.severity,
+                    "file": i.file,
+                    "name": i.name,
+                    "value": i.value,
+                    "threshold": i.threshold,
+                    "recommendation": i.recommendation,
                 }
                 for i in self.issues
             ],
-            'metrics': self.metrics,
+            "metrics": self.metrics,
         }
 
 
@@ -63,10 +65,10 @@ class QualityAnalyzer:
     """
 
     DEFAULT_THRESHOLDS = {
-        'file_lines': 500,
-        'function_lines': 50,
-        'class_methods': 20,
-        'function_params': 7,
+        "file_lines": 500,
+        "function_lines": 50,
+        "class_methods": 20,
+        "function_params": 7,
     }
 
     def __init__(self, thresholds: Dict[str, int] = None):
@@ -87,10 +89,10 @@ class QualityAnalyzer:
         """
         report = QualityReport()
         report.metrics = {
-            'total_files': project.total_files,
-            'total_lines': project.total_lines,
-            'total_classes': sum(len(m.classes) for m in project.modules),
-            'total_functions': sum(len(m.functions) for m in project.modules),
+            "total_files": project.total_files,
+            "total_lines": project.total_lines,
+            "total_classes": sum(len(m.classes) for m in project.modules),
+            "total_functions": sum(len(m.functions) for m in project.modules),
         }
 
         for module in project.modules:
@@ -98,9 +100,9 @@ class QualityAnalyzer:
 
         # Calculate score (deduct points for issues)
         deductions = {
-            'high': 10,
-            'medium': 5,
-            'low': 2,
+            "high": 10,
+            "medium": 5,
+            "low": 2,
         }
         for issue in report.issues:
             report.score -= deductions.get(issue.severity, 0)
@@ -112,17 +114,17 @@ class QualityAnalyzer:
         """Analyze a list of modules."""
         report = QualityReport()
         report.metrics = {
-            'total_files': len(modules),
-            'total_lines': sum(m.lines_total for m in modules),
-            'total_classes': sum(len(m.classes) for m in modules),
-            'total_functions': sum(len(m.functions) for m in modules),
+            "total_files": len(modules),
+            "total_lines": sum(m.lines_total for m in modules),
+            "total_classes": sum(len(m.classes) for m in modules),
+            "total_functions": sum(len(m.functions) for m in modules),
         }
 
         for module in modules:
             self._analyze_module(module, report)
 
         # Calculate score
-        deductions = {'high': 10, 'medium': 5, 'low': 2}
+        deductions = {"high": 10, "medium": 5, "low": 2}
         for issue in report.issues:
             report.score -= deductions.get(issue.severity, 0)
         report.score = max(0, report.score)
@@ -132,17 +134,23 @@ class QualityAnalyzer:
     def _analyze_module(self, module: ModuleInfo, report: QualityReport):
         """Analyze a single module."""
         # Check file length
-        if module.lines_total > self.thresholds['file_lines']:
-            severity = 'high' if module.lines_total > self.thresholds['file_lines'] * 2 else 'medium'
-            report.issues.append(QualityIssue(
-                type='long_file',
-                severity=severity,
-                file=module.path,
-                name=module.path,
-                value=module.lines_total,
-                threshold=self.thresholds['file_lines'],
-                recommendation=self._get_file_recommendation(module),
-            ))
+        if module.lines_total > self.thresholds["file_lines"]:
+            severity = (
+                "high"
+                if module.lines_total > self.thresholds["file_lines"] * 2
+                else "medium"
+            )
+            report.issues.append(
+                QualityIssue(
+                    type="long_file",
+                    severity=severity,
+                    file=module.path,
+                    name=module.path,
+                    value=module.lines_total,
+                    threshold=self.thresholds["file_lines"],
+                    recommendation=self._get_file_recommendation(module),
+                )
+            )
 
         # Check functions
         for func in module.functions:
@@ -155,43 +163,53 @@ class QualityAnalyzer:
     def _check_function(self, func, file_path: str, report: QualityReport):
         """Check function quality."""
         # Long function
-        if func.lines > self.thresholds['function_lines']:
-            severity = 'high' if func.lines > self.thresholds['function_lines'] * 2 else 'medium'
-            report.issues.append(QualityIssue(
-                type='long_function',
-                severity=severity,
-                file=file_path,
-                name=func.name,
-                value=func.lines,
-                threshold=self.thresholds['function_lines'],
-                recommendation=f"Split '{func.name}' into smaller functions. Consider extracting logical blocks into separate helpers.",
-            ))
+        if func.lines > self.thresholds["function_lines"]:
+            severity = (
+                "high"
+                if func.lines > self.thresholds["function_lines"] * 2
+                else "medium"
+            )
+            report.issues.append(
+                QualityIssue(
+                    type="long_function",
+                    severity=severity,
+                    file=file_path,
+                    name=func.name,
+                    value=func.lines,
+                    threshold=self.thresholds["function_lines"],
+                    recommendation=f"Split '{func.name}' into smaller functions. Consider extracting logical blocks into separate helpers.",
+                )
+            )
 
         # Too many parameters
-        if len(func.params) > self.thresholds['function_params']:
-            report.issues.append(QualityIssue(
-                type='many_parameters',
-                severity='medium',
-                file=file_path,
-                name=func.name,
-                value=len(func.params),
-                threshold=self.thresholds['function_params'],
-                recommendation=f"Reduce parameters in '{func.name}'. Consider using a config object or dataclass.",
-            ))
+        if len(func.params) > self.thresholds["function_params"]:
+            report.issues.append(
+                QualityIssue(
+                    type="many_parameters",
+                    severity="medium",
+                    file=file_path,
+                    name=func.name,
+                    value=len(func.params),
+                    threshold=self.thresholds["function_params"],
+                    recommendation=f"Reduce parameters in '{func.name}'. Consider using a config object or dataclass.",
+                )
+            )
 
     def _check_class(self, cls, file_path: str, report: QualityReport):
         """Check class quality."""
         # Too many methods
-        if len(cls.methods) > self.thresholds['class_methods']:
-            report.issues.append(QualityIssue(
-                type='large_class',
-                severity='medium',
-                file=file_path,
-                name=cls.name,
-                value=len(cls.methods),
-                threshold=self.thresholds['class_methods'],
-                recommendation=f"Class '{cls.name}' has too many methods. Consider splitting into smaller classes or using composition.",
-            ))
+        if len(cls.methods) > self.thresholds["class_methods"]:
+            report.issues.append(
+                QualityIssue(
+                    type="large_class",
+                    severity="medium",
+                    file=file_path,
+                    name=cls.name,
+                    value=len(cls.methods),
+                    threshold=self.thresholds["class_methods"],
+                    recommendation=f"Class '{cls.name}' has too many methods. Consider splitting into smaller classes or using composition.",
+                )
+            )
 
         # Check each method
         for method in cls.methods:
@@ -210,7 +228,9 @@ class QualityAnalyzer:
             return "Consider breaking this file into smaller, focused modules."
 
 
-def analyze_quality(project: ProjectInfo, thresholds: Dict[str, int] = None) -> QualityReport:
+def analyze_quality(
+    project: ProjectInfo, thresholds: Dict[str, int] = None
+) -> QualityReport:
     """
     Convenience function to analyze project quality.
 
@@ -243,9 +263,9 @@ def get_quality_summary(report: QualityReport) -> str:
 
     if report.issues:
         lines.append("Issues by Severity:")
-        high = sum(1 for i in report.issues if i.severity == 'high')
-        medium = sum(1 for i in report.issues if i.severity == 'medium')
-        low = sum(1 for i in report.issues if i.severity == 'low')
+        high = sum(1 for i in report.issues if i.severity == "high")
+        medium = sum(1 for i in report.issues if i.severity == "medium")
+        low = sum(1 for i in report.issues if i.severity == "low")
 
         if high:
             lines.append(f"  🔴 High: {high}")

@@ -24,6 +24,7 @@ from typing import Dict, List, Optional, Set
 # Load .env
 try:
     from dotenv import load_dotenv
+
     load_dotenv()
 except ImportError:
     pass
@@ -37,21 +38,22 @@ from .universal import (
 
 # Supported file extensions
 SUPPORTED_EXTENSIONS = {
-    '.py': Language.PYTHON,
-    '.js': Language.JAVASCRIPT,
-    '.ts': Language.TYPESCRIPT,
-    '.tsx': Language.TYPESCRIPT,
-    '.go': Language.GO,
-    '.rs': Language.RUST,
-    '.java': Language.JAVA,
-    '.sql': Language.SQL,
-    '.cs': Language.CSHARP,
+    ".py": Language.PYTHON,
+    ".js": Language.JAVASCRIPT,
+    ".ts": Language.TYPESCRIPT,
+    ".tsx": Language.TYPESCRIPT,
+    ".go": Language.GO,
+    ".rs": Language.RUST,
+    ".java": Language.JAVA,
+    ".sql": Language.SQL,
+    ".cs": Language.CSHARP,
 }
 
 
 @dataclass
 class FileResult:
     """Result for a single file reproduction."""
+
     file_path: str
     language: str
     source_chars: int
@@ -67,6 +69,7 @@ class FileResult:
 @dataclass
 class ProjectResult:
     """Result for project reproduction."""
+
     project_path: str
     total_files: int
     successful_files: int
@@ -131,14 +134,20 @@ class ProjectReproducer:
         """
         extensions = extensions or set(SUPPORTED_EXTENSIONS.keys())
         exclude_patterns = exclude_patterns or [
-            '__pycache__', 'node_modules', '.git', 'venv',
-            'dist', 'build', '.tox', '.pytest_cache'
+            "__pycache__",
+            "node_modules",
+            ".git",
+            "venv",
+            "dist",
+            "build",
+            ".tox",
+            ".pytest_cache",
         ]
 
         files = []
         root = Path(project_path)
 
-        for path in root.rglob('*'):
+        for path in root.rglob("*"):
             if not path.is_file():
                 continue
 
@@ -182,13 +191,13 @@ class ProjectReproducer:
 
             return FileResult(
                 file_path=str(file_path),
-                language=result['source_language'],
-                source_chars=result['source_chars'],
-                logic_chars=result['logic_chars'],
-                generated_chars=result['generated_chars'],
-                compression=result['compression_ratio'],
-                similarity=result['similarity'],
-                structural=result['structural_score'],
+                language=result["source_language"],
+                source_chars=result["source_chars"],
+                logic_chars=result["logic_chars"],
+                generated_chars=result["generated_chars"],
+                compression=result["compression_ratio"],
+                similarity=result["similarity"],
+                structural=result["structural_score"],
                 success=True,
             )
 
@@ -283,15 +292,14 @@ class ProjectReproducer:
 
         avg_compression = (
             sum(r.compression for r in successful) / len(successful)
-            if successful else 0
+            if successful
+            else 0
         )
         avg_similarity = (
-            sum(r.similarity for r in successful) / len(successful)
-            if successful else 0
+            sum(r.similarity for r in successful) / len(successful) if successful else 0
         )
         avg_structural = (
-            sum(r.structural for r in successful) / len(successful)
-            if successful else 0
+            sum(r.structural for r in successful) / len(successful) if successful else 0
         )
 
         # Group by language
@@ -300,17 +308,17 @@ class ProjectReproducer:
             lang = r.language
             if lang not in by_language:
                 by_language[lang] = {
-                    'count': 0,
-                    'similarity': 0,
-                    'structural': 0,
+                    "count": 0,
+                    "similarity": 0,
+                    "structural": 0,
                 }
-            by_language[lang]['count'] += 1
-            by_language[lang]['similarity'] += r.similarity
-            by_language[lang]['structural'] += r.structural
+            by_language[lang]["count"] += 1
+            by_language[lang]["similarity"] += r.similarity
+            by_language[lang]["structural"] += r.structural
 
         for _lang, data in by_language.items():
-            data['similarity'] /= data['count']
-            data['structural'] /= data['count']
+            data["similarity"] /= data["count"]
+            data["structural"] /= data["count"]
 
         return ProjectResult(
             project_path=project_path,
@@ -331,12 +339,12 @@ class ProjectReproducer:
         """Save project reproduction report."""
         # JSON data
         data = asdict(result)
-        (output_dir / 'project_results.json').write_text(json.dumps(data, indent=2))
+        (output_dir / "project_results.json").write_text(json.dumps(data, indent=2))
 
         # Markdown report
         report = f"""# Project Reproduction Report
 
-> Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}
+> Generated: {datetime.now().strftime("%Y-%m-%d %H:%M")}
 > Project: {result.project_path}
 
 ## Summary
@@ -370,7 +378,7 @@ class ProjectReproducer:
             status = "✓" if f.success else "✗"
             report += f"| {status} {Path(f.file_path).name} | {f.language} | {f.similarity:.1f}% | {f.structural:.1f}% | {f.compression:.2f}x |\n"
 
-        (output_dir / 'PROJECT_REPORT.md').write_text(report)
+        (output_dir / "PROJECT_REPORT.md").write_text(report)
         print(f"\nReport saved to: {output_dir}/PROJECT_REPORT.md")
 
 

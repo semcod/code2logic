@@ -14,6 +14,7 @@ from .models import DependencyNode, ModuleInfo
 NETWORKX_AVAILABLE = False
 try:
     import networkx as nx
+
     NETWORKX_AVAILABLE = True
 except ImportError:
     nx = None
@@ -68,12 +69,15 @@ class DependencyAnalyzer:
         for module in modules:
             deps: set = set()
             for imp in module.imports:
-                imp_clean = imp.replace('/', '.').replace('\\', '.').lstrip('.')
-                parts = imp_clean.split('.')
+                imp_clean = imp.replace("/", ".").replace("\\", ".").lstrip(".")
+                parts = imp_clean.split(".")
 
                 for i in range(len(parts), 0, -1):
-                    candidate = '.'.join(parts[:i])
-                    if candidate in module_names and module_names[candidate] != module.path:
+                    candidate = ".".join(parts[:i])
+                    if (
+                        candidate in module_names
+                        and module_names[candidate] != module.path
+                    ):
                         deps.add(module_names[candidate])
                         break
 
@@ -122,7 +126,7 @@ class DependencyAnalyzer:
                 out_degree=out_deg.get(node, 0),
                 pagerank=pagerank.get(node, 0.0),
                 is_hub=pagerank.get(node, 0) > avg_pr * 2,
-                cluster=clusters.get(node, 0)
+                cluster=clusters.get(node, 0),
             )
 
         return metrics
@@ -200,10 +204,10 @@ class DependencyAnalyzer:
 
     def _module_name(self, path: str) -> str:
         """Convert file path to module name."""
-        name = path.replace('/', '.').replace('\\', '.')
-        for ext in ['.py', '.js', '.ts', '.jsx', '.tsx']:
+        name = path.replace("/", ".").replace("\\", ".")
+        for ext in [".py", ".js", ".ts", ".jsx", ".tsx"]:
             if name.endswith(ext):
-                name = name[:-len(ext)]
+                name = name[: -len(ext)]
         return name
 
     def get_dependency_depth(self, module_path: str) -> int:

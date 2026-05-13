@@ -11,5 +11,5 @@ try:
 except ImportError:
     from code2logic.cli import main
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -4,60 +4,59 @@ Implementation executor for the refactoring plan.
 """
 
 import yaml
-import json
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Dict, List
 from datetime import datetime
 import shutil
 
 
 class RefactoringImplementationExecutor:
     """Execute the actual refactoring implementation."""
-    
+
     def __init__(self, base_path: str):
         self.base_path = Path(base_path)
         self.implementation_log = []
-        self.backup_dir = self.base_path / 'backups'
-        
+        self.backup_dir = self.base_path / "backups"
+
     def execute_implementation(self):
         """Execute the refactoring implementation."""
-        
+
         print("🔨 EXECUTING REFACTORING IMPLEMENTATION")
         print("=" * 60)
-        
+
         # Create backup
         self._create_backup()
-        
+
         # Load refactoring plan
         refactoring_plan = self._load_refactoring_plan()
-        
+
         # Execute phase 1: Critical refactoring
         self._execute_phase_1(refactoring_plan)
-        
+
         # Execute phase 2: Standard improvements
         self._execute_phase_2(refactoring_plan)
-        
+
         # Generate implementation report
         self._generate_implementation_report()
-        
+
         print("\n🎉 REFACTORING IMPLEMENTATION COMPLETE!")
-    
+
     def _create_backup(self):
         """Create backup of original files."""
-        
+
         print("📦 Creating backup...")
-        
+
         self.backup_dir.mkdir(exist_ok=True)
-        
+
         # Backup key files
         files_to_backup = [
-            'pipeline_runner.py',
-            'pipeline_runner_utils.py',
-            'src/nlp2cmd/',
-            'src/generation/',
-            'src/automation/'
+            "pipeline_runner.py",
+            "pipeline_runner_utils.py",
+            "src/nlp2cmd/",
+            "src/generation/",
+            "src/automation/",
         ]
-        
+
         for file_path in files_to_backup:
             src_path = self.base_path / file_path
             if src_path.exists():
@@ -71,97 +70,101 @@ class RefactoringImplementationExecutor:
                         shutil.rmtree(dst_path)
                     shutil.copytree(src_path, dst_path)
                     print(f"  ✅ Backed up directory: {file_path}")
-        
+
         print(f"💾 Backup created in: {self.backup_dir}")
-    
+
     def _load_refactoring_plan(self) -> Dict:
         """Load refactoring plan from report."""
-        
-        report_path = self.base_path / 'output_hybrid/llm_refactoring_report.yaml'
-        
+
+        report_path = self.base_path / "output_hybrid/llm_refactoring_report.yaml"
+
         if not report_path.exists():
             raise FileNotFoundError(f"Refactoring report not found: {report_path}")
-        
-        with open(report_path, 'r') as f:
+
+        with open(report_path, "r") as f:
             report_data = yaml.safe_load(f)
-        
+
         return report_data
-    
+
     def _execute_phase_1(self, refactoring_plan: Dict):
         """Execute phase 1: Critical refactoring."""
-        
+
         print("\n🔧 PHASE 1: Critical Refactoring")
         print("-" * 40)
-        
-        successful_results = refactoring_plan.get('successful_results', [])
-        
+
+        successful_results = refactoring_plan.get("successful_results", [])
+
         for result in successful_results:
-            if result.get('function') == 'analyze_data_hubs_and_consolidation':
+            if result.get("function") == "analyze_data_hubs_and_consolidation":
                 self._execute_data_hubs_consolidation(result)
                 break
-    
+
     def _execute_phase_2(self, refactoring_plan: Dict):
         """Execute phase 2: Standard improvements."""
-        
+
         print("\n🔧 PHASE 2: Standard Improvements")
         print("-" * 40)
-        
+
         # Simulate standard improvements
         improvements = [
-            'Creating abstractions for high PageRank nodes',
-            'Consolidating similar data types',
-            'Extracting common functions',
-            'Optimizing data flow patterns'
+            "Creating abstractions for high PageRank nodes",
+            "Consolidating similar data types",
+            "Extracting common functions",
+            "Optimizing data flow patterns",
         ]
-        
+
         for improvement in improvements:
             print(f"  ✅ {improvement}")
-            self.implementation_log.append({
-                'phase': 2,
-                'action': improvement,
-                'status': 'completed',
-                'timestamp': datetime.now().isoformat()
-            })
-    
+            self.implementation_log.append(
+                {
+                    "phase": 2,
+                    "action": improvement,
+                    "status": "completed",
+                    "timestamp": datetime.now().isoformat(),
+                }
+            )
+
     def _execute_data_hubs_consolidation(self, result: Dict):
         """Execute data hubs consolidation."""
-        
+
         print("  🎯 Executing data hubs consolidation...")
-        
-        implementation_plan = result.get('implementation_plan', {})
-        phases = implementation_plan.get('phases', [])
-        
+
+        implementation_plan = result.get("implementation_plan", {})
+        phases = implementation_plan.get("phases", [])
+
         for phase in phases:
-            phase_name = phase.get('name', 'Unknown')
-            actions = phase.get('actions', [])
-            
+            phase_name = phase.get("name", "Unknown")
+            actions = phase.get("actions", [])
+
             print(f"    📋 {phase_name}:")
-            
+
             for action in actions:
-                action_desc = action.get('description', 'Unknown action')
-                action_type = action.get('type', 'general')
-                
+                action_desc = action.get("description", "Unknown action")
+                action_type = action.get("type", "general")
+
                 print(f"      ✅ {action_desc}")
-                
+
                 # Execute specific action
-                if 'pipeline_runner' in action_desc:
+                if "pipeline_runner" in action_desc:
                     self._execute_pipeline_runner_refactoring(action)
-                elif 'zredukuj' in action_desc.lower():
+                elif "zredukuj" in action_desc.lower():
                     self._execute_complexity_reduction(action)
                 else:
                     self._execute_general_refactoring(action)
-                
-                self.implementation_log.append({
-                    'phase': 1,
-                    'action': action_desc,
-                    'type': action_type,
-                    'status': 'completed',
-                    'timestamp': datetime.now().isoformat()
-                })
-    
+
+                self.implementation_log.append(
+                    {
+                        "phase": 1,
+                        "action": action_desc,
+                        "type": action_type,
+                        "status": "completed",
+                        "timestamp": datetime.now().isoformat(),
+                    }
+                )
+
     def _execute_pipeline_runner_refactoring(self, action: Dict):
         """Execute pipeline runner specific refactoring."""
-        
+
         # Create improved pipeline_runner_utils
         improved_utils = '''
 """
@@ -208,17 +211,17 @@ class ConsolidatedMarkdownWrapper:
 _MarkdownConsoleWrapper = ConsolidatedMarkdownWrapper()
 _debug = _MarkdownConsoleWrapper.print
 '''
-        
+
         # Write improved utils
-        utils_path = self.base_path / 'pipeline_runner_utils_improved.py'
-        with open(utils_path, 'w') as f:
+        utils_path = self.base_path / "pipeline_runner_utils_improved.py"
+        with open(utils_path, "w") as f:
             f.write(improved_utils)
-        
+
         print(f"        📝 Created improved utils: {utils_path}")
-    
+
     def _execute_complexity_reduction(self, action: Dict):
         """Execute complexity reduction."""
-        
+
         # Create complexity reduction examples
         reduction_examples = '''
 """
@@ -310,21 +313,21 @@ def create_consolidated_system():
     
     return processor, nodes
 '''
-        
+
         # Write complexity reduction examples
-        reduction_path = self.base_path / 'complexity_reduction_examples.py'
-        with open(reduction_path, 'w') as f:
+        reduction_path = self.base_path / "complexity_reduction_examples.py"
+        with open(reduction_path, "w") as f:
             f.write(reduction_examples)
-        
+
         print(f"        📝 Created complexity examples: {reduction_path}")
-    
+
     def _execute_general_refactoring(self, action: Dict):
         """Execute general refactoring action."""
-        
+
         # Create general refactoring template
         refactoring_template = f'''
 """
-General refactoring implementation for: {action.get('description', 'Unknown action')}
+General refactoring implementation for: {action.get("description", "Unknown action")}
 """
 
 from typing import Dict, List, Any
@@ -336,8 +339,8 @@ class RefactoredComponent:
     
     def __init__(self):
         self._logger = logging.getLogger(__name__)
-        self._data = {}
-        self._config = {}
+        self._data = {{}}
+        self._config = {{}}
     
     def execute(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
         """Execute refactored functionality."""
@@ -354,7 +357,7 @@ class RefactoredComponent:
     def _process_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Process input data with reduced complexity."""
         return {
-            'processed': True,
+            "processed": True,
             'original_keys': list(data.keys()),
             'data': data
         }
@@ -362,7 +365,7 @@ class RefactoredComponent:
     def _apply_business_logic(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Apply business logic."""
         return {
-            'success': True,
+            "success": True,
             'result': data,
             'timestamp': datetime.now().isoformat()
         }
@@ -375,7 +378,7 @@ class RefactoredComponent:
     def get_status(self) -> Dict[str, Any]:
         """Get component status."""
         return {
-            'configured': len(self._config) > 0,
+            "configured": len(self._config) > 0,
             'data_items': len(self._data),
             'config_keys': list(self._config.keys())
         }
@@ -391,93 +394,93 @@ def create_refactored_component(config: Dict[str, Any] = None) -> RefactoredComp
     
     return component
 '''
-        
+
         # Write general refactoring template
-        template_path = self.base_path / 'general_refactoring_template.py'
-        with open(template_path, 'w') as f:
+        template_path = self.base_path / "general_refactoring_template.py"
+        with open(template_path, "w") as f:
             f.write(refactoring_template)
-        
+
         print(f"        📝 Created refactoring template: {template_path}")
-    
+
     def _generate_implementation_report(self):
         """Generate implementation report."""
-        
+
         print("\n📊 GENERATING IMPLEMENTATION REPORT")
         print("-" * 40)
-        
+
         report = {
-            'implementation_date': datetime.now().isoformat(),
-            'backup_location': str(self.backup_dir),
-            'total_actions': len(self.implementation_log),
-            'phases_completed': 2,
-            'status': 'completed',
-            'actions_log': self.implementation_log,
-            'files_created': self._get_created_files(),
-            'next_steps': [
-                'Test refactored components',
-                'Validate functionality',
-                'Update documentation',
-                'Deploy to production'
-            ]
+            "implementation_date": datetime.now().isoformat(),
+            "backup_location": str(self.backup_dir),
+            "total_actions": len(self.implementation_log),
+            "phases_completed": 2,
+            "status": "completed",
+            "actions_log": self.implementation_log,
+            "files_created": self._get_created_files(),
+            "next_steps": [
+                "Test refactored components",
+                "Validate functionality",
+                "Update documentation",
+                "Deploy to production",
+            ],
         }
-        
+
         # Save report
-        report_path = self.base_path / 'refactoring_implementation_report.yaml'
-        with open(report_path, 'w') as f:
+        report_path = self.base_path / "refactoring_implementation_report.yaml"
+        with open(report_path, "w") as f:
             yaml.dump(report, f, default_flow_style=False, sort_keys=False)
-        
+
         print(f"💾 Implementation report saved: {report_path}")
-        
+
         # Display summary
-        print(f"\n📈 IMPLEMENTATION SUMMARY:")
+        print("\n📈 IMPLEMENTATION SUMMARY:")
         print(f"  • Total Actions: {report['total_actions']}")
         print(f"  • Phases Completed: {report['phases_completed']}")
         print(f"  • Status: {report['status']}")
         print(f"  • Files Created: {len(report['files_created'])}")
-        
-        print(f"\n📁 CREATED FILES:")
-        for file_path in report['files_created']:
+
+        print("\n📁 CREATED FILES:")
+        for file_path in report["files_created"]:
             print(f"  • {file_path}")
-        
-        print(f"\n🚀 NEXT STEPS:")
-        for step in report['next_steps']:
+
+        print("\n🚀 NEXT STEPS:")
+        for step in report["next_steps"]:
             print(f"  • {step}")
-    
+
     def _get_created_files(self) -> List[str]:
         """Get list of created files."""
-        
+
         created_files = []
-        
+
         # Check for common created files
         potential_files = [
-            'pipeline_runner_utils_improved.py',
-            'complexity_reduction_examples.py',
-            'general_refactoring_template.py'
+            "pipeline_runner_utils_improved.py",
+            "complexity_reduction_examples.py",
+            "general_refactoring_template.py",
         ]
-        
+
         for file_name in potential_files:
             file_path = self.base_path / file_name
             if file_path.exists():
                 created_files.append(file_name)
-        
+
         return created_files
 
 
 def main():
     """Main implementation function."""
-    
-    base_path = '.'
+
+    base_path = "."
     executor = RefactoringImplementationExecutor(base_path)
-    
+
     try:
         executor.execute_implementation()
-        
-        print(f"\n🎉 REFACTORING IMPLEMENTATION COMPLETE!")
-        print(f"Ready for testing and validation!")
-        
+
+        print("\n🎉 REFACTORING IMPLEMENTATION COMPLETE!")
+        print("Ready for testing and validation!")
+
     except Exception as e:
         print(f"❌ Error during implementation: {e}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -17,13 +17,13 @@ from .markdown_schema import MarkdownSchema, validate_markdown
 from .yaml_schema import YAMLSchema, validate_yaml
 
 __all__ = [
-    'YAMLSchema',
-    'LogicMLSchema',
-    'MarkdownSchema',
-    'JSONSchema',
-    'validate_yaml',
-    'validate_logicml',
-    'validate_markdown',
-    'validate_json',
-    'parse_json_spec',
+    "YAMLSchema",
+    "LogicMLSchema",
+    "MarkdownSchema",
+    "JSONSchema",
+    "validate_yaml",
+    "validate_logicml",
+    "validate_markdown",
+    "validate_json",
+    "parse_json_spec",
 ]

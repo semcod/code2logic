@@ -40,14 +40,6 @@ Test: 20 files from `tests/samples/`, model: `arcee-ai/trinity-large-preview`, d
 | **Hub-focused** | `toon --hybrid` | Project structure + function details for key modules |
 | **Typed signatures** | `logicml` (level=typed) | Full type hints in compact format |
 
-## Running Benchmarks
-
-### Unified Benchmark (recommended)
-
-```bash
-# Full benchmark suite
-make benchmark
-
 # Format benchmark only
 python examples/15_unified_benchmark.py \
   --type format \
@@ -73,10 +65,6 @@ python examples/behavioral_benchmark.py \
   --file tests/samples/sample_functions.py --verbose
 ```
 
-## Sample Output
-
-### YAML Format (95 lines)
-```yaml
 # sample_class.py | Calculator | 74 lines
 
 imports:
@@ -109,8 +97,6 @@ class Calculator:
         return result
 ```
 
-### LogicML Format (best compression)
-```yaml
 # sample_class.py | Calculator | 74 lines
 
 imports:
@@ -154,8 +140,6 @@ Feature: Calculator
 | `12_comprehensive_analysis.py` | Generated code quality analysis |
 | `13_project_benchmark.py` | Entire project structure testing |
 | `14_repeatability_test.py` | Code generation repeatability |
-
-## API Usage
 
 ### Using LogicML (best compression)
 
@@ -204,8 +188,6 @@ for name, spec in formats.items():
     print(f"{name}: {tokens} tokens, {len(spec)} chars")
 ```
 
-## Conclusions (February 2026)
-
 ### Key Findings
 
 1. **TOON wins on efficiency** — best score (63,8%) at 5.9x fewer tokens than JSON
@@ -233,17 +215,10 @@ For LLM integration:
 # OpenRouter (recommended)
 export OPENROUTER_API_KEY=your_key
 
-# Or Ollama (local)
-ollama serve
-```
-
 ## Repeatability Analysis
 
 Testing how consistent code generation is across multiple invocations.
 
-### Running Repeatability Test
-
-```bash
 # Test with 3 runs (default)
 python examples/14_repeatability_test.py \
   --file tests/samples/sample_class.py

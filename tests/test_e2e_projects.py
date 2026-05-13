@@ -36,7 +36,9 @@ def test_e2e_pipeline_code2logic_logic2test_logic2code(tmp_path: Path) -> None:
     assert logic_file.stat().st_size > 0
 
     tests_out = tmp_path / "generated_tests"
-    test_gen = Logic2TestGenerator(logic_file, config=Logic2TestGeneratorConfig(framework="pytest"))
+    test_gen = Logic2TestGenerator(
+        logic_file, config=Logic2TestGeneratorConfig(framework="pytest")
+    )
 
     unit_result = test_gen.generate_unit_tests(tests_out / "unit")
     assert not unit_result.errors
@@ -70,11 +72,15 @@ def test_e2e_pipeline_code2logic_logic2test_logic2code(tmp_path: Path) -> None:
 
 
 def test_e2e_logic2test_on_examples_input(tmp_path: Path) -> None:
-    input_file = _repo_root() / "examples" / "logic2test" / "input" / "sample_project.c2l.yaml"
+    input_file = (
+        _repo_root() / "examples" / "logic2test" / "input" / "sample_project.c2l.yaml"
+    )
     assert input_file.exists()
 
     out_dir = tmp_path / "tests"
-    gen = Logic2TestGenerator(input_file, config=Logic2TestGeneratorConfig(framework="pytest"))
+    gen = Logic2TestGenerator(
+        input_file, config=Logic2TestGeneratorConfig(framework="pytest")
+    )
     result = gen.generate_unit_tests(out_dir)
 
     assert not result.errors
@@ -83,7 +89,9 @@ def test_e2e_logic2test_on_examples_input(tmp_path: Path) -> None:
 
 
 def test_e2e_logic2code_on_examples_input(tmp_path: Path) -> None:
-    input_file = _repo_root() / "examples" / "logic2code" / "input" / "sample_project.c2l.yaml"
+    input_file = (
+        _repo_root() / "examples" / "logic2code" / "input" / "sample_project.c2l.yaml"
+    )
     assert input_file.exists()
 
     out_dir = tmp_path / "generated_code"

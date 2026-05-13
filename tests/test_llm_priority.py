@@ -1,5 +1,4 @@
 import json
-import os
 from pathlib import Path
 
 import pytest
@@ -15,7 +14,9 @@ def _write_user_llm_config(tmp_path: Path, data: dict) -> Path:
     return path
 
 
-def test_get_client_auto_prefers_override_provider_on_tie(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+def test_get_client_auto_prefers_override_provider_on_tie(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
     # Isolate user config from the real home directory
     monkeypatch.setenv("HOME", str(tmp_path))
 
@@ -42,7 +43,9 @@ def test_get_client_auto_prefers_override_provider_on_tie(tmp_path: Path, monkey
     assert isinstance(client, OpenRouterClient)
 
 
-def test_get_client_auto_model_first_uses_model_priority(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+def test_get_client_auto_model_first_uses_model_priority(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
     monkeypatch.setenv("HOME", str(tmp_path))
     monkeypatch.setenv("CODE2LOGIC_DEFAULT_PROVIDER", "auto")
 

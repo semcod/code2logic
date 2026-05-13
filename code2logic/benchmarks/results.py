@@ -24,6 +24,7 @@ from typing import Any, Dict, List, Optional
 @dataclass
 class FormatResult:
     """Result for a single format test."""
+
     format_name: str
     spec_size: int = 0
     spec_tokens: int = 0
@@ -52,6 +53,7 @@ class FormatResult:
 @dataclass
 class FileResult:
     """Result for single file reproduction."""
+
     file_path: str
     language: str
 
@@ -75,13 +77,14 @@ class FileResult:
 
     def to_dict(self) -> Dict[str, Any]:
         d = asdict(self)
-        d['format_results'] = {k: v.to_dict() for k, v in self.format_results.items()}
+        d["format_results"] = {k: v.to_dict() for k, v in self.format_results.items()}
         return d
 
 
 @dataclass
 class FunctionResult:
     """Result for single function reproduction."""
+
     file_path: str
     function_name: str
     language: str
@@ -105,6 +108,7 @@ class FunctionResult:
 @dataclass
 class BenchmarkResult:
     """Complete benchmark result."""
+
     benchmark_type: str  # 'file', 'function', 'format', 'project'
     timestamp: str = ""
 
@@ -149,9 +153,19 @@ class BenchmarkResult:
         if self.file_results:
             all_scores = [r.score for r in self.file_results]
             self.avg_score = sum(all_scores) / len(all_scores) if all_scores else 0
-            self.failure_rate = sum(1 for s in all_scores if s == 0) / len(all_scores) * 100
-            self.syntax_ok_rate = sum(1 for r in self.file_results if r.syntax_ok) / len(self.file_results) * 100
-            self.runs_ok_rate = sum(1 for r in self.file_results if r.runs_ok) / len(self.file_results) * 100
+            self.failure_rate = (
+                sum(1 for s in all_scores if s == 0) / len(all_scores) * 100
+            )
+            self.syntax_ok_rate = (
+                sum(1 for r in self.file_results if r.syntax_ok)
+                / len(self.file_results)
+                * 100
+            )
+            self.runs_ok_rate = (
+                sum(1 for r in self.file_results if r.runs_ok)
+                / len(self.file_results)
+                * 100
+            )
 
         # Function results – include ALL similarities
         if self.function_results:
@@ -171,9 +185,9 @@ class BenchmarkResult:
 
     def to_dict(self) -> Dict[str, Any]:
         d = asdict(self)
-        d['file_results'] = [r.to_dict() for r in self.file_results]
-        d['function_results'] = [r.to_dict() for r in self.function_results]
-        d['format_results'] = [r.to_dict() for r in self.format_results]
+        d["file_results"] = [r.to_dict() for r in self.file_results]
+        d["function_results"] = [r.to_dict() for r in self.function_results]
+        d["format_results"] = [r.to_dict() for r in self.format_results]
         return d
 
     def to_json(self, indent: int = 2) -> str:
@@ -185,25 +199,28 @@ class BenchmarkResult:
         Path(path).write_text(self.to_json())
 
     @classmethod
-    def load(cls, path: str) -> 'BenchmarkResult':
+    def load(cls, path: str) -> "BenchmarkResult":
         """Load result from JSON file."""
         data = json.loads(Path(path).read_text())
         # Reconstruct nested objects
-        raw_file_results = data.pop('file_results', [])
+        raw_file_results = data.pop("file_results", [])
         file_results = []
         for r in raw_file_results:
-            fmt_results_raw = r.pop('format_results', {})
+            fmt_results_raw = r.pop("format_results", {})
             fr = FileResult(**r)
             fr.format_results = {
                 k: FormatResult(**v) if isinstance(v, dict) else v
                 for k, v in fmt_results_raw.items()
             }
             file_results.append(fr)
-        function_results = [FunctionResult(**r) for r in data.pop('function_results', [])]
-        format_results = [FormatResult(**r) for r in data.pop('format_results', [])]
+        function_results = [
+            FunctionResult(**r) for r in data.pop("function_results", [])
+        ]
+        format_results = [FormatResult(**r) for r in data.pop("format_results", [])]
 
         # Remove unknown fields that may not be in the dataclass
         import dataclasses
+
         known_fields = {f.name for f in dataclasses.fields(cls)}
         data = {k: v for k, v in data.items() if k in known_fields}
 
@@ -217,8 +234,9 @@ class BenchmarkResult:
 @dataclass
 class BenchmarkConfig:
     """Configuration for benchmark runs."""
+
     # Formats to test
-    formats: List[str] = field(default_factory=lambda: ['yaml', 'toon', 'json'])
+    formats: List[str] = field(default_factory=lambda: ["yaml", "toon", "json"])
 
     # Limits
     max_files: Optional[int] = None

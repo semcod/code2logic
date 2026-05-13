@@ -1,0 +1,172 @@
+version: '1'
+name: code2flow
+description: Minimal Taskfile
+variables:
+  APP_NAME: code2flow
+environments:
+  local:
+    container_runtime: docker
+    compose_command: docker compose
+pipeline:
+  python_version: "3.12"
+  runner_image: ubuntu-latest
+  branches: [main]
+  cache: [~/.cache/pip]
+  artifacts: [dist/]
+
+  stages:
+    - name: lint
+      tasks: [lint]
+
+    - name: test
+      tasks: [test]
+
+    - name: build
+      tasks: [build]
+      when: "branch:main"
+
+tasks:
+  install:
+    desc: Install Python dependencies (editable)
+    cmds:
+    - pip install -e .[dev]
+  test:
+    desc: Run pytest suite
+    cmds:
+    - pytest -q
+  build:
+    desc: Build wheel + sdist
+    cmds:
+    - python -m build
+  clean:
+    desc: Remove build artefacts
+    cmds:
+    - rm -rf build/ dist/ *.egg-info
+  up:
+    desc: Start services via docker compose
+    cmds:
+    - docker compose up -d
+  down:
+    desc: Stop services
+    cmds:
+    - docker compose down
+  logs:
+    desc: Tail compose logs
+    cmds:
+    - docker compose logs -f
+  ps:
+    desc: Show running compose services
+    cmds:
+    - docker compose ps
+  docker-build:
+    desc: Build docker image
+    cmds:
+    - docker build -t code2flow:latest .
+  help:
+    desc: '[imported from Makefile] help'
+    cmds:
+    - echo "code2flow - Python Code Flow Analysis Tool"
+    - echo ""
+    - echo "Available targets:"
+    - echo "  make install       - Install package"
+    - echo "  make dev-install   - Install with development dependencies"
+    - echo "  make test          - Run test suite"
+    - echo "  make lint          - Run linters (flake8, black --check)"
+    - echo "  make format        - Format code with black"
+    - echo "  make typecheck     - Run mypy type checking"
+    - echo "  make clean         - Remove build artifacts"
+    - echo "  make analyze       - Run analysis on sample (python folder)"
+    - echo "  make run           - Run with example arguments"
+    - echo "  make build         - Build distribution packages"
+    - echo "  make mermaid-png   - Generate PNG from all Mermaid files"
+    - echo "  make install-mermaid - Install Mermaid CLI renderer"
+    - echo "  make check-mermaid - Check available Mermaid renderers"
+    - echo ""
+  dev-install:
+    desc: '[imported from Makefile] dev-install'
+    cmds:
+    - pip install -e ".[dev]"
+    - "echo \"\u2713 code2flow installed with dev dependencies\""
+  test-cov:
+    desc: '[imported from Makefile] test-cov'
+    cmds:
+    - python -m pytest tests/ --cov=code2flow --cov-report=html --cov-report=term
+      2>/dev/null || echo "No tests yet"
+  lint:
+    desc: '[imported from Makefile] lint'
+    cmds:
+    - python -m flake8 code2flow/ --max-line-length=100 --ignore=E203,W503 2>/dev/null
+      || echo "flake8 not installed"
+    - python -m black --check code2flow/ 2>/dev/null || echo "black not installed"
+    - "echo \"\u2713 Linting complete\""
+  format:
+    desc: '[imported from Makefile] format'
+    cmds:
+    - 'python -m black code2flow/ --line-length=100 2>/dev/null || echo "black not
+      installed, run: pip install black"'
+    - "echo \"\u2713 Code formatted\""
+  typecheck:
+    desc: '[imported from Makefile] typecheck'
+    cmds:
+    - python -m mypy code2flow/ --ignore-missing-imports 2>/dev/null || echo "mypy
+      not installed"
+  run:
+    desc: '[imported from Makefile] run'
+    cmds:
+    - python -m code2flow ../python/stts_core -v -o ./output
+  analyze:
+    desc: '[imported from Makefile] analyze'
+    cmds:
+    - "echo \"\u2713 Analysis complete\""
+    deps:
+    - run
+  check:
+    desc: '[imported from Makefile] check'
+    cmds:
+    - "echo \"\u2713 All checks passed\""
+    deps:
+    - lint
+    - typecheck
+    - test
+  mermaid-png:
+    desc: '[imported from Makefile] mermaid-png'
+    cmds:
+    - python mermaid_to_png.py --batch output output
+  install-mermaid:
+    desc: '[imported from Makefile] install-mermaid'
+    cmds:
+    - npm install -g @mermaid-js/mermaid-cli
+  check-mermaid:
+    desc: '[imported from Makefile] check-mermaid'
+    cmds:
+    - echo "Checking available Mermaid renderers..."
+    - "which mmdc > /dev/null && echo \"\u2713 mmdc (mermaid-cli)\" || echo \"\u2717\
+      \ mmdc (run: npm install -g @mermaid-js/mermaid-cli)\""
+    - "which npx > /dev/null && echo \"\u2713 npx (for @mermaid-js/mermaid-cli)\"\
+      \ || echo \"\u2717 npx (install Node.js)\""
+    - "which puppeteer > /dev/null && echo \"\u2713 puppeteer\" || echo \"\u2717 puppeteer\
+      \ (run: npm install -g puppeteer)\""
+  clean-png:
+    desc: '[imported from Makefile] clean-png'
+    cmds:
+    - rm -f output/*.png
+    - "echo \"\u2713 Cleaned PNG files\""
+  health:
+    desc: '[from doql] workflow: health'
+    cmds:
+    - docker compose ps
+    - docker compose exec app echo "Health check passed"
+  import-makefile-hint:
+    desc: '[from doql] workflow: import-makefile-hint'
+    cmds:
+    - 'echo ''Run: taskfile import Makefile to import existing targets.'''
+  all:
+    desc: Run install, lint, test
+    cmds:
+    - taskfile run install
+    - taskfile run lint
+    - taskfile run test
+  fmt:
+    desc: Auto-format with ruff
+    cmds:
+    - ruff format .

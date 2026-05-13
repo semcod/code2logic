@@ -15,18 +15,18 @@ from typing import Any, Dict, List
 
 # Security patterns to check
 SECURITY_PATTERNS = {
-    'sql_injection': ['execute', 'raw', 'cursor.execute'],
-    'command_injection': ['os.system', 'subprocess.call', 'eval', 'exec'],
-    'path_traversal': ['open(', 'Path(', 'os.path.join'],
-    'hardcoded_secrets': ['password', 'secret', 'api_key', 'token'],
-    'insecure_random': ['random.', 'randint'],
+    "sql_injection": ["execute", "raw", "cursor.execute"],
+    "command_injection": ["os.system", "subprocess.call", "eval", "exec"],
+    "path_traversal": ["open(", "Path(", "os.path.join"],
+    "hardcoded_secrets": ["password", "secret", "api_key", "token"],
+    "insecure_random": ["random.", "randint"],
 }
 
 # Performance anti-patterns
 PERFORMANCE_PATTERNS = {
-    'n_plus_one': ['for.*in.*:', '.all()', '.filter('],
-    'large_memory': ['readlines()', 'list(', '.to_list()'],
-    'blocking_io': ['requests.get', 'urllib.urlopen', 'open('],
+    "n_plus_one": ["for.*in.*:", ".all()", ".filter("],
+    "large_memory": ["readlines()", "list(", ".to_list()"],
+    "blocking_io": ["requests.get", "urllib.urlopen", "open("],
 }
 
 # Thresholds
@@ -51,50 +51,64 @@ def analyze_code_quality(project) -> Dict[str, List[Dict]]:
         # Complexity analysis
         for func in module.functions:
             if func.complexity > COMPLEXITY_MEDIUM:
-                issues['high_complexity'].append({
-                    'path': module.path,
-                    'name': func.name,
-                    'complexity': func.complexity,
-                    'severity': 'high' if func.complexity > COMPLEXITY_HIGH else 'medium',
-                })
+                issues["high_complexity"].append(
+                    {
+                        "path": module.path,
+                        "name": func.name,
+                        "complexity": func.complexity,
+                        "severity": "high"
+                        if func.complexity > COMPLEXITY_HIGH
+                        else "medium",
+                    }
+                )
 
         # Long functions
         for func in module.functions:
             if func.lines > LINES_MAX:
-                issues['long_function'].append({
-                    'path': module.path,
-                    'name': func.name,
-                    'lines': func.lines,
-                    'severity': 'medium',
-                })
+                issues["long_function"].append(
+                    {
+                        "path": module.path,
+                        "name": func.name,
+                        "lines": func.lines,
+                        "severity": "medium",
+                    }
+                )
 
         # Long files
         if module.lines_code > FILE_LINES_MAX:
-            issues['long_file'].append({
-                'path': module.path,
-                'lines': module.lines_code,
-                'severity': 'low',
-            })
+            issues["long_file"].append(
+                {
+                    "path": module.path,
+                    "lines": module.lines_code,
+                    "severity": "low",
+                }
+            )
 
         # Missing docstrings
         for func in module.functions:
             if not func.docstring and not func.is_private:
-                issues['missing_docstring'].append({
-                    'path': module.path,
-                    'name': func.name,
-                    'severity': 'low',
-                })
+                issues["missing_docstring"].append(
+                    {
+                        "path": module.path,
+                        "name": func.name,
+                        "severity": "low",
+                    }
+                )
 
         # Class methods
         for cls in module.classes:
             for method in cls.methods:
                 if method.complexity > COMPLEXITY_MEDIUM:
-                    issues['high_complexity'].append({
-                        'path': module.path,
-                        'name': f"{cls.name}.{method.name}",
-                        'complexity': method.complexity,
-                        'severity': 'high' if method.complexity > COMPLEXITY_HIGH else 'medium',
-                    })
+                    issues["high_complexity"].append(
+                        {
+                            "path": module.path,
+                            "name": f"{cls.name}.{method.name}",
+                            "complexity": method.complexity,
+                            "severity": "high"
+                            if method.complexity > COMPLEXITY_HIGH
+                            else "medium",
+                        }
+                    )
 
     return dict(issues)
 
@@ -116,11 +130,15 @@ def check_security_issues(project) -> Dict[str, List[Dict]]:
             for category, patterns in SECURITY_PATTERNS.items():
                 for pattern in patterns:
                     if pattern.lower() in imp.lower():
-                        issues[category].append({
-                            'path': module.path,
-                            'import': imp,
-                            'severity': 'high' if category in ['command_injection', 'sql_injection'] else 'medium',
-                        })
+                        issues[category].append(
+                            {
+                                "path": module.path,
+                                "import": imp,
+                                "severity": "high"
+                                if category in ["command_injection", "sql_injection"]
+                                else "medium",
+                            }
+                        )
 
         # Check function calls
         for func in module.functions:
@@ -128,12 +146,17 @@ def check_security_issues(project) -> Dict[str, List[Dict]]:
                 for category, patterns in SECURITY_PATTERNS.items():
                     for pattern in patterns:
                         if pattern.lower() in call.lower():
-                            issues[category].append({
-                                'path': module.path,
-                                'name': func.name,
-                                'call': call,
-                                'severity': 'high' if category in ['command_injection', 'sql_injection'] else 'medium',
-                            })
+                            issues[category].append(
+                                {
+                                    "path": module.path,
+                                    "name": func.name,
+                                    "call": call,
+                                    "severity": "high"
+                                    if category
+                                    in ["command_injection", "sql_injection"]
+                                    else "medium",
+                                }
+                            )
 
     return dict(issues)
 
@@ -155,12 +178,14 @@ def check_performance_issues(project) -> Dict[str, List[Dict]]:
                 for category, patterns in PERFORMANCE_PATTERNS.items():
                     for pattern in patterns:
                         if pattern.lower() in call.lower():
-                            issues[category].append({
-                                'path': module.path,
-                                'name': func.name,
-                                'call': call,
-                                'severity': 'medium',
-                            })
+                            issues[category].append(
+                                {
+                                    "path": module.path,
+                                    "name": func.name,
+                                    "call": call,
+                                    "severity": "medium",
+                                }
+                            )
 
     return dict(issues)
 
@@ -176,7 +201,7 @@ class CodeReviewer:
         """
         self.client = client
 
-    def review(self, project, focus: str = 'all') -> Dict[str, Any]:
+    def review(self, project, focus: str = "all") -> Dict[str, Any]:
         """Perform code review.
 
         Args:
@@ -187,39 +212,41 @@ class CodeReviewer:
             Review results
         """
         results = {
-            'summary': {},
-            'issues': {},
+            "summary": {},
+            "issues": {},
         }
 
-        if focus in ['all', 'quality']:
-            results['issues']['quality'] = analyze_code_quality(project)
+        if focus in ["all", "quality"]:
+            results["issues"]["quality"] = analyze_code_quality(project)
 
-        if focus in ['all', 'security']:
-            results['issues']['security'] = check_security_issues(project)
+        if focus in ["all", "security"]:
+            results["issues"]["security"] = check_security_issues(project)
 
-        if focus in ['all', 'performance']:
-            results['issues']['performance'] = check_performance_issues(project)
+        if focus in ["all", "performance"]:
+            results["issues"]["performance"] = check_performance_issues(project)
 
         # Calculate summary
         total_issues = 0
-        by_severity = {'high': 0, 'medium': 0, 'low': 0}
+        by_severity = {"high": 0, "medium": 0, "low": 0}
 
-        for category_issues in results['issues'].values():
+        for category_issues in results["issues"].values():
             for issue_list in category_issues.values():
                 for issue in issue_list:
                     total_issues += 1
-                    sev = issue.get('severity', 'medium')
+                    sev = issue.get("severity", "medium")
                     by_severity[sev] = by_severity.get(sev, 0) + 1
 
-        results['summary'] = {
-            'total_issues': total_issues,
-            'by_severity': by_severity,
-            'files_analyzed': len(project.modules),
+        results["summary"] = {
+            "total_issues": total_issues,
+            "by_severity": by_severity,
+            "files_analyzed": len(project.modules),
         }
 
         return results
 
-    def generate_report(self, results: Dict[str, Any], project_name: str = 'Project') -> str:
+    def generate_report(
+        self, results: Dict[str, Any], project_name: str = "Project"
+    ) -> str:
         """Generate markdown review report.
 
         Args:
@@ -229,7 +256,7 @@ class CodeReviewer:
         Returns:
             Markdown report
         """
-        summary = results['summary']
+        summary = results["summary"]
 
         lines = [
             f"# Code Review Report: {project_name}",
@@ -244,7 +271,7 @@ class CodeReviewer:
             "",
         ]
 
-        for category, category_issues in results['issues'].items():
+        for category, category_issues in results["issues"].items():
             if not category_issues:
                 continue
 
@@ -259,8 +286,14 @@ class CodeReviewer:
                 lines.append("")
 
                 for i in issues[:10]:  # Limit to 10 per type
-                    sev = "🔴" if i.get('severity') == 'high' else "🟡" if i.get('severity') == 'medium' else "🟢"
-                    name = i.get('name', i.get('path', 'unknown'))
+                    sev = (
+                        "🔴"
+                        if i.get("severity") == "high"
+                        else "🟡"
+                        if i.get("severity") == "medium"
+                        else "🟢"
+                    )
+                    name = i.get("name", i.get("path", "unknown"))
                     lines.append(f"- {sev} `{i['path']}` - {name}")
 
                 if len(issues) > 10:
@@ -268,4 +301,4 @@ class CodeReviewer:
 
                 lines.append("")
 
-        return '\n'.join(lines)
+        return "\n".join(lines)

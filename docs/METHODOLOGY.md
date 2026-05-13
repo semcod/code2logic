@@ -1,10 +1,6 @@
-# Code2Flow Scanning Methodology
-
 ## Executive Summary
 
 This document describes the optimized scanning methodology for code2flow that addresses performance bottlenecks in large-scale Python codebases. The new approach reduces memory usage by 70% and improves analysis speed by 3-5x through smart prioritization, streaming analysis, and lazy CFG generation.
-
-## Problem Analysis
 
 ### Original Bottlenecks
 
@@ -21,8 +17,6 @@ This document describes the optimized scanning methodology for code2flow that ad
 - **CFG Edges**: 33,873
 - **Original**: Process killed (OOM/timeout)
 - **Optimized**: Completes in ~15s with bounded memory
-
-## Optimized Scanning Structure
 
 ### 4-Phase Architecture
 
@@ -88,8 +82,6 @@ class StreamingAnalyzer:
 | Peak RAM | ~2GB | ~400MB | 80% |
 | CFG Nodes | 27,069 | ~3,000 | 89% |
 | Analysis Time | Killed | 15s | ∞ |
-
-## Scanning Strategies
 
 ### 1. Quick Strategy (`STRATEGY_QUICK`)
 
@@ -178,8 +170,6 @@ analyzer = StreamingAnalyzer()
 analyzer.set_progress_callback(on_progress)
 ```
 
-## File Ordering Methodology
-
 ### Importance Tiers
 
 **Tier 1: Critical (Process First)**
@@ -207,13 +197,10 @@ analyzer.set_progress_callback(on_progress)
 During Phase 2, we learn about import relationships and can reorder Phase 3:
 
 ```python
-# If file A imports file B, and B is entry point,
 # prioritize A for deep analysis
 if import_graph[file_b] contains file_a:
     priority[file_a] += 25  # Boost priority
 ```
-
-## CFG Generation Strategy
 
 ### Lazy Evaluation
 
@@ -240,8 +227,6 @@ Build full CFG only for:
 3. Functions with <3 calls
 4. Private helper functions (if configured)
 
-## Performance Benchmarks
-
 ### Test Setup
 - **Project:** nlp2cmd (197 files, 3,567 functions)
 - **Hardware:** 4-core CPU, 8GB RAM
@@ -265,8 +250,6 @@ Build full CFG only for:
 | pyan3 | 8s | 600MB | Call graph only |
 | snakefood | 5s | 200MB | Dependencies only |
 | pydeps | 4s | 150MB | Module graph |
-
-## Usage Examples
 
 ### Quick Overview
 
@@ -314,8 +297,6 @@ else:
     print("No changes detected, skipping analysis")
 ```
 
-## Recommendations
-
 ### For Large Projects (>1000 functions)
 
 1. **Always use `STRATEGY_QUICK` first** - Get overview in seconds
@@ -337,8 +318,6 @@ else:
 2. **Quick strategy** - Sub-second response
 3. **Selective deep analysis** - Only for opened files
 4. **Background processing** - Don't block UI
-
-## Future Improvements
 
 ### Planned Optimizations
 
