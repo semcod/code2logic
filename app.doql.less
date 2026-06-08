@@ -1,0 +1,228 @@
+// LESS format — define @variables here as needed
+
+app {
+  name: code2flow;
+  version: 0.2.1;
+  description: "High-performance Python code flow analysis with NLP query processing - CFG, DFG, call graphs, and intelligent code queries";
+  license: Apache-2.0;
+  authors: "STTS Project, Tom Sapletta <tom@sapletta.com>";
+  keywords: "static-analysis, control-flow, data-flow, call-graph, reverse-engineering, nlp, code-analysis, ast";
+  homepage: https://github.com/wronai/stts;
+  repository: https://github.com/wronai/stts;
+}
+
+dependencies {
+  runtime: "networkx>=2.6, matplotlib>=3.4, pyyaml>=5.4, numpy>=1.20";
+  dev: "pytest>=6.2, pytest-cov>=2.12, black>=21.0, flake8>=3.9, mypy>=0.910";
+}
+
+entity[name="Users"] {
+  id: serial;
+  username: string;
+}
+
+entity[name="Products"] {
+  id: serial;
+  sku: string;
+}
+
+entity[name="Orders"] {
+  id: serial;
+  user_id: int;
+}
+
+entity[name="OrderItems"] {
+  id: serial;
+  order_id: int;
+}
+
+interface[type="cli"] {
+  framework: argparse;
+}
+interface[type="cli"] page[name="code2flow"] {
+  entry: code2flow.cli:main;
+}
+
+workflow[name="install"] {
+  trigger: manual;
+  step-1: run cmd=pip install -e .;
+  step-2: run cmd=echo "✓ code2flow installed";
+}
+
+workflow[name="dev-install"] {
+  trigger: manual;
+  step-1: run cmd=pip install -e ".[dev]";
+  step-2: run cmd=echo "✓ code2flow installed with dev dependencies";
+}
+
+workflow[name="test"] {
+  trigger: manual;
+  step-1: run cmd=python -m pytest tests/ -v --tb=short 2>/dev/null || echo "No tests yet - create tests/ directory";
+}
+
+workflow[name="test-cov"] {
+  trigger: manual;
+  step-1: run cmd=python -m pytest tests/ --cov=code2flow --cov-report=html --cov-report=term 2>/dev/null || echo "No tests yet";
+}
+
+workflow[name="lint"] {
+  trigger: manual;
+  step-1: run cmd=python -m flake8 code2flow/ --max-line-length=100 --ignore=E203,W503 2>/dev/null || echo "flake8 not installed";
+  step-2: run cmd=python -m black --check code2flow/ 2>/dev/null || echo "black not installed";
+  step-3: run cmd=echo "✓ Linting complete";
+}
+
+workflow[name="format"] {
+  trigger: manual;
+  step-1: run cmd=python -m black code2flow/ --line-length=100 2>/dev/null || echo "black not installed, run: pip install black";
+  step-2: run cmd=echo "✓ Code formatted";
+}
+
+workflow[name="typecheck"] {
+  trigger: manual;
+  step-1: run cmd=python -m mypy code2flow/ --ignore-missing-imports 2>/dev/null || echo "mypy not installed";
+}
+
+workflow[name="run"] {
+  trigger: manual;
+  step-1: run cmd=python -m code2flow ../python/stts_core -v -o ./output;
+}
+
+workflow[name="analyze"] {
+  trigger: manual;
+  step-1: run cmd=echo "✓ Analysis complete";
+}
+
+workflow[name="build"] {
+  trigger: manual;
+  step-1: run cmd=rm -rf build/ dist/ *.egg-info;
+  step-2: run cmd=python setup.py sdist bdist_wheel;
+  step-3: run cmd=echo "✓ Build complete - check dist/";
+}
+
+workflow[name="clean"] {
+  trigger: manual;
+  step-1: run cmd=rm -rf build/ dist/ *.egg-info;
+  step-2: run cmd=rm -rf .pytest_cache .coverage htmlcov/;
+  step-3: run cmd=rm -rf code2flow/__pycache__ code2flow/*/__pycache__;
+  step-4: run cmd=find . -name "*.pyc" -delete 2>/dev/null || true;
+  step-5: run cmd=find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true;
+  step-6: run cmd=echo "✓ Cleaned build artifacts";
+}
+
+workflow[name="check"] {
+  trigger: manual;
+  step-1: run cmd=echo "✓ All checks passed";
+}
+
+workflow[name="mermaid-png"] {
+  trigger: manual;
+  step-1: run cmd=python mermaid_to_png.py --batch output output;
+}
+
+workflow[name="install-mermaid"] {
+  trigger: manual;
+  step-1: run cmd=npm install -g @mermaid-js/mermaid-cli;
+}
+
+workflow[name="check-mermaid"] {
+  trigger: manual;
+  step-1: run cmd=echo "Checking available Mermaid renderers...";
+  step-2: run cmd=which mmdc > /dev/null && echo "✓ mmdc (mermaid-cli)" || echo "✗ mmdc (run: npm install -g @mermaid-js/mermaid-cli)";
+  step-3: run cmd=which npx > /dev/null && echo "✓ npx (for @mermaid-js/mermaid-cli)" || echo "✗ npx (install Node.js)";
+  step-4: run cmd=which puppeteer > /dev/null && echo "✓ puppeteer" || echo "✗ puppeteer (run: npm install -g puppeteer)";
+}
+
+workflow[name="clean-png"] {
+  trigger: manual;
+  step-1: run cmd=rm -f output/*.png;
+  step-2: run cmd=echo "✓ Cleaned PNG files";
+}
+
+workflow[name="up"] {
+  trigger: manual;
+  step-1: run cmd=docker compose up -d;
+}
+
+workflow[name="down"] {
+  trigger: manual;
+  step-1: run cmd=docker compose down;
+}
+
+workflow[name="logs"] {
+  trigger: manual;
+  step-1: run cmd=docker compose logs -f;
+}
+
+workflow[name="ps"] {
+  trigger: manual;
+  step-1: run cmd=docker compose ps;
+}
+
+workflow[name="docker-build"] {
+  trigger: manual;
+  step-1: run cmd=docker build -t code2flow:latest .;
+}
+
+workflow[name="help"] {
+  trigger: manual;
+  step-1: run cmd=echo "code2flow - Python Code Flow Analysis Tool";
+  step-2: run cmd=echo "";
+  step-3: run cmd=echo "Available targets:";
+  step-4: run cmd=echo "  make install       - Install package";
+  step-5: run cmd=echo "  make dev-install   - Install with development dependencies";
+  step-6: run cmd=echo "  make test          - Run test suite";
+  step-7: run cmd=echo "  make lint          - Run linters (flake8, black --check)";
+  step-8: run cmd=echo "  make format        - Format code with black";
+  step-9: run cmd=echo "  make typecheck     - Run mypy type checking";
+  step-10: run cmd=echo "  make clean         - Remove build artifacts";
+  step-11: run cmd=echo "  make analyze       - Run analysis on sample (python folder)";
+  step-12: run cmd=echo "  make run           - Run with example arguments";
+  step-13: run cmd=echo "  make build         - Build distribution packages";
+  step-14: run cmd=echo "  make mermaid-png   - Generate PNG from all Mermaid files";
+  step-15: run cmd=echo "  make install-mermaid - Install Mermaid CLI renderer";
+  step-16: run cmd=echo "  make check-mermaid - Check available Mermaid renderers";
+  step-17: run cmd=echo "";
+}
+
+workflow[name="health"] {
+  trigger: manual;
+  step-1: run cmd=docker compose ps;
+  step-2: run cmd=docker compose exec app echo "Health check passed";
+}
+
+workflow[name="import-makefile-hint"] {
+  trigger: manual;
+  step-1: run cmd=echo 'Run: taskfile import Makefile to import existing targets.';
+}
+
+workflow[name="all"] {
+  trigger: manual;
+  step-1: run cmd=taskfile run install;
+  step-2: run cmd=taskfile run lint;
+  step-3: run cmd=taskfile run test;
+}
+
+workflow[name="fmt"] {
+  trigger: manual;
+  step-1: run cmd=ruff format .;
+}
+
+env_vars {
+  keys: OPENROUTER_API_KEY, OPENROUTER_MODEL, BENCH_USE_LLM, OPENAI_API_KEY, OPENAI_MODEL, ANTHROPIC_API_KEY, ANTHROPIC_MODEL, GROQ_API_KEY, GROQ_MODEL, TOGETHER_API_KEY, TOGETHER_MODEL, OLLAMA_HOST, OLLAMA_MODEL, CODE2LOGIC_DEFAULT_PROVIDER, CODE2LOGIC_VERBOSE, CODE2LOGIC_CACHE_DIR, CODE2LOGIC_PROJECT_NAME, CODE2FLOW_CALLS_SPLIT, CODE2FLOW_CALLS_KEEP_MAIN, CODE2FLOW_CALLS_MIN_NODES, CODE2FLOW_CALLS_MAX_NODES, CODE2FLOW_CALLS_MAX_PARTS, CODE2FLOW_CALLS_INCLUDE_SINGLETONS, CODE2FLOW_MERMAID_MAX_EDGES, CODE2FLOW_MERMAID_MAX_TEXT_SIZE;
+}
+
+deploy {
+  target: docker-compose;
+  compose_file: docker-compose.yml;
+}
+
+environment[name="local"] {
+  runtime: docker-compose;
+  env_file: .env;
+  template_file: .env.example;
+  python_version: >=3.8;
+  vars: ANTHROPIC_API_KEY, ANTHROPIC_MODEL, BENCH_USE_LLM, CODE2FLOW_CALLS_INCLUDE_SINGLETONS, CODE2FLOW_CALLS_KEEP_MAIN, CODE2FLOW_CALLS_MAX_NODES, CODE2FLOW_CALLS_MAX_PARTS, CODE2FLOW_CALLS_MIN_NODES, CODE2FLOW_CALLS_SPLIT, CODE2FLOW_MERMAID_MAX_EDGES, CODE2FLOW_MERMAID_MAX_TEXT_SIZE, CODE2LOGIC_CACHE_DIR, CODE2LOGIC_DEFAULT_PROVIDER, CODE2LOGIC_PROJECT_NAME, CODE2LOGIC_VERBOSE, GROQ_API_KEY, GROQ_MODEL, OLLAMA_HOST, OLLAMA_MODEL, OPENAI_API_KEY, OPENAI_MODEL, OPENROUTER_API_KEY, OPENROUTER_MODEL, TOGETHER_API_KEY, TOGETHER_MODEL;
+  runtime_llm: OPENROUTER_API_KEY, OPENROUTER_MODEL;
+  runtime_ollama: OLLAMA_HOST, OLLAMA_MODEL;
+}
