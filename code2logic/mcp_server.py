@@ -30,19 +30,26 @@ from . import __version__
 # MCP protocol implementation
 # Note: This is a simplified implementation. For production, use the official MCP SDK.
 
+_PROTOCOL_VERSION = "2024-11-05"
+_NOTIFICATIONS = frozenset({"notifications/initialized", "notifications/cancelled"})
 
-def handle_request(request: dict) -> dict:
+
+def handle_request(request: dict) -> dict | None:
     """Handle incoming MCP request."""
     method = request.get("method", "")
     params = request.get("params", {})
     request_id = request.get("id")
 
+    if method in _NOTIFICATIONS:
+        return None
+
     if method == "initialize":
+        client_version = params.get("protocolVersion", _PROTOCOL_VERSION)
         return {
             "jsonrpc": "2.0",
             "id": request_id,
             "result": {
-                "protocolVersion": "0.1.0",
+                "protocolVersion": client_version,
                 "serverInfo": {"name": "code2logic", "version": __version__},
                 "capabilities": {"tools": {}},
             },
@@ -342,6 +349,8 @@ def run_server():
 
             request = json.loads(line)
             response = handle_request(request)
+            if response is None:
+                continue
 
             sys.stdout.write(json.dumps(response) + "\n")
             sys.stdout.flush()
