@@ -76,7 +76,7 @@ from .rotation import (
     parse_rate_limit_headers,
 )
 
-__version__ = "0.2.2"
+__version__ = "1.0.50"
 __all__ = [
     # Config
     "LLMConfig",

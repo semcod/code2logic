@@ -15,6 +15,15 @@
 - refactor(examples): configuration management system
 - release: release
 
+## [1.0.50] - 2026-06-29
+
+### Docs
+- Update README.md
+
+### Other
+- Update VERSION
+- Update code2logic/__init__.py
+
 ## [0.2.2] - 2026-06-29
 
 ### Docs

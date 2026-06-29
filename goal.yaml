@@ -1,5 +1,5 @@
 # goal.yaml - Goal configuration file
-# Generated: 2026-06-29 00:39:09
+# Generated: 2026-06-29 10:55:33
 # Documentation: https://github.com/wronai/goal#configuration
 #
 # This file configures Goal's behavior for:
@@ -13,7 +13,7 @@
 
 version: '1.0'
 project:
-  name: code2flow
+  name: code2logic
   type:
   - python
   description: Convert source code to logical representation for LLM analysis
@@ -221,11 +221,25 @@ git:
     enabled: true
     prefix: v
     format: '{prefix}{version}'
+publishing:
+  enabled: true
+  registries:
+  - pypi
+  dry_run: false
+  fallback:
+    github_release:
+      enabled: true
+      owner: ''
+      repo: ''
+      repo_map: {}
+      token_env: GITHUB_TOKEN
+      skip_pypi_retries_on_block: true
+      asset_glob: dist/*
 strategies:
   python:
     test: pytest tests/ -v
     build: python -m build
-    publish: twine upload dist/code2flow-{version}*
+    publish: twine upload dist/code2logic-{version}*
     publish_enabled: true
     dependencies:
       file: requirements.txt
@@ -233,7 +247,7 @@ strategies:
   nodejs:
     test: npm test
     build: npm run build
-    publish: twine upload dist/code2flow-{version}*
+    publish: twine upload dist/code2logic-{version}*
     publish_enabled: true
     dependencies:
       file: package-lock.json
@@ -241,7 +255,7 @@ strategies:
   rust:
     test: cargo test
     build: cargo build --release
-    publish: twine upload dist/code2flow-{version}*
+    publish: twine upload dist/code2logic-{version}*
     publish_enabled: true
     dependencies:
       file: Cargo.lock
@@ -308,13 +322,15 @@ advanced:
     - pk_test_[a-zA-Z0-9]{24}
     - sk_live_[a-zA-Z0-9]{24}
     - sk_test_[a-zA-Z0-9]{24}
-    - Bearer\s+[a-zA-Z0-9_-]{20,}
-    - Token\s+[a-zA-Z0-9_-]{20,}
     - '-----BEGIN\s+(RSA\s+)?PRIVATE\s+KEY-----'
     - '-----BEGIN\s+EC\s+PRIVATE\s+KEY-----'
     - '-----BEGIN\s+OPENSSH\s+PRIVATE\s+KEY-----'
     - '-----BEGIN\s+DSA\s+PRIVATE\s+KEY-----'
-    - ^[A-Z_]+=[a-zA-Z0-9_-]{20,}
+    - sk-or-v1-(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])[a-zA-Z0-9_-]{32,}
+    - CS:^[A-Z][A-Z0-9_]*(?:API|KEY|TOKEN|SECRET|AUTH|PASS|PWD|CREDENTIAL|ACCESS)[A-Z0-9_]*=(?=(?:.*[a-z]))(?=.*[A-Z])(?=.*[0-9])[a-zA-Z0-9_-]{20,}
+    - \bBearer\s+(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[a-zA-Z0-9_-]{32,}\b
+    - \bToken\s+(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[a-zA-Z0-9_-]{32,}\b
+    - '-----BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY-----'
   recovery:
     enabled: true
     auto_offer: true

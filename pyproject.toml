@@ -3,14 +3,13 @@ requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "code2flow"
-version = "0.2.2"
+name = "code2logic"
+version = "1.0.50"
 description = "High-performance Python code flow analysis with NLP query processing - CFG, DFG, call graphs, and intelligent code queries"
 readme = "README.md"
 requires-python = ">=3.8"
 license = "Apache-2.0"
 authors = [
-    {name = "STTS Project"},
     {name = "Tom Sapletta", email = "tom@sapletta.com"},
 ]
 keywords = [
@@ -60,12 +59,12 @@ dev = [
 ]
 
 [project.scripts]
-code2flow = "code2flow.cli:main"
+code2logic = "code2logic.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/wronai/stts"
-Repository = "https://github.com/wronai/stts"
-Issues = "https://github.com/wronai/stts/issues"
+Homepage = "https://github.com/wronai/code2logic"
+Repository = "https://github.com/wronai/code2logic"
+Issues = "https://github.com/wronai/code2logic/issues"
 
 [tool.black]
 line-length = 100
