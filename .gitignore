@@ -1,3 +1,6 @@
+logic2code/.env.example
+logic2test/.env.example
+lolm/.env.example
 .pkl
 recordings
 output/*

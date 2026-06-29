@@ -1,5 +1,17 @@
 # code2flow
 
+## AI Cost Tracking
+
+![AI Cost](https://img.shields.io/badge/AI%20Cost-$7.50-yellow) ![AI Model](https://img.shields.io/badge/AI%20Model-openrouter%2Fqwen%2Fqwen3-coder-next-lightgrey)
+
+This project uses AI-generated code. Total cost: **$7.5000** with **121** AI commits.
+
+Generated on 2026-06-29 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/models/openrouter/qwen/qwen3-coder-next)
+
+---
+
+
+
 **Python Code Flow Analysis Tool** - Static analysis for control flow graphs (CFG), data flow graphs (DFG), and call graph extraction.
 
 ## Performance Optimization
@@ -222,14 +234,10 @@ The analyzer is designed to be extensible. Key areas for enhancement:
 
 ## License
 
-Apache License 2.0 - see [LICENSE](LICENSE) for details.
-
+Licensed under Apache-2.0.
 ## Author
 
-Created by **Tom Sapletta** - [tom@sapletta.com](mailto:tom@sapletta.com)
-
-<!-- taskill:status:start -->
-
+Tom Sapletta
 ## Status
 
 _Last updated by [taskill](https://github.com/oqlos/taskill) at 2026-04-25 13:36 UTC_

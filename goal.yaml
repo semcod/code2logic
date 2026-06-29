@@ -1,8 +1,6 @@
 # goal.yaml - Goal configuration file
-# Generated: 2026-02-15 13:03:11
+# Generated: 2026-06-29 00:39:09
 # Documentation: https://github.com/wronai/goal#configuration
-# Updated: 2026-02-15 for quality gate testing
-# Testing: quality gate validation
 #
 # This file configures Goal's behavior for:
 # - Version management (semver/calver)
@@ -15,7 +13,7 @@
 
 version: '1.0'
 project:
-  name: code2logic
+  name: code2flow
   type:
   - python
   description: Convert source code to logical representation for LLM analysis
@@ -24,6 +22,7 @@ versioning:
   files:
   - VERSION
   - pyproject.toml:version
+  - setup.py:version
   - code2logic/__init__.py:__version__
   bump_rules:
     patch: 10
@@ -226,21 +225,24 @@ strategies:
   python:
     test: pytest tests/ -v
     build: python -m build
-    publish: twine upload dist/goal-{version}*
+    publish: twine upload dist/code2flow-{version}*
+    publish_enabled: true
     dependencies:
       file: requirements.txt
       lock: pip freeze > requirements.txt
   nodejs:
     test: npm test
     build: npm run build
-    publish: npm publish
+    publish: twine upload dist/code2flow-{version}*
+    publish_enabled: true
     dependencies:
       file: package-lock.json
       lock: npm install
   rust:
     test: cargo test
     build: cargo build --release
-    publish: cargo publish
+    publish: twine upload dist/code2flow-{version}*
+    publish_enabled: true
     dependencies:
       file: Cargo.lock
       lock: cargo update
@@ -261,6 +263,89 @@ advanced:
   performance:
     max_files: 50
     timeout_test: 300
+  file_validation:
+    max_file_size_mb: 10
+    block_large_files: true
+    detect_api_tokens: true
+    auto_manage_gitignore: true
+    auto_add_dot_folders: true
+    auto_handle_large_files: true
+    known_dot_folders:
+    - .idea
+    - .vscode
+    - .DS_Store
+    - Thumbs.db
+    - .pytest_cache
+    - .coverage
+    - .mypy_cache
+    - .tox
+    - .nox
+    - .venv
+    - .env
+    - .python-version
+    - .ruff_cache
+    - .cursorignore
+    - .cursorindexingignore
+    - .code2llm_cache
+    - .llm
+    - managed_components
+    - .gui-agent.pid
+    - .gui-server.pid
+    - .gui-server.log
+    token_patterns:
+    - ghp_[a-zA-Z0-9]{36}
+    - gho_[a-zA-Z0-9]{36}
+    - ghu_[a-zA-Z0-9]{36}
+    - ghs_[a-zA-Z0-9]{36}
+    - ghr_[a-zA-Z0-9]{36}
+    - ghs_[a-zA-Z0-9]{36}
+    - AKIA[0-9A-Z]{16}
+    - sk-[a-zA-Z0-9]{48}
+    - xoxb-[0-9]{13}-[0-9]{13}-[a-zA-Z0-9]{24}
+    - xoxp-[0-9]{13}-[0-9]{13}-[0-9]{13}-[a-zA-Z0-9]{24}
+    - glpat-[a-zA-Z0-9_-]{20}
+    - pk_live_[a-zA-Z0-9]{24}
+    - pk_test_[a-zA-Z0-9]{24}
+    - sk_live_[a-zA-Z0-9]{24}
+    - sk_test_[a-zA-Z0-9]{24}
+    - Bearer\s+[a-zA-Z0-9_-]{20,}
+    - Token\s+[a-zA-Z0-9_-]{20,}
+    - '-----BEGIN\s+(RSA\s+)?PRIVATE\s+KEY-----'
+    - '-----BEGIN\s+EC\s+PRIVATE\s+KEY-----'
+    - '-----BEGIN\s+OPENSSH\s+PRIVATE\s+KEY-----'
+    - '-----BEGIN\s+DSA\s+PRIVATE\s+KEY-----'
+    - ^[A-Z_]+=[a-zA-Z0-9_-]{20,}
+  recovery:
+    enabled: true
+    auto_offer: true
+    create_backup: true
+    clean_clone_fallback: true
+    strategies:
+      auth:
+        enabled: true
+        try_gh_cli: true
+        try_token_auth: true
+      large_files:
+        enabled: true
+        max_size_mb: 100
+        auto_lfs: false
+        default_action: remove
+      divergent_history:
+        enabled: true
+        default_action: rebase
+        auto_rebase: false
+      corrupted_objects:
+        enabled: true
+        run_fsck: true
+        run_gc: true
+      lfs:
+        enabled: true
+        auto_install: false
+        auto_pull: true
+      force_push:
+        enabled: true
+        require_confirmation: true
+        prefer_force_with_lease: true
 quality:
   commit_summary:
     min_value_words: 3
@@ -299,10 +384,12 @@ quality:
     generate.*message: commit message generator
     EnhancedSummaryGenerator: enterprise changelog generator
     GoalConfig: configuration manager
-    '@click\\.command': CLI command
-    '@click\\.option': CLI option
+    '@click\.command': CLI command
+    '@click\.option': CLI option
     format_.*result: output formatter
     _calculate_complexity: complexity analyzer
+    '@click\\.command': CLI command
+    '@click\\.option': CLI option
   value_patterns:
     ast_analysis:
       signatures:

@@ -210,6 +210,7 @@ class TestFiltering:
     def test_skip_private_methods(self):
         """Test private method filtering."""
         config = FilterConfig(skip_private=True, min_function_lines=1)
+        filter_obj = FastFileFilter(config)
 
         # Private methods should be skipped
         assert filter_obj.should_skip_function("_private", 5, is_private=True)

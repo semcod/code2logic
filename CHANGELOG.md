@@ -15,6 +15,28 @@
 - refactor(examples): configuration management system
 - release: release
 
+## [0.2.2] - 2026-06-29
+
+### Docs
+- Update README.md
+
+### Test
+- Update tests/test_edge_cases.py
+- Update tests/test_nlp_pipeline.py
+
+### Other
+- Update .gitignore
+- Update code2flow/_compat.py
+- Update code2flow/core/config.py
+- Update code2flow/core/models.py
+- Update code2flow/exporters/__init__.py
+- Update code2flow/exporters/base.py
+- Update code2flow/nlp/__init__.py
+- Update code2flow/nlp/config.py
+- Update code2flow/nlp/entity_resolution.py
+- Update code2flow/nlp/intent_matching.py
+- ... and 7 more files
+
 ## [0.2.1] - 2026-02-28
 
 ### Summary

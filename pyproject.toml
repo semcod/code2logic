@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "code2flow"
-version = "0.2.1"
+version = "0.2.2"
 description = "High-performance Python code flow analysis with NLP query processing - CFG, DFG, call graphs, and intelligent code queries"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -42,6 +42,9 @@ dependencies = [
     "matplotlib>=3.4",
     "pyyaml>=5.4",
     "numpy>=1.20",
+    "goal>=2.1.0",
+    "costs>=0.1.20",
+    "pfix>=0.1.60",
 ]
 
 [project.optional-dependencies]
@@ -51,6 +54,9 @@ dev = [
     "black>=21.0",
     "flake8>=3.9",
     "mypy>=0.910",
+    "goal>=2.1.0",
+    "costs>=0.1.20",
+    "pfix>=0.1.60",
 ]
 
 [project.scripts]
@@ -72,3 +78,32 @@ ignore_missing_imports = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"
+
+[tool.pfix]
+# Self-healing Python configuration
+model = "openrouter/qwen/qwen3-coder-next"
+auto_apply = true
+auto_install_deps = true
+auto_restart = false
+max_retries = 3
+create_backups = false
+git_auto_commit = false
+
+[tool.pfix.runtime_todo]
+enabled = true
+todo_file = "TODO.md"
+min_severity = "low"
+deduplicate = true
+
+[tool.costs]
+# AI Cost tracking configuration
+badge = true
+update_readme = true
+readme_path = "README.md"
+default_model = "openrouter/qwen/qwen3-coder-next"
+analysis_mode = "byok"
+full_history = true
+max_commits = 500
+
+# Cost thresholds for badge colors (USD)
+badge_color_thresholds = { low = 1.0, medium = 5.0, high = 10.0, critical = 50.0 }

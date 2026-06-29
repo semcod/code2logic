@@ -10,6 +10,11 @@ from code2flow.nlp import (
     FAST_NLP_CONFIG,
 )
 from code2flow.nlp.entity_resolution import Entity
+from code2flow.nlp.config import (
+    NormalizationConfig,
+    IntentMatchingConfig,
+    EntityResolutionConfig,
+)
 
 
 class TestQueryNormalization:
