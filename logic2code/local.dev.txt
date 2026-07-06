@@ -1,0 +1,13 @@
+# local.dev.txt — locally developed dependencies of this project (generated 2026-07-04)
+# by ~/github/local.dev.sh — DO NOT EDIT; see ~/github/local.dev.md
+# project: logic2code 0.1.9 (python) at /home/tom/github/semcod/code2logic/logic2code
+# deps declared: 14 | with local source: 5
+
+## LOCAL DEPS  (dep | required | local source (version) | installed | status)
+costs | >=0.1.20 | /home/tom/github/semcod/costs (0.1.53) | 0.1.51 non-editable | STALE-INSTALL (local 0.1.53) -> fix: pip install -e /home/tom/github/semcod/costs  [pyproject.toml]
+goal | >=2.1.0 | /home/tom/github/semcod/goal (2.1.266) | 2.1.261 non-editable | STALE-INSTALL (local 2.1.266) -> fix: pip install -e /home/tom/github/semcod/goal  [pyproject.toml]
+logic2test | >=0.1.0 | /home/tom/github/semcod/code2logic/logic2test (0.1.10) | 0.1.10 non-editable | NON-EDITABLE -> fix: pip install -e /home/tom/github/semcod/code2logic/logic2test  [pyproject.toml]
+lolm | >=0.1.0 | /home/tom/github/semcod/code2logic/lolm (0.1.10) | - | NOT-INSTALLED  [pyproject.toml[llm]]
+pfix | >=0.1.60 | /home/tom/github/semcod/pfix (0.1.76) | 0.1.73 editable | OK-EDITABLE  [pyproject.toml]
+
+## EXTERNAL DEPS (no local source, 9): black, build, isort, mypy, pytest, pytest-cov, pyyaml, ruff, twine
