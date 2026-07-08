@@ -184,3 +184,9 @@ credentials/
 
 # Separate projects
 webops/
+.benchmarks/
+.code2llm_cache/
+.github/
+.pyqual/
+.ruff_cache/
+.taskill/
