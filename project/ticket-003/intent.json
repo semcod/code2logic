@@ -1,8 +1,8 @@
 {
   "schema": "new-project.intent/v3",
   "ticket": "ticket-003",
-  "summary": "SESSION_EXECUTION_AUTHORIZATION: inspect Search-backed intent drift and repair the evidenced stale side",
-  "workstream": "documentation",
+  "summary": "Reconcile the documented Python support floor and CI matrix with the required SubLLM runtime dependency",
+  "workstream": "runtime",
   "classification": {
     "kind": "SERVICE",
     "priority": "P2",
@@ -11,6 +11,8 @@
   "allowedPaths": [
     "docs/**",
     "README.md",
+    "pyproject.toml",
+    ".github/workflows/ci.yml",
     ".gitignore",
     "project/ticket-003/**",
     ".governance/docs.json"

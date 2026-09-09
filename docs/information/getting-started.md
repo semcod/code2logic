@@ -3,7 +3,7 @@
   "schema": "wellmanifest.docs/document/v1",
   "id": "getting-started",
   "kind": "information",
-  "version": 1,
+  "version": 2,
   "title": "Getting Started",
   "status": "proposed",
   "owner": "semcod/code2logic",
@@ -49,6 +49,10 @@ The immutable original document is linked in metadata. Current API corrections a
 ```bash
 pip install code2logic
 ```
+
+Code2Logic requires Python 3.11 or newer. This is set by the mandatory
+`subactor-subllm` runtime dependency and is verified by the 3.11, 3.12 and 3.13
+CI matrix.
 
 ### From Source
 
