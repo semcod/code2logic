@@ -1,8 +1,50 @@
+---
+{
+  "schema": "wellmanifest.docs/document/v1",
+  "id": "llm-integration",
+  "kind": "information",
+  "version": 1,
+  "title": "LLM integration",
+  "status": "proposed",
+  "owner": "semcod/code2logic",
+  "created": "2026-09-09",
+  "updated": "2026-09-09",
+  "review_after": "2026-10-09",
+  "source_revision": "670066ca7c2383de95c85ab13740a3c34b1d9acb",
+  "affected_repositories": [
+    "semcod/code2logic"
+  ],
+  "evidence": [
+    "https://github.com/semcod/code2logic/blob/670066ca7c2383de95c85ab13740a3c34b1d9acb/code2logic/llm/__init__.py",
+    "https://github.com/semcod/code2logic/blob/670066ca7c2383de95c85ab13740a3c34b1d9acb/code2logic/base.py",
+    "https://github.com/semcod/code2logic/blob/670066ca7c2383de95c85ab13740a3c34b1d9acb/docs/08-llm-integration.md"
+  ]
+}
+---
+
+# LLM integration
+
+<!-- docs:section purpose -->
+## Purpose
+
+Describe the current Python API and extension points.
+
+<!-- docs:section scope -->
+## Scope
+
+This reference describes the repository revision above. Optional LLM clients require their configured provider dependencies.
+
+<!-- docs:section evidence -->
+## Evidence
+
+The exported client is `OllamaLocalClient`; the base classes are owned by `code2logic.base`. The previous reference remains auditable at the immutable source URL in metadata. The May formatting commit touched code and docs together; it does not establish semantic recency. A later August documentation edit changed unrelated MCP guidance, leaving the old client import unchanged.
+
+<!-- docs:section content -->
 # LLM Integration Guide
 
 > Using Code2Logic with Large Language Models
 
-[← README](../README.md) | [← Output Formats](05-output-formats.md) | [Examples →](12-examples.md)
+[← README](../../README.md) | [← Output Formats](output-formats.md) | [Examples →](examples.md)
 
 ## Overview
 
@@ -153,13 +195,13 @@ code2logic llm priority set-mode mixed
 
 ```python
 from code2logic import analyze_project
-from code2logic.llm import OllamaClient
+from code2logic.llm import OllamaLocalClient
 
 # Analyze code
 project = analyze_project("./my_project")
 
 # Use Ollama
-client = OllamaClient(model="qwen2.5-coder:14b")
+client = OllamaLocalClient(model="qwen2.5-coder:14b")
 response = client.generate(
     prompt=f"Analyze this project:\n{project.total_files} files",
     system="You are a code reviewer."
@@ -344,8 +386,19 @@ For Claude Desktop / Windsurf:
 }
 ```
 
-See [Examples](12-examples.md) for more integration patterns.
+See [Examples](examples.md) for more integration patterns.
 
 ---
 
-[← Output Formats](05-output-formats.md) | [Examples →](12-examples.md)
+[← Output Formats](output-formats.md) | [Examples →](examples.md)
+
+
+<!-- docs:section limitations -->
+## Validation limits
+
+The corrected imports were checked against source definitions and exports. Provider requests and tutorial workloads were not executed; their credentials and external services remain explicit prerequisites.
+
+<!-- docs:section next_actions -->
+## Maintenance
+
+Update this reference and its declared version when the public API changes.

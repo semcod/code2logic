@@ -1,0 +1,27 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-003",
+  "summary": "SESSION_EXECUTION_AUTHORIZATION: inspect Search-backed intent drift and repair the evidenced stale side",
+  "workstream": "documentation",
+  "classification": {
+    "kind": "SERVICE",
+    "priority": "P2",
+    "origin": "health"
+  },
+  "allowedPaths": [
+    "docs/**",
+    "README.md",
+    ".gitignore",
+    "project/ticket-003/**",
+    ".governance/docs.json"
+  ],
+  "forbiddenPaths": [
+    ".env",
+    "secrets/**",
+    "project/ticket-*/user-*.md"
+  ],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null
+}

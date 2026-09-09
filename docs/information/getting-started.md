@@ -1,8 +1,48 @@
+---
+{
+  "schema": "wellmanifest.docs/document/v1",
+  "id": "getting-started",
+  "kind": "information",
+  "version": 1,
+  "title": "Getting Started",
+  "status": "proposed",
+  "owner": "semcod/code2logic",
+  "created": "2026-09-09",
+  "updated": "2026-09-09",
+  "review_after": "2026-10-09",
+  "source_revision": "670066ca7c2383de95c85ab13740a3c34b1d9acb",
+  "affected_repositories": [
+    "semcod/code2logic"
+  ],
+  "evidence": [
+    "https://github.com/semcod/code2logic/blob/670066ca7c2383de95c85ab13740a3c34b1d9acb/docs/01-getting-started.md"
+  ]
+}
+---
+
+# Getting Started
+
+<!-- docs:section purpose -->
+## Purpose
+
+Preserve this reference while migrating links to the maintained canonical API documentation.
+
+<!-- docs:section scope -->
+## Scope
+
+The original material below is retained from the source revision in metadata. This migration updates its placement and relative links; it is not a fresh validation of every historical example.
+
+<!-- docs:section evidence -->
+## Evidence
+
+The immutable original document is linked in metadata. Current API corrections are documented in the project documentation index.
+
+<!-- docs:section content -->
 # Getting Started
 
 > Quick installation and first steps with Code2Logic
 
-[← README](../README.md) | [← Index](00-index.md) | [Configuration →](02-configuration.md)
+[← README](../../README.md) | [← Index](index.md) | [Configuration →](configuration.md)
 
 ### From PyPI
 
@@ -120,7 +160,7 @@ make build-subpackages
 make publish-all
 ```
 
-See: [Monorepo Workflow](19-monorepo-workflow.md).
+See: [Monorepo Workflow](../19-monorepo-workflow.md).
 
 ## Examples
 
@@ -142,11 +182,22 @@ python examples/02_refactoring.py ./my_project
 
 ## Next Steps
 
-1. [Configure API keys](02-configuration.md) for LLM features
-2. Learn [CLI commands](03-cli-reference.md)
-3. Explore [Python API](04-python-api.md)
-4. Try [Examples](12-examples.md)
+1. [Configure API keys](configuration.md) for LLM features
+2. Learn [CLI commands](cli-reference.md)
+3. Explore [Python API](python-api.md)
+4. Try [Examples](examples.md)
 
 ---
 
-[← Index](00-index.md) | [Configuration →](02-configuration.md)
+[← Index](index.md) | [Configuration →](configuration.md)
+
+
+<!-- docs:section limitations -->
+## Limits
+
+Unchanged historical examples remain subject to their original assumptions. Placement conformance does not establish semantic correctness or deployment.
+
+<!-- docs:section next_actions -->
+## Maintenance
+
+Update this declared version when changing its substantive findings.

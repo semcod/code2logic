@@ -190,3 +190,5 @@ webops/
 .pyqual/
 .ruff_cache/
 .taskill/
+
+/.worktrees/
