@@ -1,35 +1,75 @@
+---
+{
+  "schema": "wellmanifest.docs/document/v1",
+  "id": "examples",
+  "kind": "information",
+  "version": 1,
+  "title": "Examples",
+  "status": "proposed",
+  "owner": "semcod/code2logic",
+  "created": "2026-09-09",
+  "updated": "2026-09-09",
+  "review_after": "2026-10-09",
+  "source_revision": "670066ca7c2383de95c85ab13740a3c34b1d9acb",
+  "affected_repositories": [
+    "semcod/code2logic"
+  ],
+  "evidence": [
+    "https://github.com/semcod/code2logic/blob/670066ca7c2383de95c85ab13740a3c34b1d9acb/docs/12-examples.md"
+  ]
+}
+---
+
+# Examples
+
+<!-- docs:section purpose -->
+## Purpose
+
+Preserve this reference while migrating links to the maintained canonical API documentation.
+
+<!-- docs:section scope -->
+## Scope
+
+The original material below is retained from the source revision in metadata. This migration updates its placement and relative links; it is not a fresh validation of every historical example.
+
+<!-- docs:section evidence -->
+## Evidence
+
+The immutable original document is linked in metadata. Current API corrections are documented in the project documentation index.
+
+<!-- docs:section content -->
 # Examples
 
 > Usage examples and workflows for Code2Logic
 
-[← README](../README.md) | [← LLM Integration](08-llm-integration.md) | [Architecture →](13-architecture.md)
+[← README](../../README.md) | [← LLM Integration](llm-integration.md) | [Architecture →](architecture.md)
 
 ## Available Examples
 
 All examples are in the `examples/` folder:
 
-- [examples/run_examples.sh](../examples/run_examples.sh) - Example runner script (multi-command workflows)
-- [examples/code2logic/](../examples/code2logic/) - Minimal project + Docker example for code2logic
-- [examples/logic2test/](../examples/logic2test/) - Minimal project + Docker example for logic2test
-- [examples/logic2code/](../examples/logic2code/) - Minimal project + Docker example for logic2code
+- [examples/run_examples.sh](../../examples/run_examples.sh) - Example runner script (multi-command workflows)
+- [examples/code2logic/](../../examples/code2logic) - Minimal project + Docker example for code2logic
+- [examples/logic2test/](../../examples/logic2test) - Minimal project + Docker example for logic2test
+- [examples/logic2code/](../../examples/logic2code) - Minimal project + Docker example for logic2code
 
 | Example | Description |
 | --- | --- |
-| [01_quick_start.py](../examples/01_quick_start.py) | Basic usage guide |
-| [02_refactoring.py](../examples/02_refactoring.py) | Duplicate + quality analysis |
-| [03_reproduction.py](../examples/03_reproduction.py) | Reproduce code from specs |
-| [04_project.py](../examples/04_project.py) | Project-level reproduction |
-| [05_llm_integration.py](../examples/05_llm_integration.py) | LLM integration demo |
-| [06_metrics.py](../examples/06_metrics.py) | Detailed reproduction metrics |
-| [08_format_benchmark.py](../examples/08_format_benchmark.py) | Benchmark formats across files |
-| [09_async_benchmark.py](../examples/09_async_benchmark.py) | Parallel benchmark with multi-provider LLM |
-| [10_function_reproduction.py](../examples/10_function_reproduction.py) | Function-level reproduction |
-| [11_token_benchmark.py](../examples/11_token_benchmark.py) | Token-aware benchmark |
-| [12_comprehensive_analysis.py](../examples/12_comprehensive_analysis.py) | Post-run analysis of generated outputs |
-| [13_project_benchmark.py](../examples/13_project_benchmark.py) | Whole-project structure benchmark |
-| [14_repeatability_test.py](../examples/14_repeatability_test.py) | Repeatability testing |
-| [15_unified_benchmark.py](../examples/15_unified_benchmark.py) | Unified benchmark runner example |
-| [16_terminal_demo.py](../examples/16_terminal_demo.py) | Terminal markdown rendering demo |
+| [01_quick_start.py](../../examples/01_quick_start.py) | Basic usage guide |
+| [02_refactoring.py](../../examples/02_refactoring.py) | Duplicate + quality analysis |
+| [03_reproduction.py](../../examples/03_reproduction.py) | Reproduce code from specs |
+| [04_project.py](../../examples/04_project.py) | Project-level reproduction |
+| [05_llm_integration.py](../../examples/05_llm_integration.py) | LLM integration demo |
+| [06_metrics.py](../../examples/06_metrics.py) | Detailed reproduction metrics |
+| [08_format_benchmark.py](../../examples/08_format_benchmark.py) | Benchmark formats across files |
+| [09_async_benchmark.py](../../examples/09_async_benchmark.py) | Parallel benchmark with multi-provider LLM |
+| [10_function_reproduction.py](../../examples/10_function_reproduction.py) | Function-level reproduction |
+| [11_token_benchmark.py](../../examples/11_token_benchmark.py) | Token-aware benchmark |
+| [12_comprehensive_analysis.py](../../examples/12_comprehensive_analysis.py) | Post-run analysis of generated outputs |
+| [13_project_benchmark.py](../../examples/13_project_benchmark.py) | Whole-project structure benchmark |
+| [14_repeatability_test.py](../../examples/14_repeatability_test.py) | Repeatability testing |
+| [15_unified_benchmark.py](../../examples/15_unified_benchmark.py) | Unified benchmark runner example |
+| [16_terminal_demo.py](../../examples/16_terminal_demo.py) | Terminal markdown rendering demo |
 
 ## Quick Start
 
@@ -219,10 +259,21 @@ python examples/16_terminal_demo.py --folder tests/samples/
 
 ## See Also
 
-- [CLI Reference](03-cli-reference.md) - Command-line options
-- [Python API](04-python-api.md) - Programmatic interface
-- [LLM Integration](08-llm-integration.md) - LLM provider setup
+- [CLI Reference](cli-reference.md) - Command-line options
+- [Python API](python-api.md) - Programmatic interface
+- [LLM Integration](llm-integration.md) - LLM provider setup
 
 ---
 
-[← LLM Integration](08-llm-integration.md) | [Architecture →](13-architecture.md)
+[← LLM Integration](llm-integration.md) | [Architecture →](architecture.md)
+
+
+<!-- docs:section limitations -->
+## Limits
+
+Unchanged historical examples remain subject to their original assumptions. Placement conformance does not establish semantic correctness or deployment.
+
+<!-- docs:section next_actions -->
+## Maintenance
+
+Update this declared version when changing its substantive findings.

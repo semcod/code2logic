@@ -1,8 +1,50 @@
+---
+{
+  "schema": "wellmanifest.docs/document/v1",
+  "id": "python-api",
+  "kind": "information",
+  "version": 1,
+  "title": "Python API",
+  "status": "proposed",
+  "owner": "semcod/code2logic",
+  "created": "2026-09-09",
+  "updated": "2026-09-09",
+  "review_after": "2026-10-09",
+  "source_revision": "670066ca7c2383de95c85ab13740a3c34b1d9acb",
+  "affected_repositories": [
+    "semcod/code2logic"
+  ],
+  "evidence": [
+    "https://github.com/semcod/code2logic/blob/670066ca7c2383de95c85ab13740a3c34b1d9acb/code2logic/llm/__init__.py",
+    "https://github.com/semcod/code2logic/blob/670066ca7c2383de95c85ab13740a3c34b1d9acb/code2logic/base.py",
+    "https://github.com/semcod/code2logic/blob/670066ca7c2383de95c85ab13740a3c34b1d9acb/docs/04-python-api.md"
+  ]
+}
+---
+
+# Python API
+
+<!-- docs:section purpose -->
+## Purpose
+
+Describe the current Python API and extension points.
+
+<!-- docs:section scope -->
+## Scope
+
+This reference describes the repository revision above. Optional LLM clients require their configured provider dependencies.
+
+<!-- docs:section evidence -->
+## Evidence
+
+The exported client is `OllamaLocalClient`; the base classes are owned by `code2logic.base`. The previous reference remains auditable at the immutable source URL in metadata. The May formatting commit touched code and docs together; it does not establish semantic recency. A later August documentation edit changed unrelated MCP guidance, leaving the old client import unchanged.
+
+<!-- docs:section content -->
 # Python API Reference
 
 > Programmatic usage of Code2Logic
 
-[← README](../README.md) | [← CLI Reference](03-cli-reference.md) | [Output Formats →](05-output-formats.md)
+[← README](../../README.md) | [← CLI Reference](cli-reference.md) | [Output Formats →](output-formats.md)
 
 ## Package Structure
 
@@ -385,7 +427,7 @@ similar = detector.find_similar(func1, func2)
 from code2logic import analyze_project
 from code2logic.generators import CSVGenerator
 from code2logic.gherkin import GherkinGenerator
-from code2logic.llm import OllamaClient
+from code2logic.llm import OllamaLocalClient
 
 # 1. Analyze project
 project = analyze_project("./my_project")
@@ -403,7 +445,7 @@ with open("analysis.feature", "w") as f:
     f.write(gherkin)
 
 # 4. Use with LLM
-client = OllamaClient(model="qwen2.5-coder:7b")
+client = OllamaLocalClient(model="qwen2.5-coder:7b")
 if client.is_available():
     response = client.generate(
         prompt=f"Review this code structure:\n{gherkin[:2000]}",
@@ -414,4 +456,15 @@ if client.is_available():
 
 ---
 
-[← CLI Reference](03-cli-reference.md) | [Output Formats →](05-output-formats.md)
+[← CLI Reference](cli-reference.md) | [Output Formats →](output-formats.md)
+
+
+<!-- docs:section limitations -->
+## Validation limits
+
+The corrected imports were checked against source definitions and exports. Provider requests and tutorial workloads were not executed; their credentials and external services remain explicit prerequisites.
+
+<!-- docs:section next_actions -->
+## Maintenance
+
+Update this reference and its declared version when the public API changes.

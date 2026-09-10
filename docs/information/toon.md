@@ -1,8 +1,48 @@
+---
+{
+  "schema": "wellmanifest.docs/document/v1",
+  "id": "toon",
+  "kind": "information",
+  "version": 1,
+  "title": "TOON Format",
+  "status": "proposed",
+  "owner": "semcod/code2logic",
+  "created": "2026-09-09",
+  "updated": "2026-09-09",
+  "review_after": "2026-10-09",
+  "source_revision": "670066ca7c2383de95c85ab13740a3c34b1d9acb",
+  "affected_repositories": [
+    "semcod/code2logic"
+  ],
+  "evidence": [
+    "https://github.com/semcod/code2logic/blob/670066ca7c2383de95c85ab13740a3c34b1d9acb/docs/07-toon.md"
+  ]
+}
+---
+
+# TOON Format
+
+<!-- docs:section purpose -->
+## Purpose
+
+Preserve this reference while migrating links to the maintained canonical API documentation.
+
+<!-- docs:section scope -->
+## Scope
+
+The original material below is retained from the source revision in metadata. This migration updates its placement and relative links; it is not a fresh validation of every historical example.
+
+<!-- docs:section evidence -->
+## Evidence
+
+The immutable original document is linked in metadata. Current API corrections are documented in the project documentation index.
+
+<!-- docs:section content -->
 # TOON Format
 
 > Token-Oriented Object Notation - Ultra-compact format for LLM consumption
 
-[← README](../README.md) | [← Index](00-index.md) | [Format Specs →](06-format-specifications.md)
+[← README](../../README.md) | [← Index](index.md) | [Format Specs →](../06-format-specifications.md)
 
 ## Overview
 
@@ -433,11 +473,22 @@ python examples/12_comprehensive_analysis.py
 
 ## See Also
 
-- [Output Formats](05-output-formats.md) - All format comparison
-- [Format Specifications](06-format-specifications.md) - Detailed specs
-- [Benchmarking](10-benchmark.md) - Benchmark results
+- [Output Formats](output-formats.md) - All format comparison
+- [Format Specifications](../06-format-specifications.md) - Detailed specs
+- [Benchmarking](benchmark.md) - Benchmark results
 - [TOON GitHub](https://github.com/toon-format/toon) - Original spec
 
 ---
 
-[← Format Specs](06-format-specifications.md) | [LLM Integration →](08-llm-integration.md)
+[← Format Specs](../06-format-specifications.md) | [LLM Integration →](llm-integration.md)
+
+
+<!-- docs:section limitations -->
+## Limits
+
+Unchanged historical examples remain subject to their original assumptions. Placement conformance does not establish semantic correctness or deployment.
+
+<!-- docs:section next_actions -->
+## Maintenance
+
+Update this declared version when changing its substantive findings.
