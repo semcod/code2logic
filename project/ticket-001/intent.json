@@ -1,0 +1,17 @@
+{
+  "ticket": "ticket-001",
+  "summary": "Adopt immutable local CI publication instructions",
+  "allowedPaths": [
+    "AGENTS.md",
+    ".gitignore",
+    "project/ticket-001/**"
+  ],
+  "forbiddenPaths": [
+    ".env",
+    "config/**",
+    ".github/workflows/**"
+  ],
+  "authorization": "SESSION_EXECUTION_AUTHORIZATION",
+  "standard_revision": "d5f77d83b3752477cfb95a535d0e1ce77f148576",
+  "outcome": "Publication-policy-only adoption with protected review; no executor or required-check mutation."
+}
