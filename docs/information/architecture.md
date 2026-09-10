@@ -1,8 +1,50 @@
+---
+{
+  "schema": "wellmanifest.docs/document/v1",
+  "id": "architecture",
+  "kind": "information",
+  "version": 1,
+  "title": "Architecture and extension contracts",
+  "status": "proposed",
+  "owner": "semcod/code2logic",
+  "created": "2026-09-09",
+  "updated": "2026-09-09",
+  "review_after": "2026-10-09",
+  "source_revision": "670066ca7c2383de95c85ab13740a3c34b1d9acb",
+  "affected_repositories": [
+    "semcod/code2logic"
+  ],
+  "evidence": [
+    "https://github.com/semcod/code2logic/blob/670066ca7c2383de95c85ab13740a3c34b1d9acb/code2logic/llm/__init__.py",
+    "https://github.com/semcod/code2logic/blob/670066ca7c2383de95c85ab13740a3c34b1d9acb/code2logic/base.py",
+    "https://github.com/semcod/code2logic/blob/670066ca7c2383de95c85ab13740a3c34b1d9acb/docs/13-architecture.md"
+  ]
+}
+---
+
+# Architecture and extension contracts
+
+<!-- docs:section purpose -->
+## Purpose
+
+Describe the current Python API and extension points.
+
+<!-- docs:section scope -->
+## Scope
+
+This reference describes the repository revision above. Optional LLM clients require their configured provider dependencies.
+
+<!-- docs:section evidence -->
+## Evidence
+
+The exported client is `OllamaLocalClient`; the base classes are owned by `code2logic.base`. The previous reference remains auditable at the immutable source URL in metadata. The May formatting commit touched code and docs together; it does not establish semantic recency. A later August documentation edit changed unrelated MCP guidance, leaving the old client import unchanged.
+
+<!-- docs:section content -->
 # Architecture
 
 > System design and component overview
 
-[← README](../README.md) | [← Examples](12-examples.md) | [Index →](00-index.md)
+[← README](../../README.md) | [← Examples](examples.md) | [Index →](index.md)
 
 ## System Overview
 
@@ -212,7 +254,7 @@ code2logic/
 ### Adding New Generator
 
 ```python
-from code2logic.generators import BaseGenerator
+from code2logic.base import BaseGenerator
 
 class CustomGenerator(BaseGenerator):
     def generate(self, project: ProjectInfo, **kwargs) -> str:
@@ -223,7 +265,7 @@ class CustomGenerator(BaseGenerator):
 ### Adding New Parser
 
 ```python
-from code2logic.parsers import BaseParser
+from code2logic.base import BaseParser
 
 class CustomParser(BaseParser):
     def parse_file(self, path: str) -> ModuleInfo:
@@ -251,10 +293,21 @@ class CustomClient(BaseLLMClient):
 
 ## See Also
 
-- [Python API](04-python-api.md) - Detailed API reference
-- [Configuration](02-configuration.md) - Setup guide
-- [TODO.md](../TODO.md) - Refactoring roadmap
+- [Python API](python-api.md) - Detailed API reference
+- [Configuration](configuration.md) - Setup guide
+- [TODO.md](../../TODO.md) - Refactoring roadmap
 
 ---
 
-[← Examples](12-examples.md) | [Index →](00-index.md)
+[← Examples](examples.md) | [Index →](index.md)
+
+
+<!-- docs:section limitations -->
+## Validation limits
+
+The corrected imports were checked against source definitions and exports. Provider requests and tutorial workloads were not executed; their credentials and external services remain explicit prerequisites.
+
+<!-- docs:section next_actions -->
+## Maintenance
+
+Update this reference and its declared version when the public API changes.

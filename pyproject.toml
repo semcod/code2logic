@@ -7,7 +7,7 @@ name = "code2logic"
 version = "1.0.50"
 description = "High-performance Python code flow analysis with NLP query processing - CFG, DFG, call graphs, and intelligent code queries"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = "Apache-2.0"
 authors = [
     {name = "Tom Sapletta", email = "tom@sapletta.com"},
@@ -26,7 +26,6 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -70,10 +69,10 @@ Issues = "https://github.com/wronai/code2logic/issues"
 
 [tool.black]
 line-length = 100
-target-version = ['py310']
+target-version = ['py311']
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

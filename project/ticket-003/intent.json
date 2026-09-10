@@ -1,0 +1,29 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-003",
+  "summary": "Reconcile the documented Python support floor and CI matrix with the required SubLLM runtime dependency",
+  "workstream": "runtime",
+  "classification": {
+    "kind": "SERVICE",
+    "priority": "P2",
+    "origin": "health"
+  },
+  "allowedPaths": [
+    "docs/**",
+    "README.md",
+    "pyproject.toml",
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "project/ticket-003/**",
+    ".governance/docs.json"
+  ],
+  "forbiddenPaths": [
+    ".env",
+    "secrets/**",
+    "project/ticket-*/user-*.md"
+  ],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null
+}
