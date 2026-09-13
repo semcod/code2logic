@@ -1,0 +1,22 @@
+version: 2
+updates:
+- package-ecosystem: uv
+  directory: /
+  schedule:
+    interval: cron
+    cronjob: 39 4 * * *
+    timezone: Europe/Warsaw
+  open-pull-requests-limit: 1
+  versioning-strategy: increase-if-necessary
+  allow:
+  - dependency-name: costs
+    dependency-type: all
+  - dependency-name: goal
+    dependency-type: all
+  groups:
+    internal-packages:
+      patterns:
+      - costs
+      - goal
+  commit-message:
+    prefix: "chore(deps)"
