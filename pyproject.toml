@@ -43,7 +43,6 @@ dependencies = [
     "tree-sitter-python>=0.21",
     "goal>=2.1.0",
     "costs>=0.1.20",
-    "pfix>=0.1.60",
     "subactor-subllm @ git+https://github.com/subactor/subllm.git@505d89f505e90c7b40d98cafdc9104cc61072460",
 ]
 
@@ -56,7 +55,6 @@ dev = [
     "mypy>=0.910",
     "goal>=2.1.0",
     "costs>=0.1.20",
-    "pfix>=0.1.60",
 ]
 
 [project.scripts]
@@ -78,22 +76,6 @@ ignore_missing_imports = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"
-
-[tool.pfix]
-# Self-healing Python configuration
-model = "openrouter/qwen/qwen3-coder-next"
-auto_apply = true
-auto_install_deps = true
-auto_restart = false
-max_retries = 3
-create_backups = false
-git_auto_commit = false
-
-[tool.pfix.runtime_todo]
-enabled = true
-todo_file = "TODO.md"
-min_severity = "low"
-deduplicate = true
 
 [tool.costs]
 # AI Cost tracking configuration
