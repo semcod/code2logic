@@ -1,0 +1,19 @@
+{
+  "ticket": "ticket-004",
+  "summary": "Remove pfix auto-repair configuration and dependency declarations",
+  "allowedPaths": [
+    "logic2code/pyproject.toml",
+    "logic2test/pyproject.toml",
+    "lolm/pyproject.toml",
+    "pyproject.toml",
+    "project/ticket-004/**"
+  ],
+  "forbiddenPaths": [
+    ".env",
+    "src/**",
+    "tests/**",
+    ".github/workflows/**"
+  ],
+  "authorization": "SESSION_EXECUTION_AUTHORIZATION",
+  "outcome": "pfix is no longer configured, installed or locked by this project; no runtime behavior change."
+}
