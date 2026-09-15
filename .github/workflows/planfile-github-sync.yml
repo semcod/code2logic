@@ -1,0 +1,31 @@
+name: Planfile GitHub sync
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".planfile/**"
+      - "*.planfile.yaml"
+      - "*.planfile.yml"
+      - "planfile.yaml"
+      - "tickets.planfile.yaml"
+
+concurrency:
+  group: planfile-github-sync-${{ github.repository }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  sync:
+    uses: semcod/planfile/.github/workflows/planfile-sync-reusable.yml@v0.1.126
+    with:
+      planfile-version: "0.1.126"
+    permissions:
+      contents: read
+      issues: write
