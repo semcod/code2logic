@@ -611,6 +611,11 @@ def _code2logic_llm_cli(argv: list[str]) -> None:
 
 def main(argv=None):
     cli_start = time.time()
+    try:
+        from .autoupdate import check_for_updates
+        check_for_updates("code2logic")
+    except Exception:
+        pass
     parser = argparse.ArgumentParser(
         description="Analyze source code and generate logical representations",
         formatter_class=argparse.RawDescriptionHelpFormatter,
