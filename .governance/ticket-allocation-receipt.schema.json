@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wellmanifest.com/schemas/new-project-ticket-allocation-receipt-v1.json",
+  "title": "new-project registered ticket allocation receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "allocationId", "repositoryRef", "ticket", "number", "requestDigest", "processUri", "issuer", "fencingToken", "issuedAt", "expiresAt", "receiptRef", "proofDigest"],
+  "properties": {
+    "schema": {"const": "new-project.ticket-allocation-receipt/v1"},
+    "allocationId": {"type": "string", "pattern": "^[a-z][a-z0-9+.-]*://[^\\s]+$"},
+    "repositoryRef": {"type": "string", "pattern": "^[a-z][a-z0-9+.-]*://[^\\s]+$"},
+    "ticket": {"type": "string", "pattern": "^ticket-[0-9]{3,}$"},
+    "number": {"type": "integer", "minimum": 1},
+    "requestDigest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "processUri": {"type": "string", "pattern": "^[a-z][a-z0-9+.-]*://[^\\s]+$"},
+    "issuer": {"type": "string", "pattern": "^[a-z][a-z0-9+.-]*://[^\\s]+$"},
+    "fencingToken": {"type": "integer", "minimum": 1},
+    "issuedAt": {"type": "string", "format": "date-time"},
+    "expiresAt": {"type": "string", "format": "date-time"},
+    "receiptRef": {"type": "string", "pattern": "^[a-z][a-z0-9+.-]*://[^\\s]+$"},
+    "proofDigest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "schema": "wellmanifest.standard-adoption/v1",
+  "mode": "audit",
+  "profile": "baseline",
+  "repositoryRole": "unclassified",
+  "updates": {
+    "enabled": true,
+    "trigger": "pre-commit",
+    "action": "prepare-and-abort",
+    "executor": "goal"
+  },
+  "adoptions": []
+}

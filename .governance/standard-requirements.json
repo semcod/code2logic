@@ -1,0 +1,53 @@
+{
+  "schema": "wellman.standard-requirements/v1",
+  "profiles": [
+    "baseline",
+    "deployment"
+  ],
+  "requirements": [
+    {
+      "id": "wellmanifest/authority-lifecycle",
+      "minimumLevel": "S5"
+    },
+    {
+      "id": "wellmanifest/deployment",
+      "minimumLevel": "S5"
+    },
+    {
+      "id": "wellmanifest/docs",
+      "minimumLevel": "S3"
+    },
+    {
+      "id": "wellmanifest/git-lifecycle",
+      "minimumLevel": "S4"
+    },
+    {
+      "id": "wellmanifest/logs",
+      "minimumLevel": "S5"
+    },
+    {
+      "id": "wellmanifest/merge",
+      "minimumLevel": "S5"
+    },
+    {
+      "id": "wellmanifest/new-project",
+      "minimumLevel": "S4"
+    },
+    {
+      "id": "wellmanifest/poa",
+      "minimumLevel": "S5"
+    },
+    {
+      "id": "wellmanifest/ticket-lifecycle",
+      "minimumLevel": "S3"
+    },
+    {
+      "id": "wellmanifest/validation-attestation",
+      "minimumLevel": "S4"
+    },
+    {
+      "id": "wellmanifest/worktrees",
+      "minimumLevel": "S3"
+    }
+  ]
+}

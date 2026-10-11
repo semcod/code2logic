@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wellmanifest.com/schemas/new-project/reusable-workflows/v1",
+  "title": "Reviewed offline reusable workflow source bindings",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "workflows"],
+  "properties": {
+    "schema": {"const": "new-project.reusable-workflows/v1"},
+    "workflows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["uses", "sourceFile", "sourceSha256"],
+        "properties": {
+          "uses": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/\\.github/workflows/[A-Za-z0-9_.-]+\\.ya?ml@[0-9a-f]{40}$"},
+          "sourceFile": {"type": "string", "pattern": "^\\.github/reusable-workflows/[A-Za-z0-9_.-]+\\.ya?ml$"},
+          "sourceSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    }
+  }
+}

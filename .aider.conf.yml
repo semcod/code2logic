@@ -1,0 +1,22 @@
+# <!-- wellmanifest:source-links:v1 -->
+# Managed standard sources: local .governance/manifest.json,
+# .governance/manifest.lock.json and .governance/package-manifest.json are
+# authoritative. Remote links are navigation only and are never fetched at runtime.
+# Canonical instructions: https://github.com/wellmanifest/new-project/blob/main/template/files/AGENTS.template.md
+# Host contract: https://github.com/wellmanifest/new-project/blob/main/governance/agent-hosts.json
+# Immutable adoption/updater: https://github.com/wellmanifest/new-project/blob/main/scripts/create_adoption_lock.py
+# <!-- end wellmanifest:source-links:v1 -->
+# wellmanifest/new-project — fail-closed contract for aider.
+# aider loads these files into every session, so the same rules apply here as
+# in Cursor, Claude Code or Gemini. The pre-commit hook enforces them.
+read:
+  - AGENTS.md
+  - CLAUDE.md
+
+# Never let the tool create commits the governance hook has not seen.
+auto-commits: false
+attribute-commit-message-author: true
+
+# Bounded session controls: respect the ticket's maxActiveMinutes, create a
+# checkpoint before a context or tool boundary, and leave a handoff then stop
+# after a deterministic failure instead of retrying indefinitely.

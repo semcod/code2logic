@@ -1,7 +1,7 @@
 # Code2Logic Docker Image
 # Multi-stage build for smaller image
 
-FROM python:3.12-slim AS builder
+FROM python:3.12-slim@sha256:05cda9777409a9c3ffddd94a4c476b79f0769a0b4857f0c7ed9226b6800b0d6f AS builder
 
 WORKDIR /app
 
@@ -18,7 +18,7 @@ RUN python -m build --wheel
 # ============================================================================
 # Final image
 # ============================================================================
-FROM python:3.12-slim
+FROM python:3.12-slim@sha256:05cda9777409a9c3ffddd94a4c476b79f0769a0b4857f0c7ed9226b6800b0d6f
 
 LABEL maintainer="Softreck <info@softreck.dev>"
 LABEL description="Code2Logic - Convert source code to logical representation for LLM analysis"

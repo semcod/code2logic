@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wellmanifest.dev/schemas/new-project/ticket-activity.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schema", "registry", "terminalOutcomes", "unsupportedOutcomePolicy"],
+  "properties": {
+    "$schema": {"const": "./ticket-activity.schema.json"},
+    "schema": {"const": "new-project.ticket-activity/v1"},
+    "registry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["location", "path", "missingPolicy"],
+      "properties": {
+        "location": {"const": "git-common-dir"},
+        "path": {"type": "string", "pattern": "^[A-Za-z0-9._/-]+$"},
+        "missingPolicy": {"enum": ["status-projection", "git-ancestry"],
+          "description": "How to resolve a ticket when the receipt registry is absent. status-projection trusts the README status and is conservative. git-ancestry additionally asks Git whether the delivery already reached the target branch, which an adopter chooses when hand-edited statuses have stopped tracking reality."}
+      }
+    },
+    "terminalOutcomes": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["verification", "releasesReservation"],
+        "properties": {
+          "verification": {
+            "enum": [
+              "git-ancestry",
+              "git-ancestry-or-rewritten-patch-series"
+            ]
+          },
+          "releasesReservation": {"const": true}
+        }
+      }
+    },
+    "unsupportedOutcomePolicy": {"const": "remain-active"}
+  }
+}

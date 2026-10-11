@@ -1,0 +1,544 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wellmanifest.com/new-project/branch-intent-reconciliation.schema.json",
+  "title": "Branch intent reconciliation artifacts (conformance is not authority)",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/report"
+    },
+    {
+      "$ref": "#/$defs/observation"
+    },
+    {
+      "$ref": "#/$defs/evidence"
+    }
+  ],
+  "$defs": {
+    "bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "sourceRef",
+        "sourceHeadSha",
+        "targetRef",
+        "targetHeadSha",
+        "intentSha256"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceRef": {
+          "type": "string",
+          "pattern": "^refs/heads/.+"
+        },
+        "sourceHeadSha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "targetRef": {
+          "type": "string",
+          "pattern": "^refs/heads/.+"
+        },
+        "targetHeadSha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "intentSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receiptRef",
+        "sha256"
+      ],
+      "properties": {
+        "receiptRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "bindings",
+        "preservation",
+        "criteria"
+      ],
+      "properties": {
+        "schema": {
+          "const": "new-project.branch-intent-reconciliation/v1"
+        },
+        "bindings": {
+          "$ref": "#/$defs/bindings"
+        },
+        "preservation": {
+          "$ref": "#/$defs/reference"
+        },
+        "criteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "outcome",
+              "evidence",
+              "followUp",
+              "decision"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "outcome": {
+                "enum": [
+                  "implemented",
+                  "partial",
+                  "superseded",
+                  "missing",
+                  "unknown"
+                ]
+              },
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/reference"
+                },
+                "uniqueItems": true
+              },
+              "followUp": {
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/reference"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "decision": {
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/reference"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "bindings",
+        "criteria",
+        "receipts"
+      ],
+      "properties": {
+        "schema": {
+          "const": "new-project.branch-intent-observation/v1"
+        },
+        "bindings": {
+          "$ref": "#/$defs/bindings"
+        },
+        "criteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "requiredProof"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "requiredProof": {
+                "enum": [
+                  "content",
+                  "behavior",
+                  "either"
+                ]
+              }
+            }
+          }
+        },
+        "receipts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "evidence": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema",
+            "receiptRef",
+            "kind",
+            "bindings",
+            "criterionIds",
+            "facts"
+          ],
+          "properties": {
+            "schema": {
+              "const": "new-project.branch-intent-evidence/v1"
+            },
+            "receiptRef": {
+              "type": "string",
+              "minLength": 1
+            },
+            "kind": {
+              "const": "preservation"
+            },
+            "bindings": {
+              "$ref": "#/$defs/bindings"
+            },
+            "criterionIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "facts": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "archiveRef",
+                "archiveSha256",
+                "restoreVerified"
+              ],
+              "properties": {
+                "archiveRef": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "archiveSha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "restoreVerified": {
+                  "const": true
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema",
+            "receiptRef",
+            "kind",
+            "bindings",
+            "criterionIds",
+            "facts"
+          ],
+          "properties": {
+            "schema": {
+              "const": "new-project.branch-intent-evidence/v1"
+            },
+            "receiptRef": {
+              "type": "string",
+              "minLength": 1
+            },
+            "kind": {
+              "const": "content-equivalence"
+            },
+            "bindings": {
+              "$ref": "#/$defs/bindings"
+            },
+            "criterionIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "facts": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "sourcePath",
+                "targetPath",
+                "sourceSha256",
+                "targetSha256"
+              ],
+              "properties": {
+                "sourcePath": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "targetPath": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sourceSha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "targetSha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema",
+            "receiptRef",
+            "kind",
+            "bindings",
+            "criterionIds",
+            "facts"
+          ],
+          "properties": {
+            "schema": {
+              "const": "new-project.branch-intent-evidence/v1"
+            },
+            "receiptRef": {
+              "type": "string",
+              "minLength": 1
+            },
+            "kind": {
+              "const": "test-result"
+            },
+            "bindings": {
+              "$ref": "#/$defs/bindings"
+            },
+            "criterionIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "facts": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "suiteSha256",
+                "resultSha256",
+                "passed"
+              ],
+              "properties": {
+                "suiteSha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "resultSha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "passed": {
+                  "const": true
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema",
+            "receiptRef",
+            "kind",
+            "bindings",
+            "criterionIds",
+            "facts"
+          ],
+          "properties": {
+            "schema": {
+              "const": "new-project.branch-intent-evidence/v1"
+            },
+            "receiptRef": {
+              "type": "string",
+              "minLength": 1
+            },
+            "kind": {
+              "const": "decision"
+            },
+            "bindings": {
+              "$ref": "#/$defs/bindings"
+            },
+            "criterionIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "facts": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "decisionRef",
+                "actor",
+                "disposition"
+              ],
+              "properties": {
+                "decisionRef": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "actor": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "disposition": {
+                  "enum": [
+                    "superseded",
+                    "discard"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema",
+            "receiptRef",
+            "kind",
+            "bindings",
+            "criterionIds",
+            "facts"
+          ],
+          "properties": {
+            "schema": {
+              "const": "new-project.branch-intent-evidence/v1"
+            },
+            "receiptRef": {
+              "type": "string",
+              "minLength": 1
+            },
+            "kind": {
+              "const": "follow-up"
+            },
+            "bindings": {
+              "$ref": "#/$defs/bindings"
+            },
+            "criterionIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "facts": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "ticketRef",
+                "intentSha256"
+              ],
+              "properties": {
+                "ticketRef": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "intentSha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema",
+            "receiptRef",
+            "kind",
+            "bindings",
+            "criterionIds",
+            "facts"
+          ],
+          "properties": {
+            "schema": {
+              "const": "new-project.branch-intent-evidence/v1"
+            },
+            "receiptRef": {
+              "type": "string",
+              "minLength": 1
+            },
+            "kind": {
+              "const": "advisory"
+            },
+            "bindings": {
+              "$ref": "#/$defs/bindings"
+            },
+            "criterionIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "facts": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "analysisRef"
+              ],
+              "properties": {
+                "analysisRef": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

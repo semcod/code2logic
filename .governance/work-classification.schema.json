@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/wellmanifest/new-project/governance/work-classification.schema.json",
+  "title": "new-project work classification DSL",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schema", "dimensions", "ordering", "priorityDerivation", "evaluation", "rules"],
+  "properties": {
+    "$schema": {"const": "./work-classification.schema.json"},
+    "schema": {"const": "new-project.work-classification/v1"},
+    "dimensions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "priority", "origin"],
+      "properties": {
+        "kind": {
+          "type": "array",
+          "prefixItems": [{"const": "BUG"}, {"const": "FEATURE"}, {"const": "SERVICE"}],
+          "items": false,
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true
+        },
+        "priority": {
+          "type": "array",
+          "prefixItems": [{"const": "P0"}, {"const": "P1"}, {"const": "P2"}, {"const": "P3"}],
+          "items": false,
+          "minItems": 4,
+          "maxItems": 4,
+          "uniqueItems": true
+        },
+        "origin": {
+          "type": "array",
+          "prefixItems": [{"const": "regression"}, {"const": "requested"}, {"const": "health"}],
+          "items": false,
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true
+        }
+      }
+    },
+    "ordering": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["precedence", "kindOrder", "priorityOrder", "dependencyPolicy", "stableIdPolicy"],
+      "properties": {
+        "precedence": {
+          "type": "array",
+          "prefixItems": [
+            {"const": "dependencies"},
+            {"const": "kind"},
+            {"const": "priority"},
+            {"const": "stableId"}
+          ],
+          "items": false,
+          "minItems": 4,
+          "maxItems": 4,
+          "uniqueItems": true
+        },
+        "kindOrder": {
+          "type": "array",
+          "prefixItems": [{"const": "BUG"}, {"const": "FEATURE"}, {"const": "SERVICE"}],
+          "items": false,
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true
+        },
+        "priorityOrder": {
+          "type": "array",
+          "prefixItems": [{"const": "P0"}, {"const": "P1"}, {"const": "P2"}, {"const": "P3"}],
+          "items": false,
+          "minItems": 4,
+          "maxItems": 4,
+          "uniqueItems": true
+        },
+        "dependencyPolicy": {"const": "topological-before-ranking"},
+        "stableIdPolicy": {"const": "lexicographic"}
+      }
+    },
+    "priorityDerivation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["impact", "declaredPolicy", "serviceDefault"],
+      "properties": {
+        "impact": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["critical", "high", "medium", "low"],
+          "properties": {
+            "critical": {"const": "P0"},
+            "high": {"const": "P1"},
+            "medium": {"const": "P2"},
+            "low": {"const": "P3"}
+          }
+        },
+        "declaredPolicy": {"const": "require-valid-priority"},
+        "serviceDefault": {"enum": ["P0", "P1", "P2", "P3"]}
+      }
+    },
+    "evaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "unmatchedPolicy", "llmRole"],
+      "properties": {
+        "mode": {"const": "first-match"},
+        "unmatchedPolicy": {"const": "reject"},
+        "llmRole": {"const": "advisory-only"}
+      }
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/rule"}
+    }
+  },
+  "$defs": {
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "when", "assign", "prioritySource"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^W-CLASS-[0-9]{3}$"},
+        "when": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["signal"],
+          "properties": {
+            "signal": {"enum": ["defect", "cyclomatic-complexity", "work-request"]},
+            "impact": {"enum": ["outage-or-security", "functional"]},
+            "baseline": {"enum": ["measured", "pre-existing"]},
+            "delta": {"enum": ["increased", "not-increased"]},
+            "threshold": {"const": "crossed"},
+            "request": {"enum": ["new-behavior", "maintenance"]}
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {"signal": {"const": "defect"}},
+                "required": ["signal"]
+              },
+              "then": {"required": ["impact"]}
+            },
+            {
+              "if": {
+                "properties": {"signal": {"const": "cyclomatic-complexity"}},
+                "required": ["signal"]
+              },
+              "then": {
+                "required": ["baseline"],
+                "anyOf": [
+                  {"required": ["delta"]},
+                  {"required": ["threshold"]}
+                ]
+              }
+            },
+            {
+              "if": {
+                "properties": {"signal": {"const": "work-request"}},
+                "required": ["signal"]
+              },
+              "then": {"required": ["request"]}
+            }
+          ]
+        },
+        "assign": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "origin"],
+          "properties": {
+            "kind": {"enum": ["BUG", "FEATURE", "SERVICE"]},
+            "origin": {"enum": ["regression", "requested", "health"]}
+          }
+        },
+        "prioritySource": {"enum": ["impact", "declared", "service-default"]}
+      }
+    }
+  }
+}

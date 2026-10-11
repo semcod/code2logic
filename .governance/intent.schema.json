@@ -1,0 +1,384 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/wellmanifest/new-project/governance/intent.schema.json",
+  "title": "new-project ticket intent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "ticket", "summary", "workstream", "allowedPaths", "forbiddenPaths", "stacks", "dependsOn", "conflictsWith", "integrationTicket"],
+  "properties": {
+    "schema": { "enum": ["new-project.intent/v2", "new-project.intent/v3"] },
+    "ticket": { "type": "string", "pattern": "^ticket-[0-9]{3,}$" },
+    "summary": { "type": "string", "minLength": 1 },
+    "workstream": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "allowedPaths": { "type": "array", "items": { "$ref": "#/$defs/glob" }, "minItems": 1, "uniqueItems": true },
+    "forbiddenPaths": { "type": "array", "items": { "$ref": "#/$defs/glob" }, "uniqueItems": true },
+    "stacks": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "dependsOn": { "type": "array", "items": { "type": "string", "pattern": "^ticket-[0-9]{3,}$" }, "uniqueItems": true },
+    "conflictsWith": { "type": "array", "items": { "type": "string", "pattern": "^ticket-[0-9]{3,}$" }, "uniqueItems": true },
+    "integrationTicket": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "string", "pattern": "^ticket-[0-9]{3,}$" }
+      ]
+    },
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "priority", "origin"],
+      "properties": {
+        "kind": { "enum": ["BUG", "FEATURE", "SERVICE"] },
+        "priority": { "enum": ["P0", "P1", "P2", "P3"] },
+        "origin": { "enum": ["regression", "requested", "health"] }
+      }
+    },
+    "physicalChanges": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Required when a changed path matches an adopter physical contract (P-PHYS-001). One entry per exact contract/property/signal; the runtime rejects repeated claims even when before, after or acceptance differ. Property none records an edit that keeps physical meaning and must be the only entry for that contract.",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["contract", "property", "signal", "before", "after", "acceptance"],
+            "properties": {
+              "contract": { "type": "string", "minLength": 1 },
+              "property": { "enum": ["pin-assignment", "active-level", "pull", "capability-set", "unit-scale", "limit-range", "timing"] },
+              "signal": { "type": "string", "minLength": 1 },
+              "before": { "type": "string", "minLength": 1 },
+              "after": { "type": "string", "minLength": 1 },
+              "acceptance": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["contract", "property", "rationale"],
+            "properties": {
+              "contract": { "type": "string", "minLength": 1 },
+              "property": { "const": "none" },
+              "rationale": { "type": "string", "minLength": 1 }
+            }
+          }
+        ]
+      }
+    },
+    "placement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["home", "shape"],
+      "description": "Optional HOME vs ADOPT. Fill for SERVICE/FEATURE that create or place a repository. Missing is valid so existing tickets still parse; invalid values reject. runtime_service must not HOME wellmanifest.",
+      "properties": {
+        "home": {
+          "enum": ["wellmanifest", "subactor", "semcod"],
+          "description": "Org that owns the repository. Not the same as adopt."
+        },
+        "runtimeOwner": {
+          "enum": ["wellmanifest", "subactor", "semcod"],
+          "description": "Org that runs the CLI/daemon. Omit to inherit home. wellmanifest does not host product daemons."
+        },
+        "shape": {
+          "enum": ["domain_pack", "runtime_service", "both"]
+        },
+        "adopt": {
+          "type": "array",
+          "description": "wellmanifest packs to follow. ADOPT is not HOME.",
+          "items": {
+            "type": "string",
+            "pattern": "^wellmanifest/[a-z0-9][a-z0-9-]*$"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "delivery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "acceptedBaseSha",
+        "targetBranch",
+        "outcome",
+        "nonGoals",
+        "complexity",
+        "estimatedMinutes",
+        "budgets",
+        "architecture",
+        "runtimeDependencies",
+        "validation"
+      ],
+      "properties": {
+        "acceptedBaseSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "targetBranch": { "$ref": "#/$defs/branch" },
+        "outcome": { "type": "string", "minLength": 1 },
+        "nonGoals": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "complexity": { "enum": ["XS", "S", "M", "L"] },
+        "estimatedMinutes": { "type": "integer", "minimum": 1, "maximum": 240 },
+        "snapshotMigration": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema",
+            "repository",
+            "baseSha",
+            "sourceSha",
+            "sourceTree",
+            "inventorySha256",
+            "authorizationRef"
+          ],
+          "properties": {
+            "schema": {
+              "const": "new-project.snapshot-migration/v1"
+            },
+            "repository": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+            },
+            "baseSha": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "sourceSha": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "sourceTree": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "inventorySha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "authorizationRef": {
+              "type": "string",
+              "pattern": "^authorization:[A-Za-z0-9._/-]{1,200}$"
+            }
+          }
+        },
+        "standardAdoption": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sourceRepository", "fromRevision", "toRevision"],
+          "properties": {
+            "sourceRepository": { "const": "wellmanifest/new-project" },
+            "fromRevision": {
+              "oneOf": [
+                { "$ref": "#/$defs/sha" },
+                { "type": "null" }
+              ]
+            },
+            "toRevision": { "$ref": "#/$defs/sha" },
+            "managedTargetTakeovers": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["path", "baseDigest"],
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?!/)(?![A-Za-z]:[/\\\\])(?!.*(?:^|/)\\.\\.(?:/|$))[^*?\\[]+$"
+                  },
+                  "baseDigest": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            },
+            "managedTargetRestorations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["path", "baseDigest"],
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?!/)(?![A-Za-z]:[/\\\\])(?!.*(?:^|/)\\.\\.(?:/|$))[^*?\\[]+$"
+                  },
+                  "baseDigest": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            },
+            "targetOwnedTransitions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["path", "baseDigest", "headDigest"],
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?!/)(?![A-Za-z]:[/\\\\])(?!.*(?:^|/)\\.\\.(?:/|$))[^*?\\[]+$"
+                  },
+                  "baseDigest": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "headDigest": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "budgets": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "maxImplementationFiles",
+            "maxAffectedComponents",
+            "maxPublicInterfaceChanges",
+            "maxRuntimeDependencies"
+          ],
+          "properties": {
+            "maxImplementationFiles": { "type": "integer", "minimum": 1 },
+            "maxAffectedComponents": { "type": "integer", "minimum": 1 },
+            "maxPublicInterfaceChanges": { "type": "integer", "minimum": 0 },
+            "maxRuntimeDependencies": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "architecture": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "decision",
+            "components",
+            "responsibilityChanges",
+            "interfaceChanges",
+            "dataChanges",
+            "ui",
+            "rollback"
+          ],
+          "properties": {
+            "status": { "const": "accepted" },
+            "decision": { "type": "string", "minLength": 1 },
+            "components": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["name", "paths"],
+                "properties": {
+                  "name": { "type": "string", "minLength": 1 },
+                  "paths": {
+                    "type": "array",
+                    "items": { "$ref": "#/$defs/glob" },
+                    "minItems": 1,
+                    "uniqueItems": true
+                  }
+                }
+              }
+            },
+            "responsibilityChanges": { "type": "boolean" },
+            "interfaceChanges": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "uniqueItems": true
+            },
+            "dataChanges": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  { "type": "string", "minLength": 1 },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["kind", "component", "description"],
+                    "properties": {
+                      "kind": { "enum": ["component-local-state", "schema-migration", "cross-component-migration", "ownership-transfer", "unknown"] },
+                      "component": { "type": "string", "minLength": 1 },
+                      "description": { "type": "string", "minLength": 1 }
+                    }
+                  }
+                ]
+              },
+              "uniqueItems": true
+            },
+            "ui": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["impact", "states", "evidence"],
+              "properties": {
+                "impact": { "enum": ["none", "single-state", "multi-state"] },
+                "states": {
+                  "type": "array",
+                  "items": { "enum": ["loading", "empty", "error", "success"] },
+                  "uniqueItems": true
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": { "type": "string", "minLength": 1 },
+                  "uniqueItems": true
+                }
+              }
+            },
+            "rollback": { "type": "string", "minLength": 1 }
+          }
+        },
+        "runtimeDependencies": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "validation": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["criterion", "commands", "evidence"],
+            "properties": {
+              "criterion": { "type": "string", "pattern": "^AC-[0-9]+$" },
+              "commands": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1 },
+                "minItems": 1,
+                "uniqueItems": true
+              },
+              "evidence": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "schema": { "const": "new-project.intent/v3" } },
+        "required": ["schema"]
+      },
+      "then": { "required": ["classification"] }
+    },
+    {
+      "if": {
+        "properties": { "schema": { "const": "new-project.intent/v2" } },
+        "required": ["schema"]
+      },
+      "then": { "not": { "required": ["classification"] } }
+    }
+  ],
+  "$defs": {
+    "glob": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$)).+$" },
+    "branch": { "type": "string", "minLength": 1, "pattern": "^(?!@?$)(?!HEAD$)(?![-/])(?![\\s\\S]*(?:\\.\\.|//|@\\{|[ ~^:?*\\[\\\\\\x00-\\x1f\\x7f]))(?![\\s\\S]*(?:^|/)\\.)(?![\\s\\S]*(?:^|/)[^/]*\\.lock(?:/|$))(?![\\s\\S]*[/.]$)[\\s\\S]+$" },
+    "sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+  }
+}

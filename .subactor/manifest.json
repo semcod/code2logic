@@ -1,0 +1,26 @@
+{
+  "schema": "new-project.subactor-local/v1",
+  "standardPin": {
+    "lockPath": ".governance/manifest.lock.json",
+    "requiredStandardId": "wellmanifest/new-project"
+  },
+  "ignoredRuntimeDirectories": [
+    ".subactor/leases/",
+    ".subactor/sessions/",
+    ".subactor/recovery/",
+    ".subactor/receipts/",
+    ".subactor/cache/",
+    ".subactor/snapshots/"
+  ],
+  "continuity": {
+    "checkpointSchema": "new-project.work-continuity/v2",
+    "eventSchema": "new-project.work-continuity-event/v2",
+    "indexSchema": "new-project.work-continuity-index/v2",
+    "eventStreamPath": ".subactor/sessions/work-continuity.jsonl",
+    "eventStreamPolicyMaxBytes": null,
+    "checkpointIndexPath": ".subactor/recovery/checkpoint-index.json",
+    "checkpointIndexMaxEntries": 128,
+    "checkpointIndexMaxBytes": 262144,
+    "checkpointIndexWrite": "atomic-replace"
+  }
+}

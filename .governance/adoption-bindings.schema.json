@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wellmanifest.com/schemas/new-project/adoption-bindings/v2",
+  "title": "new-project atomic adoption bindings",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "revisionBoundWorkflowPaths", "digestBoundTargetPatterns"],
+  "properties": {
+    "schema": {"const": "new-project.adoption-bindings/v2"},
+    "revisionBoundWorkflowPaths": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[A-Za-z0-9._/-]+\\.ya?ml$"
+      }
+    },
+    "digestBoundTargetPatterns": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^\\.github/workflows/[A-Za-z0-9._/*?-]+\\.ya?ml$"
+      }
+    }
+  }
+}

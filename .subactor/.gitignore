@@ -1,0 +1,7 @@
+# Managed local-runtime ignores. manifest.json remains tracked.
+/leases/
+/sessions/
+/recovery/
+/receipts/
+/cache/
+/snapshots/

@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/wellmanifest/new-project/governance/approval-evidence.schema.json",
+  "title": "new-project trusted merge approval evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "source",
+    "repository",
+    "pullRequest",
+    "headSha",
+    "ticket",
+    "actor",
+    "verification"
+  ],
+  "properties": {
+    "schema": { "const": "new-project.approval-evidence/v1" },
+    "source": {
+      "enum": ["github-review", "github-app-review", "signed-attestation"]
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+    },
+    "pullRequest": { "type": "integer", "minimum": 1 },
+    "headSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "ticket": { "type": "string", "pattern": "^ticket-[0-9]{3,}$" },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["login", "type"],
+      "properties": {
+        "login": { "type": "string", "minLength": 1 },
+        "type": { "enum": ["User", "Bot", "Workflow"] }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "verified"],
+      "properties": {
+        "method": {
+          "enum": ["github-api-allowlist", "github-attestation", "sigstore"]
+        },
+        "verified": { "const": true },
+        "issuer": { "type": "string", "minLength": 1 },
+        "predicateType": { "type": "string", "minLength": 1 }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "source": { "const": "github-review" } } },
+      "then": {
+        "properties": {
+          "actor": { "properties": { "type": { "const": "User" } } },
+          "verification": {
+            "properties": { "method": { "const": "github-api-allowlist" } }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "source": { "const": "github-app-review" } } },
+      "then": {
+        "properties": {
+          "actor": { "properties": { "type": { "const": "Bot" } } },
+          "verification": {
+            "properties": { "method": { "const": "github-api-allowlist" } }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "source": { "const": "signed-attestation" } } },
+      "then": {
+        "properties": {
+          "verification": {
+            "required": ["method", "verified", "issuer", "predicateType"],
+            "properties": {
+              "method": { "enum": ["github-attestation", "sigstore"] }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "schema": "new-project.agent-hosts/v1",
+  "note": "Single source of truth for the host-agnostic agent contract (AGENTS.md rule 22). scripts/agent_host_check.py proves these files are present, that the fail-closed hook is installed and active, that source links point at the local adoption contract and concrete remote standard files, that bounded-session controls are present, and that the packaging metadata a repository already carries actually runs the gate. Instruction files are advisory to a model; the hook, the CI job and the packaging lifecycle bindings declared here are the parts that are not. Adding a host here without adding it to governance/package-manifest.json makes the requirement unshippable, so both change together.",
+  "hook": {
+    "path": ".githooks/pre-commit",
+    "hooksPathConfig": ".githooks",
+    "additionalHooks": [".githooks/commit-msg"],
+    "runtimeFiles": [
+      ".governance/worktree_guard.py",
+      ".governance/worktree_overlap_check.py",
+      "worktree-guard.yaml"
+    ]
+  },
+  "hosts": [
+    {
+      "id": "generic",
+      "file": "AGENTS.md",
+      "readers": [
+        "Codex",
+        "aider (via .aider.conf.yml read)",
+        "any AGENTS.md-aware host"
+      ]
+    },
+    {
+      "id": "claude",
+      "file": "CLAUDE.md",
+      "readers": [
+        "Claude Code"
+      ]
+    },
+    {
+      "id": "gemini",
+      "file": "GEMINI.md",
+      "readers": [
+        "Gemini CLI",
+        "Antigravity"
+      ]
+    },
+    {
+      "id": "cursor",
+      "file": ".cursor/rules/new-project-standard.mdc",
+      "readers": [
+        "Cursor"
+      ]
+    },
+    {
+      "id": "aider",
+      "file": ".aider.conf.yml",
+      "readers": [
+        "aider"
+      ]
+    },
+    {
+      "id": "copilot",
+      "file": ".github/copilot-instructions.md",
+      "readers": [
+        "GitHub Copilot",
+        "Copilot Chat in VS Code and JetBrains"
+      ]
+    }
+  ],
+  "sourceLinks": {
+    "schema": "new-project.agent-source-links/v1",
+    "authority": "Local adoption lock, local managed-file digests and protected validation are authoritative. Remote main URLs are navigation only; host instructions never fetch or execute them.",
+    "local": [
+      {"id": "hub-manifest", "path": "governance/manifest.hub.json"},
+      {"id": "hub-package", "path": "governance/package-manifest.json"},
+      {"id": "adopter-manifest", "path": ".governance/manifest.json"},
+      {"id": "adopter-lock", "path": ".governance/manifest.lock.json"},
+      {"id": "adopter-package", "path": ".governance/package-manifest.json"}
+    ],
+    "remote": [
+      {"id": "new-project-agents", "repository": "wellmanifest/new-project", "path": "template/files/AGENTS.template.md", "url": "https://github.com/wellmanifest/new-project/blob/main/template/files/AGENTS.template.md"},
+      {"id": "new-project-hosts", "repository": "wellmanifest/new-project", "path": "governance/agent-hosts.json", "url": "https://github.com/wellmanifest/new-project/blob/main/governance/agent-hosts.json"},
+      {"id": "new-project-adoption", "repository": "wellmanifest/new-project", "path": "scripts/create_adoption_lock.py", "url": "https://github.com/wellmanifest/new-project/blob/main/scripts/create_adoption_lock.py"},
+      {"id": "worktrees-schema", "repository": "wellmanifest/worktrees", "path": "models/worktrees.schema.json", "url": "https://github.com/wellmanifest/worktrees/blob/main/models/worktrees.schema.json"},
+      {"id": "git-lifecycle-schema", "repository": "wellmanifest/git-lifecycle", "path": "standard/git-lifecycle.schema.json", "url": "https://github.com/wellmanifest/git-lifecycle/blob/main/standard/git-lifecycle.schema.json"},
+      {"id": "ticket-lifecycle-schema", "repository": "wellmanifest/ticket-lifecycle", "path": "standard/ticket-lifecycle.schema.json", "url": "https://github.com/wellmanifest/ticket-lifecycle/blob/main/standard/ticket-lifecycle.schema.json"},
+      {"id": "policy-dsl", "repository": "wellmanifest/policy-dsl", "path": "spec/POLICY_DSL.md", "url": "https://github.com/wellmanifest/policy-dsl/blob/main/spec/POLICY_DSL.md"},
+      {"id": "logs-contract", "repository": "wellmanifest/logs", "path": "contracts/logs.contract.json", "url": "https://github.com/wellmanifest/logs/blob/main/contracts/logs.contract.json"},
+      {"id": "agent-schema", "repository": "wellmanifest/agent", "path": "standard/agent.schema.json", "url": "https://github.com/wellmanifest/agent/blob/main/standard/agent.schema.json"},
+      {"id": "llm-policy", "repository": "wellmanifest/llm", "path": "README.md", "url": "https://github.com/wellmanifest/llm/blob/main/README.md"},
+      {"id": "offer-pointer", "repository": "wellmanifest/offer", "path": "README.md", "url": "https://github.com/wellmanifest/offer/blob/main/README.md"},
+      {"id": "brand-pointer", "repository": "wellmanifest/brand", "path": "README.md", "url": "https://github.com/wellmanifest/brand/blob/main/README.md"}
+    ],
+    "requiredInEveryHost": ["new-project-agents", "new-project-hosts", "new-project-adoption"],
+    "requiredInAgents": ["new-project-agents", "new-project-hosts", "new-project-adoption", "worktrees-schema", "git-lifecycle-schema", "ticket-lifecycle-schema", "policy-dsl", "logs-contract", "agent-schema", "llm-policy", "offer-pointer", "brand-pointer"]
+  },
+  "anomalyChecks": {
+    "schema": "new-project.agent-guidance-audit/v1",
+    "maxInstructionBytes": 65536,
+    "requiredTerms": ["checkpoint", "handoff", "stop", "maxActiveMinutes"],
+    "contradictions": [
+      {
+        "id": "direct-default-branch-delivery",
+        "patterns": ["push directly to main", "never push directly to main"]
+      },
+      {
+        "id": "self-merge",
+        "patterns": ["merge directly", "never merge directly"]
+      }
+    ],
+    "ci": {
+      "requiredChecksCandidates": [
+        "governance/required-checks.json",
+        ".governance/required-checks.json"
+      ]
+    }
+  },
+  "packaging": {
+    "python": {
+      "marker": "pyproject.toml",
+      "declaration": "tool.wellmanifest",
+      "lifecycle": {
+        "kind": "pytest-plugin",
+        "field": "tool.pytest.ini_options.addopts",
+        "mustContain": "-p wellmanifest_governance"
+      }
+    },
+    "node": {
+      "marker": "package.json",
+      "declaration": "wellmanifest",
+      "lifecycle": {
+        "kind": "npm-script",
+        "field": "scripts.prepare",
+        "mustContain": "install-agent-hosts"
+      }
+    }
+  },
+  "declarationFields": {
+    "standard": "must equal .governance/manifest.lock.json standard.version",
+    "revision": "must equal .governance/manifest.lock.json standard.sourceRevision",
+    "gate": "repository-relative path of the managed governance gate"
+  }
+}

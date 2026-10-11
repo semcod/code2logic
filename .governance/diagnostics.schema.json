@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wellmanifest.com/schemas/new-project-diagnostics-v2.json",
+  "title": "new-project stable diagnostic catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "codes"],
+  "properties": {
+    "schema": {"const": "new-project.diagnostics/v2"},
+    "codes": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^GOV-[A-Z]+(?:-[A-Z]+)*-[0-9]{3}$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["message", "remediation", "documentation"],
+        "properties": {
+          "message": {"type": "string", "minLength": 1},
+          "remediation": {"type": "string", "minLength": 1},
+          "documentation": {
+            "oneOf": [
+              {"type": "null"},
+              {"type": "string", "pattern": "^error/[^/]+\\.md$"}
+            ]
+          }
+        }
+      }
+    }
+  }
+}

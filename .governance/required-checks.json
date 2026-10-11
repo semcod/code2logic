@@ -1,0 +1,43 @@
+{
+  "repository": "semcod/code2logic",
+  "requiredChecks": [
+    {
+      "name": "test",
+      "workflowFile": ".github/workflows/ci.yml"
+    },
+    {
+      "name": "governance / remote lifecycle",
+      "workflowFile": ".github/workflows/new-project-governance.yml"
+    },
+    {
+      "name": "governance / enforce",
+      "workflowFile": ".github/workflows/new-project-governance.yml"
+    },
+    {
+      "name": "Test lolm",
+      "workflowFile": ".github/workflows/packages.yml"
+    },
+    {
+      "name": "Test logic2test",
+      "workflowFile": ".github/workflows/packages.yml"
+    },
+    {
+      "name": "Test logic2code",
+      "workflowFile": ".github/workflows/packages.yml"
+    },
+    {
+      "name": "Publish lolm",
+      "workflowFile": ".github/workflows/packages.yml"
+    },
+    {
+      "name": "Publish logic2test",
+      "workflowFile": ".github/workflows/packages.yml"
+    },
+    {
+      "name": "Publish logic2code",
+      "workflowFile": ".github/workflows/packages.yml"
+    }
+  ],
+  "schema": "new-project.required-checks/v1",
+  "version": 1
+}

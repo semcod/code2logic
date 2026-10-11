@@ -1,0 +1,357 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/wellmanifest/new-project/governance/change-evaluation.schema.json",
+  "title": "Canonical change evaluation contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "subject",
+    "contract",
+    "actors",
+    "changeSet",
+    "criteriaEvaluation",
+    "gates",
+    "dimensions",
+    "approval",
+    "findings",
+    "contribution",
+    "verdict",
+    "confidence",
+    "provenance"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "t2c.change-evaluation/v1" },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "event", "baseSha", "headSha", "mergeBaseSha", "evaluatedAt"],
+      "properties": {
+        "repository": { "$ref": "#/$defs/repository" },
+        "event": { "enum": ["commit", "push", "pull_request", "merge_group"] },
+        "pullRequest": { "type": ["integer", "null"], "minimum": 1 },
+        "baseSha": { "$ref": "#/$defs/sha" },
+        "headSha": { "$ref": "#/$defs/sha" },
+        "mergeBaseSha": { "$ref": "#/$defs/sha" },
+        "evaluatedAt": { "type": "string", "format": "date-time" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "event": { "enum": ["pull_request", "merge_group"] } },
+            "required": ["event"]
+          },
+          "then": { "required": ["pullRequest"] }
+        }
+      ]
+    },
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ticket",
+        "workstream",
+        "criteria",
+        "intentHash",
+        "policyHash",
+        "manifestLockHash",
+        "approvalScopeHash"
+      ],
+      "properties": {
+        "ticket": { "type": "string", "pattern": "^ticket-[0-9]{3,}$" },
+        "workstream": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+        "criteria": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/criterion" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "intentHash": { "$ref": "#/$defs/digest" },
+        "policyHash": { "$ref": "#/$defs/digest" },
+        "manifestLockHash": { "$ref": "#/$defs/digest" },
+        "approvalScopeHash": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "actors": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "role", "contributionTypes"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "role": {
+            "enum": [
+              "author",
+              "last-push-author",
+              "implementation-assistant",
+              "reviewer",
+              "tester",
+              "decision-owner"
+            ]
+          },
+          "contributionTypes": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "changeSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commits", "changedPaths", "changedSymbols", "publicApiChanges", "dependencyChanges"],
+      "properties": {
+        "commits": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/sha" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "changedPaths": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/path" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "changedSymbols": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "publicApiChanges": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "dependencyChanges": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "criteriaEvaluation": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "criterion",
+          "status",
+          "implementationEvidence",
+          "validationEvidence",
+          "missingEvidence",
+          "confidence"
+        ],
+        "properties": {
+          "criterion": { "$ref": "#/$defs/criterion" },
+          "status": { "enum": ["SATISFIED", "PARTIAL", "FAILED", "UNKNOWN", "NOT_APPLICABLE"] },
+          "implementationEvidence": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/evidence" }
+          },
+          "validationEvidence": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/evidence" }
+          },
+          "missingEvidence": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "uniqueItems": true
+          },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "status": { "const": "SATISFIED" } }, "required": ["status"] },
+            "then": {
+              "properties": {
+                "implementationEvidence": { "minItems": 1 },
+                "validationEvidence": { "minItems": 1 },
+                "missingEvidence": { "maxItems": 0 }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "governance",
+        "scope",
+        "secrets",
+        "tests",
+        "regression",
+        "documentation",
+        "approval",
+        "evidenceCompleteness"
+      ],
+      "properties": {
+        "governance": { "$ref": "#/$defs/gateStatus" },
+        "scope": { "$ref": "#/$defs/gateStatus" },
+        "secrets": { "$ref": "#/$defs/gateStatus" },
+        "tests": { "$ref": "#/$defs/gateStatus" },
+        "regression": { "$ref": "#/$defs/gateStatus" },
+        "documentation": { "$ref": "#/$defs/gateStatus" },
+        "approval": { "$ref": "#/$defs/gateStatus" },
+        "evidenceCompleteness": { "$ref": "#/$defs/gateStatus" }
+      }
+    },
+    "dimensions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "governanceCompliance",
+        "intentAlignment",
+        "implementationCorrectness",
+        "projectDirection",
+        "changeReasonableness",
+        "contributionValue",
+        "evidenceConfidence"
+      ],
+      "properties": {
+        "governanceCompliance": { "$ref": "#/$defs/dimensionStatus" },
+        "intentAlignment": { "$ref": "#/$defs/dimensionStatus" },
+        "implementationCorrectness": { "$ref": "#/$defs/dimensionStatus" },
+        "projectDirection": { "$ref": "#/$defs/dimensionStatus" },
+        "changeReasonableness": { "$ref": "#/$defs/dimensionStatus" },
+        "contributionValue": { "$ref": "#/$defs/dimensionStatus" },
+        "evidenceConfidence": { "$ref": "#/$defs/dimensionStatus" }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "source",
+        "actor",
+        "actorRole",
+        "verificationMethod",
+        "headSha",
+        "approvalScopeHash",
+        "evidenceDigest"
+      ],
+      "properties": {
+        "status": { "enum": ["VERIFIED", "WAITING", "REJECTED"] },
+        "source": { "enum": ["github-review", "github-app-review", "signed-attestation", "none"] },
+        "actor": { "type": "string", "minLength": 1 },
+        "actorRole": { "enum": ["human", "validator-app", "attestation-issuer", "unresolved"] },
+        "verificationMethod": { "enum": ["github-api-allowlist", "signed-attestation", "none"] },
+        "headSha": { "oneOf": [{ "$ref": "#/$defs/sha" }, { "type": "null" }] },
+        "approvalScopeHash": { "oneOf": [{ "$ref": "#/$defs/digest" }, { "type": "null" }] },
+        "evidenceDigest": { "oneOf": [{ "$ref": "#/$defs/digest" }, { "type": "null" }] }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "severity", "message", "evidence", "remediation", "blocks"],
+        "properties": {
+          "code": { "type": "string", "pattern": "^(GOV|COM|INT|EVD|REG|DIR|DOC|APR|CTR|SEC)-[A-Z0-9-]+$" },
+          "severity": { "enum": ["BLOCKING", "REVIEW_REQUIRED", "INFO"] },
+          "criterion": { "$ref": "#/$defs/criterion" },
+          "message": { "type": "string", "minLength": 1 },
+          "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" }, "minItems": 1 },
+          "remediation": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 },
+          "blocks": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["merge", "completion"],
+            "properties": {
+              "merge": { "type": "boolean" },
+              "completion": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+    "contribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claims"],
+      "properties": {
+        "claims": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["actor", "type", "evidence"],
+            "properties": {
+              "actor": { "type": "string", "minLength": 1 },
+              "type": { "enum": ["implementation", "test", "diagnosis", "review", "decision", "documentation"] },
+              "criterion": { "$ref": "#/$defs/criterion" },
+              "finding": { "type": "string", "minLength": 1 },
+              "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" }, "minItems": 1 }
+            }
+          }
+        }
+      }
+    },
+    "verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["merge", "completion", "reasonCodes", "requiredHumanDecisions"],
+      "properties": {
+        "merge": { "enum": ["BLOCKED", "REVIEW_REQUIRED", "ALLOWED"] },
+        "completion": { "enum": ["NOT_DONE", "CANDIDATE", "ACCEPTED"] },
+        "reasonCodes": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "requiredHumanDecisions": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }
+      }
+    },
+    "confidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["overall", "unknowns"],
+      "properties": {
+        "overall": { "type": "number", "minimum": 0, "maximum": 1 },
+        "unknowns": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evaluatorVersion", "generatedByWorkflow"],
+      "properties": {
+        "evaluatorVersion": { "type": "string", "minLength": 1 },
+        "generatedByWorkflow": { "type": "string", "minLength": 1 },
+        "evaluationDigest": { "$ref": "#/$defs/digest" }
+      }
+    }
+  },
+  "$defs": {
+    "sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "repository": { "type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$" },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$)).+$"
+    },
+    "criterion": { "type": "string", "pattern": "^AC-[0-9]+$" },
+    "gateStatus": { "enum": ["PASS", "FAILED", "UNKNOWN", "WAITING", "NOT_APPLICABLE"] },
+    "dimensionStatus": { "enum": ["PASS", "REVIEW_REQUIRED", "FAILED", "INSUFFICIENT_EVIDENCE", "NOT_APPLICABLE"] },
+    "evidence": {
+      "type": "object",
+      "minProperties": 2,
+      "required": ["type"],
+      "properties": {
+        "type": { "type": "string", "minLength": 1 },
+        "reference": { "type": "string", "minLength": 1 },
+        "path": { "$ref": "#/$defs/path" },
+        "symbol": { "type": "string", "minLength": 1 },
+        "revision": { "$ref": "#/$defs/sha" },
+        "result": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

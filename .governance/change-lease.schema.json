@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wellmanifest.dev/schemas/change-lease/v1",
+  "title": "Wellmanifest multi-agent change lease",
+  "oneOf": [
+    {"$ref": "#/$defs/lease"},
+    {"$ref": "#/$defs/transition"},
+    {"$ref": "#/$defs/receipt"}
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "gitSha": {"type": "string", "pattern": "^[0-9a-f]{40,64}$"},
+    "phase": {"enum": ["claimed", "editing", "validating", "publication_frozen", "dispatching", "approved", "merged", "closed", "cancelled", "expired", "released"]},
+    "action": {"enum": ["heartbeat", "begin-edit", "begin-validation", "freeze-publication", "dispatch-validation", "approve", "record-merge", "close", "cancel", "expire", "release", "supersede"]},
+    "lease": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "leaseId", "repositoryRef", "targetBranch", "ticketId", "workstream", "scopeHash", "branchRef", "worktreeId", "ownerActor", "ownerSession", "phase", "leaseRevision", "fencingToken", "issuedAt", "expiresAt", "heartbeatAt", "headSha", "pullRequest", "validatorRunId", "publicationFrozen", "planHash", "previousReceiptRef", "eventSequence"],
+      "properties": {
+        "schema": {"const": "wellmanifest.change-lease/v1"},
+        "leaseId": {"type": "string", "minLength": 1, "maxLength": 160},
+        "repositoryRef": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "targetBranch": {"type": "string", "minLength": 1, "maxLength": 255},
+        "ticketId": {"type": "string", "minLength": 1, "maxLength": 160},
+        "workstream": {"type": "string", "minLength": 1, "maxLength": 160},
+        "scopeHash": {"$ref": "#/$defs/sha256"},
+        "branchRef": {"type": "string", "minLength": 1, "maxLength": 255},
+        "worktreeId": {"type": "string", "minLength": 1, "maxLength": 255},
+        "ownerActor": {"type": "string", "minLength": 1, "maxLength": 160},
+        "ownerSession": {"type": "string", "minLength": 1, "maxLength": 255},
+        "phase": {"$ref": "#/$defs/phase"},
+        "leaseRevision": {"type": "integer", "minimum": 1},
+        "fencingToken": {"type": "integer", "minimum": 1},
+        "issuedAt": {"type": "string", "format": "date-time"},
+        "expiresAt": {"type": "string", "format": "date-time"},
+        "heartbeatAt": {"type": "string", "format": "date-time"},
+        "headSha": {"oneOf": [{"$ref": "#/$defs/gitSha"}, {"type": "null"}]},
+        "pullRequest": {"type": ["integer", "null"], "minimum": 1},
+        "validatorRunId": {"type": ["string", "null"], "minLength": 1, "maxLength": 255},
+        "publicationFrozen": {"type": "boolean"},
+        "planHash": {"$ref": "#/$defs/sha256"},
+        "previousReceiptRef": {"type": ["string", "null"], "maxLength": 512},
+        "eventSequence": {"type": "integer", "minimum": 1}
+      }
+    },
+    "transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "requestId", "leaseId", "action", "expectedRevision", "expectedFencingToken", "expectedPhase", "requestedBy", "idempotencyKey", "targetHeadSha", "replacementReceiptRef", "authorityRef", "requestedAt"],
+      "properties": {
+        "schema": {"const": "wellmanifest.change-lease-transition/v1"},
+        "requestId": {"type": "string", "minLength": 1, "maxLength": 160},
+        "leaseId": {"type": "string", "minLength": 1, "maxLength": 160},
+        "action": {"$ref": "#/$defs/action"},
+        "expectedRevision": {"type": "integer", "minimum": 1},
+        "expectedFencingToken": {"type": "integer", "minimum": 1},
+        "expectedPhase": {"$ref": "#/$defs/phase"},
+        "requestedBy": {"type": "string", "minLength": 1, "maxLength": 160},
+        "idempotencyKey": {"type": "string", "minLength": 1, "maxLength": 255},
+        "targetHeadSha": {"oneOf": [{"$ref": "#/$defs/gitSha"}, {"type": "null"}]},
+        "replacementReceiptRef": {"type": ["string", "null"], "maxLength": 512},
+        "authorityRef": {"type": "string", "minLength": 1, "maxLength": 512},
+        "requestedAt": {"type": "string", "format": "date-time"}
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "requestId", "leaseId", "previousRevision", "leaseRevision", "previousFencingToken", "fencingToken", "action", "outcome", "code", "phaseBefore", "phaseAfter", "headSha", "pullRequest", "receiptRef", "occurredAt"],
+      "properties": {
+        "schema": {"const": "wellmanifest.change-lease-receipt/v1"},
+        "requestId": {"type": "string", "minLength": 1, "maxLength": 160},
+        "leaseId": {"type": "string", "minLength": 1, "maxLength": 160},
+        "previousRevision": {"type": "integer", "minimum": 1},
+        "leaseRevision": {"type": "integer", "minimum": 1},
+        "previousFencingToken": {"type": "integer", "minimum": 1},
+        "fencingToken": {"type": "integer", "minimum": 1},
+        "action": {"$ref": "#/$defs/action"},
+        "outcome": {"enum": ["accepted", "rejected", "idempotent"]},
+        "code": {"type": ["string", "null"]},
+        "phaseBefore": {"$ref": "#/$defs/phase"},
+        "phaseAfter": {"$ref": "#/$defs/phase"},
+        "headSha": {"oneOf": [{"$ref": "#/$defs/gitSha"}, {"type": "null"}]},
+        "pullRequest": {"type": ["integer", "null"], "minimum": 1},
+        "receiptRef": {"type": "string", "minLength": 1, "maxLength": 512},
+        "occurredAt": {"type": "string", "format": "date-time"}
+      }
+    }
+  }
+}

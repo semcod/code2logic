@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wellmanifest.dev/schemas/standard-adoption/v1",
+  "title": "Wellmanifest standard pack adoption",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "mode", "profile", "repositoryRole", "adoptions"],
+  "properties": {
+    "schema": {"const": "wellmanifest.standard-adoption/v1"},
+    "mode": {"enum": ["audit", "enforce"]},
+    "profile": {"type": "string", "minLength": 1},
+    "repositoryRole": {"type": "string", "minLength": 1},
+    "updates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "trigger", "action", "executor"],
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "trigger": {"const": "pre-commit"},
+        "action": {"const": "prepare-and-abort"},
+        "executor": {"enum": ["goal", "koru-goal"]}
+      }
+    },
+    "adoptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "version", "revision", "model", "level", "artifacts", "evidence"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^wellmanifest/[a-z0-9][a-z0-9-]*$"},
+          "version": {"type": "string", "minLength": 1},
+          "revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+          "model": {"enum": ["reference-only", "local-conformance", "protected-conformance", "runtime-conformance"]},
+          "level": {"enum": ["S0", "S1", "S2", "S3", "S4", "S5"]},
+          "artifacts": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["target", "sha256"], "properties": {"target": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}}},
+          "evidence": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["level", "uri", "sha256"], "properties": {"level": {"enum": ["S0", "S1", "S2", "S3", "S4", "S5"]}, "uri": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}}}
+        }
+      }
+    }
+  }
+}

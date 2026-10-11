@@ -1,0 +1,65 @@
+schema: wellmanifest.worktree-guard/v1
+pipeline:
+  name: worktree-overlap-guard
+  description: >
+    Fail closed when two or more worktrees of the same repository identity
+    change the same paths, or when IN_PROGRESS intents overlap without
+    conflictsWith. Companion to workspace_lifecycle_check.py (terminal cleanup)
+    and to pyqual.yaml / goal.yaml style enforcement.
+
+  detect:
+    min_worktrees: 2
+    same_identity: true
+    workspace_roots:
+      - .
+      - worktrees
+      - .worktrees
+      - ../.worktrees
+
+  compare:
+    git: true
+    intents: true
+    code2llm: optional
+
+  ignore:
+    - TODO.md
+    - project/TICKETS.md
+    - project/ticket-*/**
+    - node_modules/**
+    - .venv/**
+    - venv/**
+    - __pycache__/**
+
+  enforce:
+    on_overlap: fail_closed
+    require_conflictsWith: true
+
+  triggers:
+    - kind: once
+    - kind: interval
+      seconds: 300
+    - kind: worktree-change
+    - kind: pre-commit
+    - kind: governance-check
+    - kind: systemd-timer
+      seconds: 300
+    - kind: systemd-path
+
+  command: python3 .governance/worktree_overlap_check.py --workspace-root {workdir}
+
+# Run the managed, read-only guard:
+#   once:  python3 .governance/worktree_guard.py --root . --once
+#   watch: python3 .governance/worktree_guard.py --root . --watch --interval 300
+#
+# Optional pyqual.yaml snippet, also printed by
+# `python3 .governance/worktree_guard.py --print-pyqual-stage`:
+#
+# custom_tools:
+#   - name: worktree_guard
+#     binary: python3
+#     command: python3 .governance/worktree_guard.py --root {workdir} --once
+#     allow_failure: false
+# stages:
+#   - name: worktree-overlap
+#     tool: worktree_guard
+#     optional: false
