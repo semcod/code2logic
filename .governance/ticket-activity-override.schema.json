@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wellmanifest.dev/schemas/new-project/ticket-activity-override.v1.schema.json",
+  "title": "Target-owned ticket activity policy override",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schema", "missingPolicy"],
+  "properties": {
+    "$schema": {"const": "./ticket-activity-override.schema.json"},
+    "schema": {"const": "new-project.ticket-activity-override/v1"},
+    "missingPolicy": {"enum": ["status-projection", "git-ancestry"]}
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "schema": "new-project.remediation-intent/v1",
+  "intentId": "RI-UNRESOLVED",
+  "ticket": "ticket-000",
+  "repository": "owner/repository",
+  "ownerRoute": "unresolved:human",
+  "status": "DRAFT",
+  "source": {
+    "producer": {
+      "name": "diagnostic-tool",
+      "version": "unresolved:agent"
+    },
+    "observedAt": "1970-01-01T00:00:00Z",
+    "reportDigest": "unresolved:agent"
+  },
+  "objective": {
+    "outcome": "Replace this draft outcome with one observable desired state.",
+    "nonGoals": [
+      "Do not expand scope beyond the owning ticket."
+    ],
+    "constraints": [
+      "Preserve user-owned and unclassified data."
+    ]
+  },
+  "scope": {
+    "allowedPaths": [
+      "unresolved:agent"
+    ],
+    "forbiddenPaths": [
+      ".env"
+    ],
+    "preservePaths": []
+  },
+  "findings": [
+    {
+      "id": "F-UNRESOLVED",
+      "category": "OTHER",
+      "status": "PROPOSED",
+      "priority": "P2",
+      "summary": "Replace this draft with an evidence-backed finding.",
+      "diagnostic": {
+        "code": "UNRESOLVED_FINDING",
+        "current": "MISSING",
+        "required": "EMIT"
+      },
+      "evidence": [
+        {
+          "ref": "unresolved:agent",
+          "observation": "Capture the exact report path, code and observed state."
+        }
+      ],
+      "applicability": {
+        "requiredSignals": [
+          "Define the signal that proves this finding applies."
+        ],
+        "excludedSignals": [],
+        "unknownOutcome": "BLOCK"
+      },
+      "desiredOutcome": "Define a deterministic postcondition.",
+      "affectedPaths": [
+        "unresolved:agent"
+      ],
+      "dependsOn": [],
+      "acceptanceCriteria": [
+        "AC-01"
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "id": "A-UNRESOLVED",
+      "findingIds": [
+        "F-UNRESOLVED"
+      ],
+      "operation": "CLASSIFY",
+      "description": "Resolve the affected path and implementation action.",
+      "paths": [
+        "unresolved:agent"
+      ],
+      "dependsOn": [],
+      "verificationIds": [
+        "V-UNRESOLVED"
+      ],
+      "risk": {
+        "level": "READ_ONLY",
+        "authorization": "NOT_APPLICABLE",
+        "automation": "ALLOWED",
+        "preservesUserData": true
+      }
+    }
+  ],
+  "verifications": [
+    {
+      "id": "V-UNRESOLVED",
+      "type": "ASSERTION",
+      "command": null,
+      "expected": "Replace with a deterministic verification.",
+      "deterministic": true,
+      "covers": [
+        "F-UNRESOLVED",
+        "A-UNRESOLVED"
+      ]
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-01",
+      "statement": "The finding has a bounded implementation path and deterministic verification.",
+      "findingIds": [
+        "F-UNRESOLVED"
+      ],
+      "verificationIds": [
+        "V-UNRESOLVED"
+      ]
+    }
+  ],
+  "llmGuidance": {
+    "role": "Plan a bounded refactoring; do not implement or approve it.",
+    "mustPreserve": [
+      "Accepted ticket scope and user-owned data."
+    ],
+    "forbiddenAssumptions": [
+      "Do not infer missing paths, ownership or authorization."
+    ],
+    "planningOrder": [
+      "A-UNRESOLVED"
+    ],
+    "openQuestions": [
+      "Which exact source and test paths implement this diagnostic?"
+    ]
+  },
+  "todo2code": {
+    "enabled": true,
+    "taskPath": "project/ticket-000/REMEDIATION.task.md",
+    "todoPath": "project/ticket-000/REMEDIATION.todo.md",
+    "planSchema": "t2c.code-change-plan/v1",
+    "requiredDiagnosticCodes": [
+      "AMBIGUOUS_REQUIREMENT",
+      "HUMAN_AGENT_CONFLICT",
+      "HUMAN_COMMUNICATION_CONFLICT",
+      "PLANNED_NOT_IMPLEMENTED"
+    ]
+  }
+}

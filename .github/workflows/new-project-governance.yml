@@ -1,0 +1,136 @@
+name: new-project-governance
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  remote-lifecycle:
+    name: governance / remote lifecycle
+    runs-on: ${{ vars.NEW_PROJECT_RUNNER_LABEL || 'ubuntu-latest' }}
+    steps:
+      - name: Check out governed repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Acquire GitHub branch lifecycle snapshot
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          BRANCH_LIFECYCLE_SNAPSHOT: ${{ runner.temp }}/new-project-branch-lifecycle.json
+        with:
+          script: |
+            const fs = require('fs');
+            const repository = await github.rest.repos.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            const settings = await github.graphql(`
+              query($owner: String!, $repo: String!) {
+                repository(owner: $owner, name: $repo) { deleteBranchOnMerge }
+              }
+            `, {owner: context.repo.owner, repo: context.repo.repo});
+            const branches = await github.paginate(github.rest.repos.listBranches, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100,
+            });
+            const pulls = await github.paginate(github.rest.pulls.list, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100,
+            });
+            const snapshot = {
+              schema: 'new-project.branch-lifecycle-snapshot/v1',
+              repository: `${context.repo.owner}/${context.repo.repo}`,
+              defaultBranch: repository.data.default_branch,
+              deleteBranchOnMerge: settings.repository.deleteBranchOnMerge,
+              branches: branches.map(branch => branch.name).sort(),
+              openPullRequests: pulls.map(pull => ({
+                number: pull.number,
+                headRepository: pull.head.repo?.full_name ?? null,
+                headRef: pull.head.ref,
+              })).sort((left, right) => left.number - right.number),
+            };
+            fs.writeFileSync(
+              process.env.BRANCH_LIFECYCLE_SNAPSHOT,
+              `${JSON.stringify(snapshot)}\n`,
+              {encoding: 'utf8', mode: 0o600},
+            );
+      - name: Validate remote branch lifecycle
+        shell: bash
+        env:
+          BRANCH_LIFECYCLE_SNAPSHOT: ${{ runner.temp }}/new-project-branch-lifecycle.json
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          arguments=(
+            --snapshot "$BRANCH_LIFECYCLE_SNAPSHOT"
+            --expected-repository "$GITHUB_REPOSITORY"
+            --format text
+          )
+          if [[ -n "${HEAD_REF:-}" ]]; then
+            arguments+=(--focus-branch "$HEAD_REF")
+          fi
+          python3 .governance/branch_lifecycle_check.py "${arguments[@]}"
+
+  enforce:
+    name: governance / enforce
+    # A closed pull request has nothing left to gate; remote-lifecycle still runs.
+    if: github.event.action != 'closed'
+    runs-on: ${{ vars.NEW_PROJECT_RUNNER_LABEL || 'ubuntu-latest' }}
+    steps:
+      - name: Check out the exact revision under review
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Set up Python
+        if: runner.environment == 'github-hosted'
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+      - name: Require provisioned Python on self-hosted runner
+        if: runner.environment == 'self-hosted'
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v python3 >/dev/null
+          python3 -c 'import sys; assert sys.version_info >= (3, 11), sys.version'
+      - name: Install wellman governance runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          standard_version="$(python3 -c 'import json; print(json.load(open(".governance/manifest.json", encoding="utf-8"))["standard"]["version"])')"
+          runtime_ref="v${standard_version}"
+          python3 -m pip install --disable-pip-version-check "git+https://github.com/wellmanifest/new-project.git@${runtime_ref}#subdirectory=packages/wellman"
+          wellman --version
+      - name: Run the managed governance gate
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          # CI has no local clone hook; checks bound to a developer clone are
+          # skipped for the ci actor, exactly as for governance_check.py below.
+          range_arguments=()
+          if [[ -n "${BASE_SHA:-}" || -n "${HEAD_SHA:-}" ]]; then
+            if [[ -z "${BASE_SHA:-}" || -z "${HEAD_SHA:-}" ]]; then
+              echo "Both BASE_SHA and HEAD_SHA are required for PR validation." >&2
+              exit 1
+            fi
+            range_arguments=(--base "$BASE_SHA" --head "$HEAD_SHA")
+          fi
+          wellman check --root . --actor ci --json "${range_arguments[@]}"
+          # The adopter's standard-adoption.json mode decides: "enforce" fails on
+          # missing packs, "audit" reports them without failing the gate.
+          python3 .governance/standard_pack_check.py --root . --format json
+          arguments=(--root . --manifest .governance/manifest.json
+            --lock .governance/manifest.lock.json
+            --stack-profiles .governance/stack-profiles.json --actor ci)
+          python3 .governance/governance_check.py "${arguments[@]}" "${range_arguments[@]}"

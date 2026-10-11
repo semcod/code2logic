@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wellmanifest.com/schemas/new-project-ticket-allocation-v1.json",
+  "title": "new-project ticket allocation policy",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["$schema", "schema", "mode"],
+      "properties": {
+        "$schema": {"type": "string", "minLength": 1},
+        "schema": {"const": "new-project.ticket-allocation/v1"},
+        "mode": {"const": "local-single-clone"}
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["$schema", "schema", "mode", "allocator"],
+      "properties": {
+        "$schema": {"type": "string", "minLength": 1},
+        "schema": {"const": "new-project.ticket-allocation/v1"},
+        "mode": {"const": "registered"},
+        "allocator": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["processUri", "issuer", "maxReceiptAgeSeconds"],
+          "properties": {
+            "processUri": {"type": "string", "pattern": "^[a-z][a-z0-9+.-]*://[^\\s]+$"},
+            "issuer": {"type": "string", "pattern": "^[a-z][a-z0-9+.-]*://[^\\s]+$"},
+            "maxReceiptAgeSeconds": {"type": "integer", "minimum": 30, "maximum": 3600}
+          }
+        }
+      }
+    }
+  ]
+}

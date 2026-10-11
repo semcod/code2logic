@@ -3,7 +3,6 @@ version: '3.8'
 services:
   code2logic:
     build: .
-    image: code2logic:latest
     volumes:
       - ./:/project:ro
       - ./output:/output
@@ -14,7 +13,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    image: code2logic:dev
     volumes:
       - ./:/app
       - ./output:/output
@@ -23,19 +21,6 @@ services:
     stdin_open: true
     tty: true
 
-
-  # LiteLLM proxy for unified API
-  litellm:
-    image: ghcr.io/berriai/litellm:main-latest
-    ports:
-      - "4000:4000"
-    environment:
-      - OLLAMA_API_BASE=http://localhost:11434
-    volumes:
-      - ./litellm_config.yaml:/app/config.yaml
-    command: ["--config", "/app/config.yaml"]
-    depends_on:
-      - ollama
 
 volumes:
   ollama_data:

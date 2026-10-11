@@ -1,0 +1,458 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wellmanifest.com/schemas/new-project-remediation-intent-v1.json",
+  "title": "Target-owned diagnostic remediation intent DSL",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "intentId",
+    "ticket",
+    "repository",
+    "ownerRoute",
+    "status",
+    "source",
+    "objective",
+    "scope",
+    "findings",
+    "actions",
+    "verifications",
+    "acceptanceCriteria",
+    "llmGuidance",
+    "todo2code"
+  ],
+  "properties": {
+    "schema": {"const": "new-project.remediation-intent/v1"},
+    "intentId": {"type": "string", "pattern": "^RI-[A-Z0-9][A-Z0-9-]*$"},
+    "ticket": {"type": "string", "pattern": "^ticket-[0-9]{3,}$"},
+    "repository": {"$ref": "#/$defs/repository"},
+    "ownerRoute": {"$ref": "#/$defs/nonempty"},
+    "status": {"enum": ["DRAFT", "READY", "ANALYZED"]},
+    "source": {"$ref": "#/$defs/source"},
+    "objective": {"$ref": "#/$defs/objective"},
+    "scope": {"$ref": "#/$defs/scope"},
+    "findings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/finding"}
+    },
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/action"}
+    },
+    "verifications": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/verification"}
+    },
+    "acceptanceCriteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/acceptanceCriterion"}
+    },
+    "llmGuidance": {"$ref": "#/$defs/llmGuidance"},
+    "todo2code": {"$ref": "#/$defs/todo2code"},
+    "advisoryAnalysis": {"$ref": "#/$defs/advisoryAnalysis"}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"status": {"const": "ANALYZED"}},
+        "required": ["status"]
+      },
+      "then": {"required": ["advisoryAnalysis"]}
+    }
+  ],
+  "$defs": {
+    "nonempty": {"type": "string", "minLength": 1},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "repository": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!unresolved:)(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$)).+$"
+    },
+    "pathOrUnresolved": {
+      "oneOf": [
+        {"$ref": "#/$defs/path"},
+        {"const": "unresolved:agent"}
+      ]
+    },
+    "stringList": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/nonempty"},
+      "uniqueItems": true
+    },
+    "nonemptyStringList": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/nonempty"},
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["producer", "observedAt", "reportDigest"],
+      "properties": {
+        "producer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "version"],
+          "properties": {
+            "name": {"$ref": "#/$defs/nonempty"},
+            "version": {"$ref": "#/$defs/nonempty"}
+          }
+        },
+        "observedAt": {"type": "string", "format": "date-time"},
+        "reportDigest": {
+          "oneOf": [
+            {"$ref": "#/$defs/digest"},
+            {"const": "unresolved:agent"}
+          ]
+        }
+      }
+    },
+    "objective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["outcome", "nonGoals", "constraints"],
+      "properties": {
+        "outcome": {"$ref": "#/$defs/nonempty"},
+        "nonGoals": {"$ref": "#/$defs/nonemptyStringList"},
+        "constraints": {"$ref": "#/$defs/nonemptyStringList"}
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowedPaths", "forbiddenPaths", "preservePaths"],
+      "properties": {
+        "allowedPaths": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/pathOrUnresolved"},
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "forbiddenPaths": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/path"},
+          "uniqueItems": true
+        },
+        "preservePaths": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/path"},
+          "uniqueItems": true
+        }
+      }
+    },
+    "diagnosticExpectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "current", "required"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9]*(?:[_-][A-Z0-9]+)*$"
+        },
+        "current": {"enum": ["EMITTED", "MISSING", "FALSE_POSITIVE", "DRIFT"]},
+        "required": {"enum": ["EMIT", "SUPPRESS", "REFINE", "PRESERVE"]}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "observation"],
+      "properties": {
+        "ref": {"$ref": "#/$defs/nonempty"},
+        "observation": {"$ref": "#/$defs/nonempty"}
+      }
+    },
+    "applicability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requiredSignals", "excludedSignals", "unknownOutcome"],
+      "properties": {
+        "requiredSignals": {"$ref": "#/$defs/nonemptyStringList"},
+        "excludedSignals": {"$ref": "#/$defs/stringList"},
+        "unknownOutcome": {"enum": ["BLOCK", "REPORT"]}
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "category",
+        "status",
+        "priority",
+        "summary",
+        "diagnostic",
+        "evidence",
+        "applicability",
+        "desiredOutcome",
+        "affectedPaths",
+        "dependsOn",
+        "acceptanceCriteria"
+      ],
+      "properties": {
+        "id": {"type": "string", "pattern": "^F-[A-Z0-9][A-Z0-9-]*$"},
+        "category": {
+          "enum": [
+            "FALSE_POSITIVE",
+            "SILENT_OMISSION",
+            "AMBIGUOUS_HEURISTIC",
+            "CONTRACT_DRIFT",
+            "MISSING_INVENTORY",
+            "STATE_RISK",
+            "OTHER"
+          ]
+        },
+        "status": {"enum": ["CONFIRMED", "PROPOSED", "DEFERRED"]},
+        "priority": {"enum": ["P0", "P1", "P2", "P3"]},
+        "summary": {"$ref": "#/$defs/nonempty"},
+        "diagnostic": {"$ref": "#/$defs/diagnosticExpectation"},
+        "evidence": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/evidence"},
+          "minItems": 1
+        },
+        "applicability": {"$ref": "#/$defs/applicability"},
+        "desiredOutcome": {"$ref": "#/$defs/nonempty"},
+        "affectedPaths": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/pathOrUnresolved"},
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "dependsOn": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^F-[A-Z0-9][A-Z0-9-]*$"},
+          "uniqueItems": true
+        },
+        "acceptanceCriteria": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^AC-[0-9]+$"},
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      }
+    },
+    "risk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "authorization", "automation", "preservesUserData"],
+      "properties": {
+        "level": {"enum": ["READ_ONLY", "REVERSIBLE_WRITE", "DESTRUCTIVE"]},
+        "authorization": {
+          "enum": ["NOT_APPLICABLE", "SESSION_EXECUTION_AUTHORIZATION", "EXPLICIT_HUMAN"]
+        },
+        "automation": {"enum": ["ALLOWED", "PROHIBITED"]},
+        "preservesUserData": {"type": "boolean"}
+      }
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "findingIds",
+        "operation",
+        "description",
+        "paths",
+        "dependsOn",
+        "verificationIds",
+        "risk"
+      ],
+      "properties": {
+        "id": {"type": "string", "pattern": "^A-[A-Z0-9][A-Z0-9-]*$"},
+        "findingIds": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^F-[A-Z0-9][A-Z0-9-]*$"},
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "operation": {
+          "enum": ["CLASSIFY", "IMPLEMENT", "TEST", "DOCUMENT", "RELEASE", "TRIAGE", "PRESERVE"]
+        },
+        "description": {"$ref": "#/$defs/nonempty"},
+        "paths": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/pathOrUnresolved"},
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "dependsOn": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^A-[A-Z0-9][A-Z0-9-]*$"},
+          "uniqueItems": true
+        },
+        "verificationIds": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^V-[A-Z0-9][A-Z0-9-]*$"},
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "risk": {"$ref": "#/$defs/risk"}
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "command", "expected", "deterministic", "covers"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^V-[A-Z0-9][A-Z0-9-]*$"},
+        "type": {"enum": ["COMMAND", "ASSERTION", "EXTERNAL_EVIDENCE"]},
+        "command": {
+          "oneOf": [
+            {"$ref": "#/$defs/nonempty"},
+            {"type": "null"}
+          ]
+        },
+        "expected": {"$ref": "#/$defs/nonempty"},
+        "deterministic": {"type": "boolean"},
+        "covers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(?:F|A)-[A-Z0-9][A-Z0-9-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      }
+    },
+    "acceptanceCriterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "statement", "findingIds", "verificationIds"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^AC-[0-9]+$"},
+        "statement": {"$ref": "#/$defs/nonempty"},
+        "findingIds": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^F-[A-Z0-9][A-Z0-9-]*$"},
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "verificationIds": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^V-[A-Z0-9][A-Z0-9-]*$"},
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      }
+    },
+    "llmGuidance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "mustPreserve", "forbiddenAssumptions", "planningOrder", "openQuestions"],
+      "properties": {
+        "role": {"$ref": "#/$defs/nonempty"},
+        "mustPreserve": {"$ref": "#/$defs/nonemptyStringList"},
+        "forbiddenAssumptions": {"$ref": "#/$defs/nonemptyStringList"},
+        "planningOrder": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^A-[A-Z0-9][A-Z0-9-]*$"},
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "openQuestions": {"$ref": "#/$defs/stringList"}
+      }
+    },
+    "todo2code": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "taskPath", "todoPath", "planSchema", "requiredDiagnosticCodes"],
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "taskPath": {"$ref": "#/$defs/path"},
+        "todoPath": {"$ref": "#/$defs/path"},
+        "planSchema": {"const": "t2c.code-change-plan/v1"},
+        "requiredDiagnosticCodes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "AMBIGUOUS_REQUIREMENT",
+              "HUMAN_AGENT_CONFLICT",
+              "HUMAN_COMMUNICATION_CONFLICT",
+              "PLANNED_NOT_IMPLEMENTED"
+            ]
+          },
+          "minItems": 4,
+          "uniqueItems": true
+        }
+      }
+    },
+    "analysisFinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "severity", "message", "references", "llmHint"],
+      "properties": {
+        "code": {
+          "enum": [
+            "T2C_AMBIGUOUS_INTENT",
+            "T2C_CONFLICT",
+            "T2C_CRITERION_GAP",
+            "T2C_PLAN_GAP",
+            "T2C_PRIORITY_DRIFT",
+            "T2C_SCOPE_EXPANSION",
+            "T2C_UNAUTHORIZED_DELETION"
+          ]
+        },
+        "severity": {"enum": ["BLOCKING", "REVIEW", "INFO"]},
+        "message": {"$ref": "#/$defs/nonempty"},
+        "references": {"$ref": "#/$defs/nonemptyStringList"},
+        "llmHint": {"$ref": "#/$defs/nonempty"}
+      }
+    },
+    "advisoryAnalysis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authority",
+        "producer",
+        "analyzedAt",
+        "intentDigest",
+        "graphDigest",
+        "diagnosticsDigest",
+        "plansDigest",
+        "projectionRecordIds",
+        "planIds",
+        "findings",
+        "llmHints"
+      ],
+      "properties": {
+        "authority": {"const": "ADVISORY"},
+        "producer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "version", "mode"],
+          "properties": {
+            "name": {"const": "todo2code"},
+            "version": {"$ref": "#/$defs/nonempty"},
+            "mode": {"const": "deterministic"}
+          }
+        },
+        "analyzedAt": {"type": "string", "format": "date-time"},
+        "intentDigest": {"$ref": "#/$defs/digest"},
+        "graphDigest": {"$ref": "#/$defs/digest"},
+        "diagnosticsDigest": {"$ref": "#/$defs/digest"},
+        "plansDigest": {"$ref": "#/$defs/digest"},
+        "projectionRecordIds": {
+          "$ref": "#/$defs/stringList",
+          "minItems": 1
+        },
+        "planIds": {"$ref": "#/$defs/stringList"},
+        "findings": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/analysisFinding"}
+        },
+        "llmHints": {"$ref": "#/$defs/stringList"}
+      }
+    }
+  }
+}

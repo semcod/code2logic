@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/wellmanifest/new-project/governance/decision-record.schema.json",
+  "title": "Recomputable autonomous decision record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "decisionId",
+    "ticket",
+    "headSha",
+    "correlationId",
+    "actor",
+    "appliedRule",
+    "inputs",
+    "verdict",
+    "verdictAuthority",
+    "rejected",
+    "assertions"
+  ],
+  "properties": {
+    "schema": { "const": "new-project.decision-record/v1" },
+    "decisionId": {
+      "type": "string",
+      "pattern": "^D-[0-9]{3}-[0-9]{4,}$"
+    },
+    "ticket": {
+      "type": "string",
+      "pattern": "^ticket-[0-9]{3,}$"
+    },
+    "headSha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "correlationId": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 200
+    },
+    "actor": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "appliedRule": {
+      "type": "string",
+      "pattern": "^[A-Z]+-[A-Z0-9]+-[0-9]{3}$|^P-CORE-[0-9]{3}$|^C-[A-Z]+-[0-9]{3}$"
+    },
+    "inputs": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": ["string", "number", "boolean", "array", "object", "null"]
+      }
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["APPROVE", "REQUEST_CHANGES", "BLOCKED", "SKIP"]
+    },
+    "verdictAuthority": {
+      "type": "string",
+      "enum": ["DETERMINISTIC", "ADVISORY"]
+    },
+    "rejected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["alternative", "because"],
+      "properties": {
+        "alternative": { "type": "string", "minLength": 1 },
+        "because": { "type": "string", "minLength": 1 }
+      }
+    },
+    "advisory": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "llmVerdict": { "type": "string" },
+        "model": { "type": "string" }
+      }
+    },
+    "assertions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "derivedFrom": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "changeEvaluationSchema": { "const": "t2c.change-evaluation/v1" },
+        "evaluationPath": { "type": "string" }
+      }
+    }
+  }
+}

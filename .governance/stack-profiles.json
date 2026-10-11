@@ -1,0 +1,14 @@
+{
+  "schema": "new-project.stack-profiles/v1",
+  "profiles": {
+    "node": { "anyFiles": ["package.json"], "recommended": ["npm ci", "lint", "typecheck", "test", "dependency audit"] },
+    "python": { "anyFiles": ["pyproject.toml", "requirements.txt"], "recommended": ["ruff", "mypy", "pytest", "bandit", "pip-audit"] },
+    "go": { "anyFiles": ["go.mod"], "recommended": ["gofmt", "go vet", "go test -race", "staticcheck", "govulncheck"] },
+    "rust": { "anyFiles": ["Cargo.toml"], "recommended": ["cargo fmt --check", "cargo clippy -- -D warnings", "cargo test", "cargo deny"] },
+    "java": { "anyFiles": ["pom.xml", "build.gradle", "build.gradle.kts"], "recommended": ["wrapper verify", "tests", "Checkstyle or SpotBugs", "dependency audit"] },
+    "docker": { "anyFiles": ["Dockerfile", "Dockerfile.e2e", "compose.yml", "compose.yaml", "docker-compose.yml", "docker-compose.yaml"], "recommended": ["hadolint", "docker compose config", "build", "Trivy", "SBOM"] },
+    "frontend": { "anyFiles": ["playwright.config.ts", "playwright.config.js", "cypress.config.ts", "cypress.config.js"], "recommended": ["browser E2E", "accessibility", "pinned browser image"] },
+    "terraform": { "anyFiles": ["main.tf", "versions.tf"], "recommended": ["terraform fmt -check", "terraform validate", "tflint", "checkov"] },
+    "kubernetes": { "anyFiles": ["Chart.yaml", "kustomization.yaml"], "recommended": ["helm lint", "kubeconform", "OPA/Conftest"] }
+  }
+}

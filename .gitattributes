@@ -1,0 +1,3 @@
+# Wellmanifest new-project standard git attributes
+project/TICKETS.md merge=wellmanifest-ticket-index
+TODO.md merge=wellmanifest-ticket-index

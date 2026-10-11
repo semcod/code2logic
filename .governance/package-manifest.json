@@ -1,0 +1,707 @@
+{
+  "schema": "new-project.package-manifest/v1",
+  "files": [
+    {
+      "source": "scripts/snapshot_allocation.py",
+      "target": ".governance/snapshot_allocation.py",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "scripts/ticket_recovery.py",
+      "target": ".governance/ticket_recovery.py",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "scripts/work_start_check.py",
+      "target": ".governance/work_start_check.py",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "governance/work-start-report.schema.json",
+      "target": ".governance/work-start-report.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "error/GOV-WORK-START.md",
+      "target": ".governance/error/GOV-WORK-START.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "template/files/AGENTS.template.md",
+      "target": "AGENTS.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "docs/AGENT_DECISIONS.md",
+      "target": ".governance/AGENT_DECISIONS.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": ".subactor/.gitignore",
+      "target": ".subactor/.gitignore",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": ".subactor/manifest.json",
+      "target": ".subactor/manifest.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "template/files/tests/conftest-worktree-bootstrap.template.py",
+      "target": ".governance/templates/conftest-worktree-bootstrap.py",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "project.sh",
+      "target": "project.sh",
+      "strategy": "seed",
+      "executable": true
+    },
+    {
+      "source": "project.bat",
+      "target": "project.bat",
+      "strategy": "seed",
+      "executable": false
+    },
+    {
+      "source": "governance/approval-evidence.schema.json",
+      "target": ".governance/approval-evidence.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/adoption-bindings.json",
+      "target": ".governance/adoption-bindings.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/adoption-bindings.schema.json",
+      "target": ".governance/adoption-bindings.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/change-evaluation.schema.json",
+      "target": ".governance/change-evaluation.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/diagnostics.json",
+      "target": ".governance/diagnostics.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/diagnostics.schema.json",
+      "target": ".governance/diagnostics.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/ticket-allocation.json",
+      "target": ".governance/ticket-allocation.json",
+      "strategy": "extendable",
+      "executable": false
+    },
+    {
+      "source": "governance/ticket-allocation.schema.json",
+      "target": ".governance/ticket-allocation.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/ticket-allocation-request.schema.json",
+      "target": ".governance/ticket-allocation-request.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/ticket-allocation-receipt.schema.json",
+      "target": ".governance/ticket-allocation-receipt.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/ticket-activity.json",
+      "target": ".governance/ticket-activity.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/ticket-activity.schema.json",
+      "target": ".governance/ticket-activity.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/ticket-activity-override.schema.json",
+      "target": ".governance/ticket-activity-override.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/terminal-receipt-registry.schema.json",
+      "target": ".governance/terminal-receipt-registry.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/work-continuity.schema.json",
+      "target": ".governance/work-continuity.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/remediation-intent.schema.json",
+      "target": ".governance/remediation-intent.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "template/files/remediation-intent.template.dsl.json",
+      "target": ".governance/remediation-intent.template.dsl.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "error/README.md",
+      "target": ".governance/error/README.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "error/GOV-APPROVAL.md",
+      "target": ".governance/error/GOV-APPROVAL.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "error/GOV-REMEDIATION-INTENT.md",
+      "target": ".governance/error/GOV-REMEDIATION-INTENT.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "error/GOV-TICKET-001.md",
+      "target": ".governance/error/GOV-TICKET-001.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "error/GOV-TICKET-ALLOCATION.md",
+      "target": ".governance/error/GOV-TICKET-ALLOCATION.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "error/GOV-TICKET-ACTIVITY.md",
+      "target": ".governance/error/GOV-TICKET-ACTIVITY.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "error/GOV-WORK-CONTINUITY.md",
+      "target": ".governance/error/GOV-WORK-CONTINUITY.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "error/GOV-WORKSPACE-LIFECYCLE.md",
+      "target": ".governance/error/GOV-WORKSPACE-LIFECYCLE.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "error/GOV-WORKTREE-OVERLAP.md",
+      "target": ".governance/error/GOV-WORKTREE-OVERLAP.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "error/GOV-CHANGE-LEASE.md",
+      "target": ".governance/error/GOV-CHANGE-LEASE.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "error/GOV-PHYS.md",
+      "target": ".governance/error/GOV-PHYS.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/physical-contracts.schema.json",
+      "target": ".governance/physical-contracts.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "subprojects/change-lease/change-lease.schema.json",
+      "target": ".governance/change-lease.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "subprojects/worktrees/worktrees.schema.json",
+      "target": ".governance/worktrees.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "subprojects/worktrees/conformance.py",
+      "target": ".governance/worktree_path_check.py",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "governance/worktrees.lock.json",
+      "target": ".governance/worktrees.lock.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "scripts/change_lease_check.py",
+      "target": ".governance/change_lease_check.py",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "error/GOV-INTENT.md",
+      "target": ".governance/error/GOV-INTENT.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "scripts/worktree_overlap_check.py",
+      "target": ".governance/worktree_overlap_check.py",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "scripts/ticket_activity.py",
+      "target": ".governance/ticket_activity.py",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "scripts/work_continuity.py",
+      "target": ".governance/work_continuity.py",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "scripts/ticket_input.py",
+      "target": ".governance/ticket_input.py",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "scripts/ticket_storage.py",
+      "target": ".governance/ticket_storage.py",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "scripts/ticket_allocation.py",
+      "target": ".governance/ticket_allocation.py",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "scripts/worktree_guard.py",
+      "target": ".governance/worktree_guard.py",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "template/files/worktree-guard.template.yaml",
+      "target": "worktree-guard.yaml",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "template/files/required-checks.template.json",
+      "target": ".governance/required-checks.json",
+      "strategy": "extendable",
+      "executable": false
+    },
+    {
+      "source": "governance/required-checks.schema.json",
+      "target": ".governance/required-checks.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/decision-record.schema.json",
+      "target": ".governance/decision-record.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "scripts/check_required_checks.py",
+      "target": ".governance/check_required_checks.py",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "scripts/decision_record.py",
+      "target": ".governance/decision_record.py",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "scripts/remediation_intent.py",
+      "target": ".governance/remediation_intent.py",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "scripts/branch_lifecycle_check.py",
+      "target": ".governance/branch_lifecycle_check.py",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "scripts/workspace_lifecycle_check.py",
+      "target": ".governance/workspace_lifecycle_check.py",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "scripts/ticket_index_merge_driver.py",
+      "target": ".governance/ticket_index_merge_driver.py",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "scripts/prune_merged_worktrees.py",
+      "target": ".governance/prune_merged_worktrees.py",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "template/files/.gitattributes",
+      "target": ".gitattributes",
+      "strategy": "seed",
+      "executable": false
+    },
+    {
+      "source": "governance/intent.schema.json",
+      "target": ".governance/intent.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/lock.schema.json",
+      "target": ".governance/lock.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/manifest.schema.json",
+      "target": ".governance/manifest.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/package-manifest.json",
+      "target": ".governance/package-manifest.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/stack-profiles.json",
+      "target": ".governance/stack-profiles.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/work-classification.dsl.json",
+      "target": ".governance/work-classification.dsl.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/work-classification.schema.json",
+      "target": ".governance/work-classification.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "scripts/governance_check.py",
+      "target": ".governance/governance_check.py",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "scripts/repository_policy.py",
+      "target": ".governance/repository_policy.py",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "template/files/new-project-governance.workflow.yml",
+      "target": ".github/workflows/new-project-governance.yml",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "template/files/new-project-branch-hygiene.workflow.yml",
+      "target": ".github/workflows/new-project-branch-hygiene.yml",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "scripts/runtime.sh",
+      "target": "scripts/runtime.sh",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "project/governance-check.sh",
+      "target": "project/governance-check.sh",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "project/governance-check.bat",
+      "target": "project/governance-check.bat",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "project/new-ticket.sh",
+      "target": "project/new-ticket.sh",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "project/readme.sh",
+      "target": "project/readme.sh",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "governance/manifest.default.json",
+      "target": ".governance/manifest.base.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/manifest.default.json",
+      "target": ".governance/manifest.json",
+      "strategy": "extendable",
+      "executable": false
+    },
+    {
+      "source": "error/GOV-AGENT-HOST.md",
+      "target": ".governance/error/GOV-AGENT-HOST.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "error/GOV-STANDARD-UPDATE.md",
+      "target": ".governance/error/GOV-STANDARD-UPDATE.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "error/GOV-PACKAGING.md",
+      "target": ".governance/error/GOV-PACKAGING.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "template/files/CLAUDE.template.md",
+      "target": "CLAUDE.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "template/files/GEMINI.template.md",
+      "target": "GEMINI.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "template/files/cursor-rule.template.mdc",
+      "target": ".cursor/rules/new-project-standard.mdc",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "template/files/pre-commit.template.sh",
+      "target": ".githooks/pre-commit",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "template/files/commit-msg.template.sh",
+      "target": ".githooks/commit-msg",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "scripts/precommit_standard_update.py",
+      "target": ".governance/precommit_standard_update.py",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "governance/agent-hosts.json",
+      "target": ".governance/agent-hosts.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/agent-hosts.schema.json",
+      "target": ".governance/agent-hosts.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "scripts/agent_host_check.py",
+      "target": ".governance/agent_host_check.py",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "scripts/install-agent-hosts.sh",
+      "target": "scripts/install-agent-hosts.sh",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "scripts/generate_required_checks.py",
+      "target": ".governance/generate_required_checks.py",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "template/files/aider.template.yml",
+      "target": ".aider.conf.yml",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "template/files/copilot-instructions.template.md",
+      "target": ".github/copilot-instructions.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "template/files/wellmanifest_governance.py",
+      "target": "wellmanifest_governance.py",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/standard-packs.json",
+      "target": ".governance/standard-packs.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/standard-adoption.schema.json",
+      "target": ".governance/standard-adoption.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/standard-adoption.default.json",
+      "target": ".governance/standard-adoption.json",
+      "strategy": "seed",
+      "executable": false
+    },
+    {
+      "source": "scripts/standard_pack_check.py",
+      "target": ".governance/standard_pack_check.py",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "scripts/branch_intent_reconciliation.py",
+      "target": ".governance/branch_intent_reconciliation.py",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/branch-intent-reconciliation.schema.json",
+      "target": ".governance/branch-intent-reconciliation.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "docs/BRANCH_INTENT_RECONCILIATION.md",
+      "target": ".governance/docs/BRANCH_INTENT_RECONCILIATION.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "template/files/LOCAL_CI_PUBLICATION.template.md",
+      "target": ".governance/docs/LOCAL_CI_PUBLICATION.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "scripts/snapshot_migration.py",
+      "target": ".governance/snapshot_migration.py",
+      "strategy": "managed",
+      "executable": true
+    },
+    {
+      "source": "governance/snapshot-migration.schema.json",
+      "target": ".governance/snapshot-migration.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "error/GOV-SNAPSHOT-MIGRATION.md",
+      "target": ".governance/error/GOV-SNAPSHOT-MIGRATION.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "docs/information/snapshot-migration.md",
+      "target": ".governance/docs/SNAPSHOT_MIGRATION.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/managed-copies.json",
+      "target": ".governance/managed-copies.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "error/GOV-ARCHITECTURE-001.md",
+      "target": ".governance/error/GOV-ARCHITECTURE-001.md",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "governance/reusable-workflows.schema.json",
+      "target": ".governance/reusable-workflows.schema.json",
+      "strategy": "managed",
+      "executable": false
+    },
+    {
+      "source": "error/GOV-VERSION.md",
+      "target": ".governance/error/GOV-VERSION.md",
+      "strategy": "managed",
+      "executable": false
+    }
+  ]
+}

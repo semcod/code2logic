@@ -1,0 +1,72 @@
+name: new-project-branch-hygiene
+
+# `delete_branch_on_merge` covers the merge exit. This workflow covers the
+# other one: a branch whose pull request was closed without merging. Nothing
+# in the toolchain removes those, and `GOV-BRANCH-LIFECYCLE-002` validates the
+# repository as a whole rather than the diff under review, so a single left
+# behind branch fails `governance / remote lifecycle` on *every* later pull
+# request, indefinitely and through no fault of its own.
+#
+# Closing a pull request without merging is the explicit owner decision to
+# discard the branch that the check's own remediation asks for, and GitHub
+# keeps the branch restorable from the pull request page afterwards.
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+
+jobs:
+  discard-unmerged-head:
+    # Forks cannot be written to, and the default branch is never a head to
+    # discard. Both guards are cheap and keep the job from ever running where
+    # deleting would be wrong.
+    if: >-
+      github.event.pull_request.merged == false &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref != github.event.repository.default_branch
+    runs-on: ${{ vars.NEW_PROJECT_RUNNER_LABEL || 'ubuntu-latest' }}
+    permissions:
+      contents: write
+    steps:
+      - name: Delete the closed pull request's head branch
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const ref = context.payload.pull_request.head.ref;
+
+            // Several pull requests may share one head branch. Deleting it
+            // while another is still open would break that one instead.
+            const owners = await github.paginate(github.rest.pulls.list, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              head: `${context.repo.owner}:${ref}`,
+              per_page: 100,
+            });
+            if (owners.length > 0) {
+              const numbers = owners.map(pull => `#${pull.number}`).join(', ');
+              core.info(`Kept ${ref}: still owned by ${numbers}.`);
+              return;
+            }
+
+            try {
+              await github.rest.git.deleteRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `heads/${ref}`,
+              });
+              core.info(
+                `Deleted ${ref}. GitHub keeps it restorable from the pull request page.`,
+              );
+            } catch (error) {
+              // The branch is commonly gone already, because the person
+              // closing the pull request ticked "delete branch".
+              if (error.status === 404 || error.status === 422) {
+                core.info(`${ref} was already deleted.`);
+                return;
+              }
+              throw error;
+            }

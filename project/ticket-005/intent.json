@@ -1,0 +1,93 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-005",
+  "summary": "adopt wellmanifest new-project 0.20.92 release",
+  "workstream": "governance",
+  "classification": {
+    "kind": "SERVICE",
+    "priority": "P2",
+    "origin": "health"
+  },
+  "allowedPaths": [
+    "project/ticket-005/**",
+    "TODO.md",
+    "project/TICKETS.md",
+    ".gitattributes",
+    ".githooks/**",
+    ".gitignore",
+    ".governance/**",
+    ".subactor/**",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "project.bat",
+    "project/**",
+    "scripts/**",
+    "wellmanifest_governance.py",
+    "worktree-guard.yaml",
+    "pyproject.toml",
+    "Dockerfile",
+    "Dockerfile.dev",
+    "docker-compose.yml",
+    "docs/CONTRIBUTING.md"
+  ],
+  "forbiddenPaths": [
+    "project/ticket-*/user-*.md"
+  ],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "7114175b0b030b1635c804e4fa9479185b79d5c3",
+    "targetBranch": "main",
+    "outcome": "Adopt wellmanifest new-project 0.20.92 release.",
+    "nonGoals": [
+      "No production logic modifications"
+    ],
+    "complexity": "L",
+    "estimatedMinutes": 30,
+    "budgets": {
+      "maxImplementationFiles": 15,
+      "maxAffectedComponents": 5,
+      "maxPublicInterfaceChanges": 3,
+      "maxRuntimeDependencies": 3
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "Adopt wellmanifest new-project 0.20.92.",
+      "components": [
+        {
+          "name": "governance",
+          "paths": [
+            "**"
+          ]
+        }
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": [],
+      "dataChanges": [],
+      "ui": {
+        "impact": "none",
+        "states": [],
+        "evidence": []
+      },
+      "rollback": "git revert"
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {
+        "criterion": "AC-01",
+        "commands": [
+          "bash project/governance-check.sh"
+        ],
+        "evidence": "Governance check passes cleanly."
+      }
+    ],
+    "standardAdoption": {
+      "sourceRepository": "wellmanifest/new-project",
+      "fromRevision": null,
+      "toRevision": "fcbb13e0ae04c688d825d5a87e2d2721dfab483d"
+    }
+  }
+}

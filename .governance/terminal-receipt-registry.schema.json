@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wellmanifest.dev/schemas/new-project/terminal-receipt-registry.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "repositoryRef", "receipts"],
+  "properties": {
+    "schema": {"const": "new-project.terminal-receipt-registry/v1"},
+    "repositoryRef": {"type": "string", "minLength": 1},
+    "receipts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["receiptRef", "ticket", "outcome", "headSha", "terminalSha", "targetBranch", "occurredAt"],
+        "properties": {
+          "receiptRef": {"type": "string", "pattern": "^receipt:\\S+$"},
+          "ticket": {"type": "string", "pattern": "^ticket-[0-9]{3,}$"},
+          "outcome": {"type": "string", "minLength": 1},
+          "headSha": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+          "terminalSha": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+          "targetBranch": {"type": "string", "pattern": "^[A-Za-z0-9._/-]+$"},
+          "occurredAt": {"type": "string", "format": "date-time"}
+        }
+      }
+    }
+  }
+}

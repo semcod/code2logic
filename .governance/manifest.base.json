@@ -1,0 +1,170 @@
+{
+  "approvalEvidence": {
+    "requiredBindings": [
+      "repository",
+      "pullRequest",
+      "headSha",
+      "ticket",
+      "actor"
+    ],
+    "reviewVerificationMethod": "github-api-allowlist",
+    "schema": "new-project.approval-evidence/v1",
+    "signedAttestationPredicateType": "https://wellmanifest.com/attestations/validator/v1"
+  },
+  "coordination": {
+    "integration": {
+      "workstream": "integration"
+    },
+    "maxActiveTicketsPerWorkstream": 8,
+    "mode": "workstreams",
+    "rejectActiveScopeOverlap": true
+  },
+  "delivery": {
+    "allowedComplexityClasses": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
+    "checkpointMinutes": 30,
+    "dependencyManifestPaths": [
+      "package.json",
+      "package-lock.json",
+      "pnpm-lock.yaml",
+      "yarn.lock",
+      "pyproject.toml",
+      "uv.lock",
+      "poetry.lock",
+      "go.mod",
+      "go.sum",
+      "Cargo.toml",
+      "Cargo.lock",
+      "pom.xml"
+    ],
+    "maxActiveMinutes": 120,
+    "maxAffectedComponents": 5,
+    "maxImplementationFiles": 15,
+    "maxPublicInterfaceChanges": 3,
+    "maxRuntimeDependencies": 3,
+    "profiles": {
+      "L": {
+        "maxAffectedComponents": 5,
+        "maxImplementationFiles": 15,
+        "maxPublicInterfaceChanges": 3,
+        "maxRuntimeDependencies": 3
+      },
+      "M": {
+        "maxAffectedComponents": 3,
+        "maxImplementationFiles": 9,
+        "maxPublicInterfaceChanges": 2,
+        "maxRuntimeDependencies": 2
+      },
+      "S": {
+        "maxAffectedComponents": 2,
+        "maxImplementationFiles": 5,
+        "maxPublicInterfaceChanges": 1,
+        "maxRuntimeDependencies": 1
+      },
+      "XS": {
+        "maxAffectedComponents": 1,
+        "maxImplementationFiles": 2,
+        "maxPublicInterfaceChanges": 0,
+        "maxRuntimeDependencies": 0
+      }
+    },
+    "targetBranches": [
+      "main"
+    ]
+  },
+  "docker": {
+    "composeFiles": [
+      "compose.yml",
+      "compose.yaml",
+      "docker-compose.yml",
+      "docker-compose.yaml",
+      "compose.e2e.yml"
+    ],
+    "dockerfiles": [
+      "Dockerfile",
+      "Dockerfile.e2e"
+    ]
+  },
+  "domainContracts": {
+    "mode": "none"
+  },
+  "governancePaths": [
+    "TODO.md",
+    "project/TICKETS.md",
+    "project/ticket-*/**",
+    ".governance/standard-adoption.json",
+    "config/artifact-registry.json"
+  ],
+  "repository": {
+    "componentRoots": [],
+    "mode": "standalone"
+  },
+  "repositoryPolicy": {
+    "delivery": {
+      "checkout": "linked-worktree",
+      "mode": "ticket-branch",
+      "targetBranches": [
+        "main"
+      ]
+    },
+    "enforcement": "enforce",
+    "profile": "ticket-worktree",
+    "tickets": {
+      "backend": "files",
+      "idPattern": "^ticket-[0-9]{3,}$",
+      "referenceRequired": true
+    }
+  },
+  "requiredFiles": [
+    "README.md",
+    "VERSION",
+    "CHANGELOG.md",
+    "TODO.md",
+    "AGENTS.md",
+    "project/TICKETS.md",
+    "project/new-ticket.sh",
+    "project/readme.sh"
+  ],
+  "schema": "new-project.governance/v2",
+  "stacks": [],
+  "standard": {
+    "id": "wellmanifest/new-project",
+    "version": "0.20.92"
+  },
+  "ticket": {
+    "activeStatuses": [
+      "IN_PROGRESS"
+    ],
+    "closedStatuses": [
+      "DONE",
+      "CANCELLED"
+    ],
+    "directoryPattern": "^ticket-[0-9]{3,}$",
+    "implementationStates": [
+      "EDIT",
+      "VALIDATION",
+      "PUBLICATION"
+    ],
+    "intentFile": "intent.json",
+    "nonActiveStatuses": [
+      "BACKLOG",
+      "PLAN",
+      "BLOCKED"
+    ],
+    "requiredAgentFiles": [],
+    "requiredFiles": [
+      "README.md",
+      "intent.json"
+    ],
+    "root": "project"
+  },
+  "trustedApprovalSources": [
+    "github-review",
+    "github-app-review",
+    "signed-attestation"
+  ]
+}

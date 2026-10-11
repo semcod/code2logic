@@ -1,0 +1,389 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:wellmanifest:new-project:schema:work-start-report:v1",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "readOnly",
+        "grantsAuthority",
+        "createsWorktree",
+        "scope",
+        "primaryCheckout",
+        "targetBranch",
+        "targetObservations",
+        "remoteFreshness",
+        "workstream",
+        "requestedPaths",
+        "requestedTicket",
+        "route",
+        "diagnostic",
+        "worktrees",
+        "uncheckedBranches",
+        "blockers",
+        "activeTicketCount",
+        "workstreamLimit",
+        "requiredBeforeWrite",
+        "observationDigest"
+      ],
+      "properties": {
+        "schema": {
+          "const": "new-project.work-start-report/v1"
+        },
+        "readOnly": {
+          "const": true
+        },
+        "grantsAuthority": {
+          "const": false
+        },
+        "createsWorktree": {
+          "const": false
+        },
+        "scope": {
+          "const": "registered-clone-local"
+        },
+        "primaryCheckout": {
+          "type": "string"
+        },
+        "targetBranch": {
+          "type": "string"
+        },
+        "targetObservations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{40,64}$"
+          }
+        },
+        "remoteFreshness": {
+          "const": "not-refreshed"
+        },
+        "workstream": {
+          "type": "string"
+        },
+        "requestedPaths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "requestedTicket": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "route": {
+          "enum": [
+            "NEW_TICKET_CANDIDATE",
+            "REUSE_EXISTING",
+            "RECONCILE",
+            "ASSIST_READ_ONLY",
+            "HANDOFF_REQUIRED",
+            "SERIALIZE"
+          ]
+        },
+        "diagnostic": {
+          "enum": [
+            null,
+            "GOV-WORK-START-001"
+          ]
+        },
+        "worktrees": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "branch",
+              "headSha",
+              "ahead",
+              "behind",
+              "dirtyPaths",
+              "dirtyDigest",
+              "dirtyNewestModifiedAt",
+              "pending",
+              "ticket",
+              "workstream",
+              "allowedPaths",
+              "intentDigest",
+              "active",
+              "status",
+              "activityAuthority",
+              "canonical",
+              "writerAuthority",
+              "allDirtyPaths"
+            ],
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "branch": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "headSha": {
+                "type": "string"
+              },
+              "ahead": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "behind": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "dirtyPaths": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "dirtyDigest": {
+                "type": "string"
+              },
+              "dirtyNewestModifiedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "pending": {
+                "type": "boolean"
+              },
+              "ticket": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "workstream": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "allowedPaths": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "intentDigest": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "active": {
+                "type": "boolean"
+              },
+              "status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "activityAuthority": {
+                "type": "string"
+              },
+              "canonical": {
+                "type": "boolean"
+              },
+              "writerAuthority": {
+                "const": "unverified"
+              },
+              "allDirtyPaths": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "uncheckedBranches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "branch",
+              "headSha",
+              "ahead",
+              "behind"
+            ],
+            "properties": {
+              "branch": {
+                "type": "string"
+              },
+              "headSha": {
+                "type": "string"
+              },
+              "ahead": {
+                "type": "integer"
+              },
+              "behind": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "blockers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "branch",
+              "ticket",
+              "active",
+              "reason"
+            ],
+            "properties": {
+              "path": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "branch": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "ticket": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "active": {
+                "type": "boolean"
+              },
+              "reason": {
+                "enum": [
+                  "scope-reservation",
+                  "pending-delta",
+                  "unassigned-branch-delta",
+                  "unassigned-ticket",
+                  "integrated-ticket-carrier",
+                  "selected-checkout-changed"
+                ]
+              }
+            }
+          }
+        },
+        "activeTicketCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "workstreamLimit": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "requiredBeforeWrite": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "observationDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "publication": {
+          "$ref": "#/$defs/publicationObservation"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "readOnly",
+        "grantsAuthority",
+        "createsWorktree",
+        "route",
+        "diagnostic",
+        "reason"
+      ],
+      "properties": {
+        "schema": {
+          "const": "new-project.work-start-report/v1"
+        },
+        "readOnly": {
+          "const": true
+        },
+        "grantsAuthority": {
+          "const": false
+        },
+        "createsWorktree": {
+          "const": false
+        },
+        "route": {
+          "const": "RECONCILE"
+        },
+        "diagnostic": {
+          "const": "GOV-WORK-START-001"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "publicationObservation": {
+      "$anchor": "publicationObservation",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "observedAt", "readOnly", "grantsAuthority", "remote", "scope", "status", "remoteRefsDigest", "targetRef", "notObservedStages", "worktrees"],
+      "properties": {
+        "schema": {"const": "new-project.publication-observation/v1"},
+        "observedAt": {"type": "string", "format": "date-time"},
+        "readOnly": {"const": true},
+        "grantsAuthority": {"const": false},
+        "remote": {"const": "origin"},
+        "scope": {"const": "origin-heads"},
+        "status": {"enum": ["observed", "partial", "unavailable", "changed"]},
+        "remoteRefsDigest": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+        "targetRef": {"type": "string", "pattern": "^refs/heads/.+"},
+        "notObservedStages": {"const": ["pull-request", "checks", "approval", "protected-merge", "release", "deployment"]},
+        "worktrees": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/publicationWorktree"}
+        }
+      }
+    },
+    "publicationWorktree": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "branch", "headSha", "uncommittedPathCount", "remoteContainingRefs", "unpublishedCommitCount", "sameBranchContainsHead", "headReachableFromTarget", "nextAction"],
+      "properties": {
+        "path": {"type": "string"},
+        "branch": {"type": ["string", "null"]},
+        "headSha": {"type": "string", "pattern": "^([a-f0-9]{40}|[a-f0-9]{64})$"},
+        "uncommittedPathCount": {"type": "integer", "minimum": 0},
+        "remoteContainingRefs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^refs/heads/.+"}
+        },
+        "unpublishedCommitCount": {"type": ["integer", "null"], "minimum": 0},
+        "sameBranchContainsHead": {"type": ["boolean", "null"]},
+        "headReachableFromTarget": {"type": ["boolean", "null"]},
+        "nextAction": {"enum": ["preserve-local-work", "observe-remote", "review-push-preconditions", "reconcile-branch-binding", "observe-integration-evidence", "observe-review-release-deployment"]}
+      }
+    }
+  }
+}

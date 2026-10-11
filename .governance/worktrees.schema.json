@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wellmanifest.org/schemas/worktrees/v5",
+  "title": "Wellmanifest worktree records",
+  "oneOf": [
+    {"$ref": "#/$defs/layoutRecord"},
+    {"$ref": "#/$defs/inventoryRecord"}
+  ],
+  "$defs": {
+    "repositoryName": {
+      "$ref": "#/$defs/observedRepositoryName"
+    },
+    "observedRepositoryName": {
+      "type": "string",
+      "minLength": 1,
+      "not": {"enum": [".", ".."]},
+      "pattern": "^[^/\\\\\\u0000]+$"
+    },
+    "ticket": {
+      "type": "string",
+      "pattern": "^ticket-[0-9]{3,}$"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "nullableTicket": {
+      "oneOf": [
+        {"$ref": "#/$defs/ticket"},
+        {"type": "null"}
+      ]
+    },
+    "nullableSlug": {
+      "oneOf": [
+        {"$ref": "#/$defs/slug"},
+        {"type": "null"}
+      ]
+    },
+    "nullableString": {
+      "oneOf": [
+        {"type": "string"},
+        {"type": "null"}
+      ]
+    },
+    "pathStyle": {
+      "enum": ["posix", "windows"]
+    },
+    "layoutRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "kind",
+        "repository",
+        "repositoryName",
+        "ticket",
+        "slug",
+        "branch",
+        "pathStyle",
+        "primaryCheckout",
+        "worktreesRoot",
+        "worktreePath",
+        "leaseRoot",
+        "leasePath",
+        "linkMode",
+        "minimumGitVersion"
+      ],
+      "properties": {
+        "schema": {"const": "wellmanifest.worktrees/v5"},
+        "kind": {"const": "layout-record"},
+        "repository": {"type": "string", "minLength": 1},
+        "repositoryName": {"$ref": "#/$defs/repositoryName"},
+        "ticket": {"$ref": "#/$defs/ticket"},
+        "slug": {"$ref": "#/$defs/slug"},
+        "branch": {
+          "type": "string",
+          "pattern": "^ticket/[0-9]{3,}-[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "pathStyle": {"$ref": "#/$defs/pathStyle"},
+        "primaryCheckout": {"type": "string", "minLength": 1},
+        "worktreesRoot": {"type": "string", "minLength": 1},
+        "worktreePath": {"type": "string", "minLength": 1},
+        "leaseRoot": {"type": "string", "minLength": 1},
+        "leasePath": {"type": "string", "minLength": 1},
+        "linkMode": {"const": "relative"},
+        "minimumGitVersion": {"const": "2.51.0"}
+      }
+    },
+    "inventoryEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "branch",
+        "classification",
+        "layoutVersion",
+        "ticket",
+        "slug",
+        "anomalies",
+        "head",
+        "bare",
+        "detached",
+        "locked",
+        "prunable"
+      ],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "branch": {"$ref": "#/$defs/nullableString"},
+        "classification": {
+          "enum": [
+            "primary",
+            "canonical-v5",
+            "legacy-v4",
+            "legacy-v3",
+            "legacy-v2",
+            "legacy-v1",
+            "system-temp",
+            "unknown"
+          ]
+        },
+        "layoutVersion": {
+          "oneOf": [
+            {"enum": ["v1", "v2", "v3", "v4", "v5"]},
+            {"type": "null"}
+          ]
+        },
+        "ticket": {"$ref": "#/$defs/nullableTicket"},
+        "slug": {"$ref": "#/$defs/nullableSlug"},
+        "anomalies": {
+          "type": "array",
+          "items": {"const": "duplicate-delivery"},
+          "uniqueItems": true
+        },
+        "head": {"$ref": "#/$defs/nullableString"},
+        "bare": {"type": "boolean"},
+        "detached": {"type": "boolean"},
+        "locked": {"type": "boolean"},
+        "prunable": {"type": "boolean"}
+      }
+    },
+    "countMap": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "inventoryRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "kind",
+        "repository",
+        "repositoryName",
+        "pathStyle",
+        "primaryCheckout",
+        "readOnly",
+        "entries",
+        "summary"
+      ],
+      "properties": {
+        "schema": {"const": "wellmanifest.worktrees/v5"},
+        "kind": {"const": "inventory-record"},
+        "repository": {"type": "string", "minLength": 1},
+        "repositoryName": {"$ref": "#/$defs/observedRepositoryName"},
+        "pathStyle": {"$ref": "#/$defs/pathStyle"},
+        "primaryCheckout": {"type": "string", "minLength": 1},
+        "readOnly": {"const": true},
+        "entries": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/inventoryEntry"}
+        },
+        "summary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["total", "classifications", "anomalies"],
+          "properties": {
+            "total": {"type": "integer", "minimum": 0},
+            "classifications": {"$ref": "#/$defs/countMap"},
+            "anomalies": {"$ref": "#/$defs/countMap"}
+          }
+        }
+      }
+    }
+  }
+}

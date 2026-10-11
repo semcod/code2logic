@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/wellmanifest/new-project/governance/lock.schema.json",
+  "title": "new-project governance lock",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "standard", "managedFiles"],
+  "properties": {
+    "schema": { "const": "new-project.lock/v1" },
+    "standard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "sourceRepository", "sourceRevision", "publicationStatus"],
+      "properties": {
+        "id": { "const": "wellmanifest/new-project" },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "sourceRepository": { "const": "wellmanifest/new-project" },
+        "sourceRevision": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "publicationStatus": {
+          "enum": ["published", "unpublished-test"]
+        }
+      }
+    },
+    "managedFiles": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$)).+$" },
+      "additionalProperties": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+    }
+  }
+}

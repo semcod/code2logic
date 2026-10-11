@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wellmanifest.com/schemas/new-project-ticket-allocation-request-v1.json",
+  "title": "new-project registered ticket allocation request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "repositoryRef", "allocationKey", "titleDigest", "agent", "workstream", "classification", "processUri"],
+  "properties": {
+    "schema": {"const": "new-project.ticket-allocation-request/v1"},
+    "repositoryRef": {"type": "string", "pattern": "^[a-z][a-z0-9+.-]*://[^\\s]+$"},
+    "allocationKey": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$"},
+    "titleDigest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "agent": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+    "workstream": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "priority", "origin"],
+      "properties": {
+        "kind": {"enum": ["BUG", "FEATURE", "SERVICE"]},
+        "priority": {"enum": ["P0", "P1", "P2", "P3"]},
+        "origin": {"enum": ["regression", "requested", "health"]}
+      }
+    },
+    "processUri": {"type": "string", "pattern": "^[a-z][a-z0-9+.-]*://[^\\s]+$"}
+  }
+}

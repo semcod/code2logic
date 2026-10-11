@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wellmanifest.com/schemas/new-project/agent-hosts/v1",
+  "title": "new-project host-agnostic agent contract",
+  "description": "Declares the instruction files every LLM host loads, the fail-closed git hook, and the packaging touchpoints that make the contract executable rather than advisory.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "hook", "hosts", "sourceLinks", "anomalyChecks", "packaging", "declarationFields"],
+  "properties": {
+    "schema": { "const": "new-project.agent-hosts/v1" },
+    "note": { "type": "string" },
+    "hook": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "hooksPathConfig", "runtimeFiles"],
+      "properties": {
+        "path": { "type": "string", "pattern": "^(?!.*(?:^|/)\\.\\.(?:/|$))[^/\\\\:\\x00-\\x1f\\x7f]+(?:/[^/\\\\:\\x00-\\x1f\\x7f]+)*$" },
+        "hooksPathConfig": { "type": "string", "minLength": 1 },
+        "additionalHooks": {
+          "type": "array", "uniqueItems": true,
+          "items": { "type": "string", "enum": [".githooks/commit-msg", ".githooks/prepare-commit-msg"] }
+        },
+        "runtimeFiles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^(?!.*(?:^|/)\\.\\.(?:/|$))[^/\\\\:\\x00-\\x1f\\x7f]+(?:/[^/\\\\:\\x00-\\x1f\\x7f]+)*$" }
+        }
+      }
+    },
+    "hosts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "file", "readers"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+          "file": { "type": "string", "pattern": "^(?!.*(?:^|/)\\.\\.(?:/|$))[^/\\\\:\\x00-\\x1f\\x7f]+(?:/[^/\\\\:\\x00-\\x1f\\x7f]+)*$" },
+          "readers": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "sourceLinks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "authority", "local", "remote", "requiredInEveryHost", "requiredInAgents"],
+      "properties": {
+        "schema": { "const": "new-project.agent-source-links/v1" },
+        "authority": { "type": "string", "minLength": 1 },
+        "local": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "path"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "path": { "type": "string", "pattern": "^(?!.*(?:^|/)\\.\\.(?:/|$))[^/\\\\:\\x00-\\x1f\\x7f]+(?:/[^/\\\\:\\x00-\\x1f\\x7f]+)*$" }
+            }
+          }
+        },
+        "remote": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "repository", "path", "url"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "repository": { "type": "string", "pattern": "^wellmanifest/[a-z0-9.-]+$" },
+              "path": { "type": "string", "pattern": "^(?!.*(?:^|/)\\.\\.(?:/|$))[^/\\\\:\\x00-\\x1f\\x7f]+(?:/[^/\\\\:\\x00-\\x1f\\x7f]+)*$" },
+              "url": { "type": "string", "pattern": "^https://github\\.com/wellmanifest/[a-z0-9.-]+/blob/main/.+$" }
+            }
+          }
+        },
+        "requiredInEveryHost": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" }
+        },
+        "requiredInAgents": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" }
+        }
+      }
+    },
+    "anomalyChecks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "maxInstructionBytes", "requiredTerms", "contradictions", "ci"],
+      "properties": {
+        "schema": { "const": "new-project.agent-guidance-audit/v1" },
+        "maxInstructionBytes": { "type": "integer", "minimum": 1 },
+        "requiredTerms": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "contradictions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "patterns"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "patterns": {
+                "type": "array",
+                "minItems": 2,
+                "uniqueItems": true,
+                "items": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        },
+        "ci": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["requiredChecksCandidates"],
+          "properties": {
+            "requiredChecksCandidates": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "packaging": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["marker", "declaration", "lifecycle"],
+        "properties": {
+          "marker": { "type": "string", "minLength": 1 },
+          "declaration": { "type": "string", "minLength": 1 },
+          "lifecycle": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "field", "mustContain"],
+            "properties": {
+              "kind": { "enum": ["npm-script", "pytest-plugin"] },
+              "field": { "type": "string", "minLength": 1 },
+              "mustContain": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "declarationFields": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["standard", "revision", "gate"],
+      "properties": {
+        "standard": { "type": "string", "minLength": 1 },
+        "revision": { "type": "string", "minLength": 1 },
+        "gate": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

@@ -1,0 +1,273 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/wellmanifest/new-project/governance/manifest.schema.json",
+  "title": "new-project governance manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "standard", "requiredFiles", "ticket", "docker", "governancePaths", "trustedApprovalSources", "coordination"],
+  "properties": {
+    "$schema": { "type": "string", "minLength": 1 },
+    "schema": { "const": "new-project.governance/v2" },
+    "standard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "const": "wellmanifest/new-project" },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" }
+      }
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "componentRoots"],
+      "properties": {
+        "mode": { "enum": ["standalone", "monorepo"] },
+        "componentRoots": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/glob" },
+          "uniqueItems": true
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "mode": { "const": "standalone" } }, "required": ["mode"] },
+          "then": { "properties": { "componentRoots": { "maxItems": 0 } } }
+        },
+        {
+          "if": { "properties": { "mode": { "const": "monorepo" } }, "required": ["mode"] },
+          "then": { "properties": { "componentRoots": { "minItems": 1 } } }
+        }
+      ]
+    },
+    "repositoryPolicy": {
+      "$ref": "#/$defs/repositoryPolicy"
+    },
+    "domainContracts": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode"],
+          "properties": {
+            "mode": { "const": "none" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "commandsAndQueries", "events", "errors", "models"],
+          "properties": {
+            "mode": { "const": "cqrs" },
+            "commandsAndQueries": { "const": "operations/index.json" },
+            "events": { "const": "events/index.json" },
+            "errors": { "const": "error/index.json" },
+            "models": { "const": "operations/index.json#/models" }
+          }
+        }
+      ]
+    },
+    "requiredFiles": { "type": "array", "items": { "$ref": "#/$defs/path" }, "uniqueItems": true },
+    "governancePaths": { "type": "array", "items": { "$ref": "#/$defs/glob" }, "uniqueItems": true },
+    "trustedApprovalSources": {
+      "type": "array",
+      "items": { "enum": ["github-review", "github-app-review", "signed-attestation"] },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "approvalEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "requiredBindings", "reviewVerificationMethod", "signedAttestationPredicateType"],
+      "properties": {
+        "schema": { "const": "new-project.approval-evidence/v1" },
+        "requiredBindings": {
+          "type": "array",
+          "prefixItems": [
+            { "const": "repository" },
+            { "const": "pullRequest" },
+            { "const": "headSha" },
+            { "const": "ticket" },
+            { "const": "actor" }
+          ],
+          "items": false,
+          "minItems": 5,
+          "maxItems": 5
+        },
+        "reviewVerificationMethod": { "const": "github-api-allowlist" },
+        "signedAttestationPredicateType": {
+          "const": "https://wellmanifest.com/attestations/validator/v1"
+        }
+      }
+    },
+    "ticket": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["root", "directoryPattern", "requiredFiles", "requiredAgentFiles", "activeStatuses", "nonActiveStatuses", "closedStatuses", "implementationStates", "intentFile"],
+      "properties": {
+        "root": { "$ref": "#/$defs/path" },
+        "directoryPattern": { "type": "string", "minLength": 1 },
+        "requiredFiles": { "const": ["README.md", "intent.json"] },
+        "requiredAgentFiles": { "const": [] },
+        "activeStatuses": { "type": "array", "items": { "type": "string" }, "minItems": 1, "uniqueItems": true },
+        "nonActiveStatuses": { "type": "array", "items": { "type": "string" }, "minItems": 1, "uniqueItems": true },
+        "closedStatuses": { "type": "array", "items": { "type": "string" }, "minItems": 1, "uniqueItems": true },
+        "implementationStates": { "type": "array", "items": { "type": "string" }, "minItems": 1, "uniqueItems": true },
+        "intentFile": { "$ref": "#/$defs/path" }
+      }
+    },
+    "docker": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "dockerfiles", "composeFiles"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "dockerfiles": { "type": "array", "items": { "$ref": "#/$defs/path" }, "minItems": 1 },
+        "composeFiles": { "type": "array", "items": { "$ref": "#/$defs/path" }, "minItems": 1 }
+      }
+    },
+    "coordination": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "maxActiveTicketsPerWorkstream", "rejectActiveScopeOverlap", "workstreams", "integration"],
+      "properties": {
+        "mode": { "const": "workstreams" },
+        "maxActiveTicketsPerWorkstream": { "type": "integer", "minimum": 1 },
+        "rejectActiveScopeOverlap": { "type": "boolean" },
+        "workstreams": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": { "pattern": "^[a-z0-9][a-z0-9-]*$" },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["ownedPaths"],
+            "properties": {
+              "ownedPaths": { "type": "array", "items": { "$ref": "#/$defs/glob" }, "minItems": 1, "uniqueItems": true }
+            }
+          }
+        },
+        "integration": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["workstream", "requiredForPaths"],
+          "properties": {
+            "workstream": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+            "requiredForPaths": { "type": "array", "items": { "$ref": "#/$defs/glob" }, "uniqueItems": true }
+          }
+        }
+      }
+    },
+    "delivery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requiredForImplementation",
+        "maxActiveMinutes",
+        "checkpointMinutes",
+        "allowedComplexityClasses",
+        "maxImplementationFiles",
+        "maxAffectedComponents",
+        "maxPublicInterfaceChanges",
+        "maxRuntimeDependencies",
+        "targetBranches",
+        "publicInterfacePaths",
+        "dependencyManifestPaths"
+      ],
+      "properties": {
+        "requiredForImplementation": { "type": "boolean" },
+        "maxActiveMinutes": { "type": "integer", "minimum": 1, "maximum": 240 },
+        "checkpointMinutes": { "type": "integer", "minimum": 1, "maximum": 239 },
+        "allowedComplexityClasses": {
+          "type": "array",
+          "items": { "enum": ["XS", "S", "M", "L"] },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "maxImplementationFiles": { "type": "integer", "minimum": 1 },
+        "maxAffectedComponents": { "type": "integer", "minimum": 1 },
+        "maxPublicInterfaceChanges": { "type": "integer", "minimum": 0 },
+        "maxRuntimeDependencies": { "type": "integer", "minimum": 0 },
+        "profiles": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "XS": { "$ref": "#/$defs/deliveryProfile" },
+            "S": { "$ref": "#/$defs/deliveryProfile" },
+            "M": { "$ref": "#/$defs/deliveryProfile" },
+            "L": { "$ref": "#/$defs/deliveryProfile" }
+          }
+        },
+        "targetBranches": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/branch" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "publicInterfacePaths": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/glob" },
+          "uniqueItems": true
+        },
+        "dependencyManifestPaths": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/path" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "stacks": {
+      "type": "array",
+      "items": { "enum": ["node", "python", "go", "rust", "java", "docker", "frontend", "terraform", "kubernetes"] },
+      "uniqueItems": true,
+      "default": []
+    }
+  },
+  "$defs": {
+    "deliveryProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxImplementationFiles", "maxAffectedComponents", "maxPublicInterfaceChanges", "maxRuntimeDependencies"],
+      "properties": {
+        "maxImplementationFiles": { "type": "integer", "minimum": 1 },
+        "maxAffectedComponents": { "type": "integer", "minimum": 1 },
+        "maxPublicInterfaceChanges": { "type": "integer", "minimum": 0 },
+        "maxRuntimeDependencies": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "repositoryPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile", "enforcement", "delivery", "tickets"],
+      "properties": {
+        "profile": { "enum": ["ticket-worktree", "main-only-planfile", "main-only-files", "protected-pr", "local-audit"] },
+        "enforcement": { "enum": ["audit", "enforce"] },
+        "delivery": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "checkout", "targetBranches"],
+          "properties": {
+            "mode": { "enum": ["ticket-branch", "main-only"] },
+            "checkout": { "enum": ["linked-worktree", "primary"] },
+            "targetBranches": { "type": "array", "items": { "$ref": "#/$defs/branch" }, "minItems": 1, "uniqueItems": true }
+          }
+        },
+        "tickets": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["backend", "idPattern", "referenceRequired"],
+          "properties": {
+            "backend": { "enum": ["files", "sqlite", "planfile"] },
+            "idPattern": { "type": "string", "minLength": 1 },
+            "referenceRequired": { "type": "boolean" },
+            "adapterPath": { "$ref": "#/$defs/path" },
+            "sourcePaths": { "type": "array", "items": { "$ref": "#/$defs/path" }, "minItems": 1, "uniqueItems": true }
+          }
+        }
+      }
+    },
+    "path": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$)).+$" },
+    "glob": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$)).+$" },
+    "branch": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:\\.\\.|//|@\\{|[~^:?*\\[\\\\])).+$" }
+  }
+}

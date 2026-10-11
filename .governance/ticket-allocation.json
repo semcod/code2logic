@@ -1,0 +1,5 @@
+{
+  "$schema": "./ticket-allocation.schema.json",
+  "mode": "local-single-clone",
+  "schema": "new-project.ticket-allocation/v1"
+}

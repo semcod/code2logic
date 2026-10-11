@@ -1,0 +1,120 @@
+{
+  "$schema": "./work-classification.schema.json",
+  "schema": "new-project.work-classification/v1",
+  "dimensions": {
+    "kind": ["BUG", "FEATURE", "SERVICE"],
+    "priority": ["P0", "P1", "P2", "P3"],
+    "origin": ["regression", "requested", "health"]
+  },
+  "ordering": {
+    "precedence": ["dependencies", "kind", "priority", "stableId"],
+    "kindOrder": ["BUG", "FEATURE", "SERVICE"],
+    "priorityOrder": ["P0", "P1", "P2", "P3"],
+    "dependencyPolicy": "topological-before-ranking",
+    "stableIdPolicy": "lexicographic"
+  },
+  "priorityDerivation": {
+    "impact": {
+      "critical": "P0",
+      "high": "P1",
+      "medium": "P2",
+      "low": "P3"
+    },
+    "declaredPolicy": "require-valid-priority",
+    "serviceDefault": "P2"
+  },
+  "evaluation": {
+    "mode": "first-match",
+    "unmatchedPolicy": "reject",
+    "llmRole": "advisory-only"
+  },
+  "rules": [
+    {
+      "id": "W-CLASS-001",
+      "when": {
+        "signal": "defect",
+        "impact": "outage-or-security"
+      },
+      "assign": {
+        "kind": "BUG",
+        "origin": "regression"
+      },
+      "prioritySource": "impact"
+    },
+    {
+      "id": "W-CLASS-002",
+      "when": {
+        "signal": "cyclomatic-complexity",
+        "baseline": "measured",
+        "delta": "increased"
+      },
+      "assign": {
+        "kind": "BUG",
+        "origin": "regression"
+      },
+      "prioritySource": "impact"
+    },
+    {
+      "id": "W-CLASS-003",
+      "when": {
+        "signal": "cyclomatic-complexity",
+        "baseline": "measured",
+        "threshold": "crossed"
+      },
+      "assign": {
+        "kind": "BUG",
+        "origin": "regression"
+      },
+      "prioritySource": "impact"
+    },
+    {
+      "id": "W-CLASS-004",
+      "when": {
+        "signal": "cyclomatic-complexity",
+        "baseline": "pre-existing",
+        "delta": "not-increased"
+      },
+      "assign": {
+        "kind": "SERVICE",
+        "origin": "health"
+      },
+      "prioritySource": "service-default"
+    },
+    {
+      "id": "W-CLASS-005",
+      "when": {
+        "signal": "work-request",
+        "request": "new-behavior"
+      },
+      "assign": {
+        "kind": "FEATURE",
+        "origin": "requested"
+      },
+      "prioritySource": "declared"
+    },
+    {
+      "id": "W-CLASS-006",
+      "when": {
+        "signal": "work-request",
+        "request": "maintenance"
+      },
+      "assign": {
+        "kind": "SERVICE",
+        "origin": "health"
+      },
+      "prioritySource": "service-default"
+    },
+    {
+      "id": "W-CLASS-007",
+      "when": {
+        "signal": "defect",
+        "impact": "functional"
+      },
+      "assign": {
+        "kind": "BUG",
+        "origin": "regression"
+      },
+      "prioritySource": "impact"
+    }
+  ]
+}

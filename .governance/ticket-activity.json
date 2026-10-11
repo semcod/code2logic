@@ -1,0 +1,20 @@
+{
+  "$schema": "./ticket-activity.schema.json",
+  "schema": "new-project.ticket-activity/v1",
+  "registry": {
+    "location": "git-common-dir",
+    "path": "new-project/terminal-receipts.json",
+    "missingPolicy": "status-projection"
+  },
+  "terminalOutcomes": {
+    "merged": {
+      "verification": "git-ancestry-or-rewritten-patch-series",
+      "releasesReservation": true
+    },
+    "no-change": {
+      "verification": "git-ancestry",
+      "releasesReservation": true
+    }
+  },
+  "unsupportedOutcomePolicy": "remain-active"
+}

@@ -1,0 +1,6 @@
+{
+  "schema": "new-project.local-ci-publication/v1",
+  "scope": {
+    "mode": "all"
+  }
+}

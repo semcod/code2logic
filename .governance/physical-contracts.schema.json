@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/wellmanifest/new-project/governance/physical-contracts.schema.json",
+  "title": "Adopter physical interface contracts",
+  "description": "Files whose values carry physical meaning. A change to a matching path requires intent physicalChanges (P-PHYS-001).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "contracts"],
+  "properties": {
+    "schema": { "const": "new-project.physical-contracts/v1" },
+    "contracts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "paths", "properties", "hazard", "acceptance"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]*$" },
+          "paths": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+          "properties": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "enum": ["pin-assignment", "active-level", "pull", "capability-set", "unit-scale", "limit-range", "timing"] }
+          },
+          "hazard": { "enum": ["motion", "pressure", "electrical", "thermal", "none"] },
+          "acceptance": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}
