@@ -43,6 +43,7 @@
     "workstreams": {
       "application": {
         "ownedPaths": [
+          "code2logic/**",
           "src/**",
           "app/**",
           "lib/**",
