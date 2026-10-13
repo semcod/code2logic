@@ -99,6 +99,12 @@ class ProjectAnalyzer:
         ".mypy_cache",
         ".ruff_cache",
         ".cache",
+        ".subactor",
+        ".worktrees",
+        ".planfile",
+        ".benchmarks",
+        "managed_components",
+        "workshop",
     }
 
     # Files to ignore
@@ -132,6 +138,7 @@ class ProjectAnalyzer:
         include_private: bool = False,
         enable_similarity: bool = True,
         respect_gitignore: bool = True,
+        exclude: Optional[List[str]] = None,
     ):
         """
         Initialize the project analyzer.
@@ -142,12 +149,14 @@ class ProjectAnalyzer:
             verbose: Whether to print status messages
             include_private: Whether to include private functions/classes
             enable_similarity: Whether to enable similarity detection
+            exclude: Optional list of exclusion glob patterns or directories
         """
         self.root_path = Path(root_path).resolve()
         self.verbose = verbose
         self.include_private = include_private
         self.enable_similarity = enable_similarity
         self.respect_gitignore = respect_gitignore
+        self.exclude_patterns: List[str] = list(exclude or [])
         self.modules: List[ModuleInfo] = []
         self.languages: Dict[str, int] = defaultdict(int)
 
@@ -163,6 +172,30 @@ class ProjectAnalyzer:
 
         if verbose:
             self._print_status()
+
+    def _is_excluded(self, path: Path | str) -> bool:
+        """Check if a path matches any exclude patterns."""
+        if not self.exclude_patterns:
+            return False
+        import fnmatch
+
+        try:
+            rel = str(Path(path).relative_to(self.root_path)).replace("\\", "/")
+        except Exception:
+            rel = str(path).replace("\\", "/")
+
+        parts = set(rel.split("/"))
+        for pattern in self.exclude_patterns:
+            clean = pattern.rstrip("/").replace("\\", "/")
+            if clean in parts:
+                return True
+            if fnmatch.fnmatch(rel, pattern) or fnmatch.fnmatch(rel, clean):
+                return True
+            if pattern.endswith("/**") and (
+                rel == pattern[:-3] or rel.startswith(pattern[:-2])
+            ):
+                return True
+        return False
 
     def _print_status(self):
         """Print library availability status."""
@@ -275,6 +308,12 @@ class ProjectAnalyzer:
                 if filename in self.IGNORE_FILES:
                     continue
 
+                if any(part in self.IGNORE_DIRS for part in fp.parts):
+                    continue
+
+                if self._is_excluded(fp):
+                    continue
+
                 ext = fp.suffix.lower()
                 language = self.LANGUAGE_EXTENSIONS.get(ext)
                 if language is None and ext == "":
@@ -342,12 +381,19 @@ class ProjectAnalyzer:
 
         else:
             for root, dirnames, filenames in os.walk(self.root_path):
-                dirnames[:] = [d for d in dirnames if d not in self.IGNORE_DIRS]
+                dirnames[:] = [
+                    d
+                    for d in dirnames
+                    if d not in self.IGNORE_DIRS and not self._is_excluded(Path(root) / d)
+                ]
                 for filename in filenames:
                     files_seen += 1
                     fp = Path(root) / filename
 
                     if filename in self.IGNORE_FILES:
+                        continue
+
+                    if self._is_excluded(fp):
                         continue
 
                     ext = fp.suffix.lower()
