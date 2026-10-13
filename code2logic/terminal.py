@@ -4,7 +4,7 @@ Terminal Renderer - Colorized Markdown Output in Shell.
 Renders markdown codeblocks with ANSI colors in terminal.
 Provides syntax highlighting for YAML, JSON, Python, Bash, Markdown.
 
-Based on: /home/tom/github/wronai/contract/src/python/reclapp/evolution/shell_renderer.py
+Based on: contract:reclapp/evolution/shell_renderer.py
 
 Usage:
     from code2logic.terminal import render, ShellRenderer
