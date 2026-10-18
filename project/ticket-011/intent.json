@@ -1,0 +1,94 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-011",
+  "summary": "Align pyproject version 1.0.51 and add errors runbook index",
+  "workstream": "integration",
+  "classification": {
+    "kind": "SERVICE",
+    "priority": "P1",
+    "origin": "health"
+  },
+  "allowedPaths": [
+    "project/ticket-011/**",
+    "TODO.md",
+    "project/TICKETS.md",
+    ".governance/manifest.json",
+    "pyproject.toml",
+    "errors/README.md",
+    "VERSION",
+    "setup.py",
+    "code2logic/__init__.py",
+    "logic2code/__init__.py",
+    "logic2test/__init__.py",
+    "lolm/__init__.py"
+  ],
+  "forbiddenPaths": [
+    "project/ticket-*/user-*.md"
+  ],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "3d6d7f1421c35fc569ffc56440622b2f4c763525",
+    "targetBranch": "main",
+    "outcome": "Align pyproject.toml version to 1.0.51 and add errors/README.md runbook index for Wellmanifest logs compliance.",
+    "nonGoals": [
+      "No runtime behavior changes."
+    ],
+    "complexity": "M",
+    "estimatedMinutes": 10,
+    "budgets": {
+      "maxImplementationFiles": 9,
+      "maxAffectedComponents": 1,
+      "maxPublicInterfaceChanges": 0,
+      "maxRuntimeDependencies": 0
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "Register errors/** and pyproject.toml under governance workstream, add errors/README.md, and set pyproject.toml version to 1.0.51.",
+      "components": [
+        {
+          "name": "governance",
+          "paths": [
+            ".governance/manifest.json",
+            "pyproject.toml",
+            "VERSION",
+            "errors/README.md",
+            "setup.py",
+            "code2logic/__init__.py",
+            "logic2code/__init__.py",
+            "logic2test/__init__.py",
+            "lolm/__init__.py"
+          ]
+        }
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": [],
+      "dataChanges": [],
+      "ui": {
+        "impact": "none",
+        "states": [],
+        "evidence": []
+      },
+      "rollback": "Revert the ticket commit."
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {
+        "criterion": "AC-01",
+        "commands": [
+          "wellman check --root ."
+        ],
+        "evidence": "project/ticket-011/README.md"
+      },
+      {
+        "criterion": "AC-02",
+        "commands": [
+          "./project/governance-check.sh"
+        ],
+        "evidence": "project/ticket-011/README.md"
+      }
+    ]
+  }
+}
