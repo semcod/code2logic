@@ -43,7 +43,7 @@ dependencies = [
     "tree-sitter-python>=0.21",
     "goal>=2.1.0",
     "costs>=0.1.20",
-    "subactor-subllm @ git+https://github.com/subactor/subllm.git@505d89f505e90c7b40d98cafdc9104cc61072460",
+    "subactor-subllm>=0.1.0",
 ]
 
 [project.optional-dependencies]
@@ -96,3 +96,4 @@ badge_color_thresholds = { low = 1.0, medium = 5.0, high = 10.0, critical = 50.0
 standard = "0.20.92"
 revision = "fcbb13e0ae04c688d825d5a87e2d2721dfab483d"
 gate = "project/governance-check.sh"
+# release-target: 1.0.51
