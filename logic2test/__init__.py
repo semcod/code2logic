@@ -15,5 +15,5 @@ from .generator import GenerationResult, GeneratorConfig, TestGenerator
 from .parsers import LogicParser
 from .templates import TestTemplate
 
-__version__ = "1.0.50"
+__version__ = "1.0.51"
 __all__ = ["TestGenerator", "GeneratorConfig", "GenerationResult", "LogicParser", "TestTemplate"]

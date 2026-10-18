@@ -14,5 +14,5 @@ Usage:
 from .generator import CodeGenerator, GenerationResult, GeneratorConfig
 from .renderers import PythonRenderer
 
-__version__ = "1.0.50"
+__version__ = "1.0.51"
 __all__ = ["CodeGenerator", "GeneratorConfig", "GenerationResult", "PythonRenderer"]

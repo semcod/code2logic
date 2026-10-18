@@ -81,7 +81,9 @@
           "wellmanifest_governance.py",
           "worktree-guard.yaml",
           ".gitattributes",
-          "docs/CONTRIBUTING.md"
+          "docs/CONTRIBUTING.md",
+          "errors/**",
+          "pyproject.toml"
         ]
       },
       "infrastructure": {
@@ -115,7 +117,13 @@
           "events/**",
           "error/**",
           "models/**",
-          "proto/**"
+          "proto/**",
+          "errors/**",
+          ".governance/manifest.json",
+          "code2logic/__init__.py",
+          "logic2code/__init__.py",
+          "logic2test/__init__.py",
+          "lolm/__init__.py"
         ]
       },
       "interfaces": {

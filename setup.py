@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 import os
 
 # Read version
-version = "1.0.50"
+version = "1.0.51"
 
 
 # Read long description
