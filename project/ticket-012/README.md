@@ -1,0 +1,21 @@
+# Ticket 012: Sync standard-requirements.json with baseline and transitive dependencies
+
+- **ID**: ticket-012
+- **Owner**: agent:gemini (SESSION_EXECUTION_AUTHORIZATION)
+- **Status**: IN_PROGRESS
+- **Workflow state**: EDIT
+- **Created**: 2026-10-27
+
+## Goal and scope
+
+To be completed from human-owned input.
+
+## Acceptance criteria
+
+- [x] AC-01: .governance/standard-requirements.json synced with baseline and transitive dependencies.
+- [x] AC-02: .github/workflows/ci.yml checks out full git history (`fetch-depth: 0`) so `wellmanifest_governance.py` resolves the Git base on push events.
+
+## Tracking boundary
+
+This directory contains the minimal reviewed intent. Optional participant prose
+and raw command logs are not required delivery output.

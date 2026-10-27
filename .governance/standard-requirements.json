@@ -22,6 +22,10 @@
       "minimumLevel": "S4"
     },
     {
+      "id": "wellmanifest/lifecycle",
+      "minimumLevel": "S4"
+    },
+    {
       "id": "wellmanifest/logs",
       "minimumLevel": "S5"
     },
