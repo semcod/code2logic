@@ -13,6 +13,7 @@ To be completed from human-owned input.
 ## Acceptance criteria
 
 - [x] AC-01: .governance/standard-requirements.json synced with baseline and transitive dependencies.
+- [x] AC-02: .github/workflows/ci.yml checks out full git history (`fetch-depth: 0`) so `wellmanifest_governance.py` resolves the Git base on push events.
 
 ## Tracking boundary
 

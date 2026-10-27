@@ -59,6 +59,7 @@
           ".cursor/rules/**",
           ".githooks/**",
           ".github/copilot-instructions.md",
+          ".github/workflows/ci.yml",
           ".github/workflows/new-project-governance.yml",
           ".gitignore",
           ".governance/**",
