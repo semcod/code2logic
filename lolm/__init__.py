@@ -76,7 +76,20 @@ from .rotation import (
     parse_rate_limit_headers,
 )
 
-__version__ = "1.0.51"
+def _resolve_version() -> str:
+    """Installed metadata first; a source checkout reads the sibling pyproject.toml."""
+    from importlib.metadata import PackageNotFoundError, version
+    try:
+        return version("lolm")
+    except PackageNotFoundError:
+        import re
+        from pathlib import Path
+        pyproject = Path(__file__).resolve().with_name("pyproject.toml")
+        match = re.search(r'^version\s*=\s*"([^"]+)"', pyproject.read_text(encoding="utf-8"), re.M) if pyproject.is_file() else None
+        return match.group(1) if match else "0+unknown"
+
+
+__version__ = _resolve_version()
 __all__ = [
     # Config
     "LLMConfig",
