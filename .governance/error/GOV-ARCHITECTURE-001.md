@@ -30,7 +30,8 @@ approval. Observe the actual diff and existing execution authorization first.
    `integrationTicket` alone does not transfer path ownership.
 5. If another writer owns the same files, preserve its work. Prepare a patch
    and isolated regression tests; apply it only after an accepted handoff or
-   serialization. Unknown ownership is not inferred from idle time.
+   serialization. Unknown ownership is not inferred from idle time; only the
+   measured `GOV-IDLE-TAKEOVER` policy may move a known lease to a new writer.
 6. Revalidate intent and lease before writes. Validate the full delivery diff
    with the exact observed base and head before publication; a check of an
    empty worktree does not validate the PR. Keep protected review unchanged.

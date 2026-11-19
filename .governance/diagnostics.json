@@ -106,6 +106,16 @@
       "remediation": "Reduce the slice or obtain fresh authorization for a larger bounded intent.",
       "documentation": null
     },
+    "GOV-IDLE-TAKEOVER-001": {
+      "message": "Idle takeover was refused: the ticket is active, frozen, integrated, noncanonical, disabled by policy or its lease changed concurrently.",
+      "remediation": "Read the reported state on .subactor/cache/autonomy-board.md; continue only an IDLE_TAKEOVER_ELIGIBLE ticket, otherwise assist, reconcile or request an accepted handoff.",
+      "documentation": "error/GOV-IDLE-TAKEOVER.md"
+    },
+    "GOV-IDLE-TAKEOVER-002": {
+      "message": "Idle takeover could not observe the repository or write its snapshot, receipt, lease or board.",
+      "remediation": "Preserve the worktree, fix the reported read or write failure and re-run observe before any takeover.",
+      "documentation": "error/GOV-IDLE-TAKEOVER.md"
+    },
     "GOV-CHANGE-LEASE-001": {
       "message": "A change lease, transition request or receipt is malformed or not closed.",
       "remediation": "Rebuild the document from the managed change-lease schema without undeclared fields.",
@@ -113,7 +123,7 @@
     },
     "GOV-CHANGE-LEASE-002": {
       "message": "Change authority is stale or its receipt trace is not monotonic.",
-      "remediation": "Read the authoritative lease and retry with its exact revision, fencing token and phase.",
+      "remediation": "Have the controller verify the calling writer/session and supply current revision, fencing token and phase. A different writer requires the accepted handoff described in error/GOV-WORK-START.md; never copy the holder identity.",
       "documentation": "error/GOV-CHANGE-LEASE.md"
     },
     "GOV-CHANGE-LEASE-003": {
@@ -231,6 +241,11 @@
       "remediation": "Route the shared path through the manifest-declared integration workstream without transferring path ownership.",
       "documentation": null
     },
+    "GOV-HOST-MERGE-001": {
+      "message": "Host instructions carry the superseded autonomous-merge block that allows agents to merge on green or bypass review.",
+      "remediation": "Preview and apply scripts/host_publication_policy.py from the standard in an owned ticket; only the independent Validator may approve and merge.",
+      "documentation": "error/GOV-HOST-MERGE.md"
+    },
     "GOV-INTENT-001": {
       "message": "Implementation changed before the ticket entered an implementation state.",
       "remediation": "Record authorization and move the active ticket to EDIT, VALIDATION or PUBLICATION before changing implementation.",
@@ -300,6 +315,11 @@
       "message": "The protected workflow cannot bind a live pull-request state to its event.",
       "remediation": "Re-acquire the pull request through the GitHub API and retry the workflow; do not skip open-PR ticket, scope or approval enforcement.",
       "documentation": null
+    },
+    "GOV-PUSH-001": {
+      "message": "A push would update a declared target branch directly.",
+      "remediation": "Push the ticket branch and open a pull request; the validator merges it into the target branch.",
+      "documentation": "error/GOV-PUSH.md"
     },
     "GOV-REMEDIATION-001": {
       "message": "A diagnostic remediation intent is malformed, unresolved or semantically unsafe.",

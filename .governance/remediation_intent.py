@@ -857,7 +857,7 @@ def _validate_planning_guidance(document, action_graph, errors):
         guidance.get("planningOrder"), "llmGuidance.planningOrder", errors, minimum=1
     )
     _string_list(guidance.get("openQuestions"), "llmGuidance.openQuestions", errors)
-    if set(planning_order) != set(action_graph):
+    if set(planning_order) != set(action_graph) or len(planning_order) != len(set(planning_order)):
         errors.append(
             _issue(
                 MALFORMED_CODE,
@@ -1113,15 +1113,17 @@ def _validate_analysis(
 
 
 def _validate_finding_paths(findings, allowed, forbidden, errors):
-    for finding in findings:
-        for affected_path in finding.get("affectedPaths", []):
+    for index, finding in enumerate(findings):
+        finding_id = finding.get("id") if isinstance(finding, dict) else None
+        id_str = str(finding_id) if finding_id is not None else str(index)
+        for affected_path in finding.get("affectedPaths", []) if isinstance(finding, dict) else []:
             if affected_path == "unresolved:agent":
                 continue
             if not _matches(affected_path, allowed):
                 errors.append(
                     _issue(
                         MALFORMED_CODE,
-                        f"finding:{finding['id']}.affectedPaths",
+                        f"finding:{id_str}.affectedPaths",
                         f"path is outside scope.allowedPaths: {affected_path}",
                     )
                 )
@@ -1129,7 +1131,7 @@ def _validate_finding_paths(findings, allowed, forbidden, errors):
                 errors.append(
                     _issue(
                         MALFORMED_CODE,
-                        f"finding:{finding['id']}.affectedPaths",
+                        f"finding:{id_str}.affectedPaths",
                         f"path matches scope.forbiddenPaths: {affected_path}",
                     )
                 )
@@ -1149,11 +1151,15 @@ def _validate_unresolved_paths(document, status, owner_route, allowed, findings,
     for path in allowed:
         if path == "unresolved:agent":
             unresolved_paths.append("scope.allowedPaths")
-    for finding in findings:
+    for index, finding in enumerate(findings):
+        if not isinstance(finding, dict):
+            continue
+        finding_id = finding.get("id")
+        id_str = str(finding_id) if finding_id is not None else str(index)
         if "unresolved:agent" in finding.get("affectedPaths", []):
-            unresolved_paths.append(f"finding:{finding['id']}.affectedPaths")
-        if any(item.get("ref") == "unresolved:agent" for item in finding.get("evidence", [])):
-            unresolved_paths.append(f"finding:{finding['id']}.evidence")
+            unresolved_paths.append(f"finding:{id_str}.affectedPaths")
+        if any(isinstance(item, dict) and item.get("ref") == "unresolved:agent" for item in finding.get("evidence", [])):
+            unresolved_paths.append(f"finding:{id_str}.evidence")
     for action in actions:
         if "unresolved:agent" in action.get("paths", []):
             unresolved_paths.append(f"action:{action['id']}.paths")
@@ -1223,11 +1229,16 @@ def validate_document(document: dict[str, Any]) -> dict[str, Any]:
         for finding_id in action.get("findingIds", [])
     }
     for finding in findings:
-        if finding.get("status") != "DEFERRED" and finding["id"] not in action_finding_ids:
+        if not isinstance(finding, dict):
+            continue
+        fid = finding.get("id")
+        if not fid:
+            continue
+        if finding.get("status") != "DEFERRED" and fid not in action_finding_ids:
             errors.append(
                 _issue(
                     MALFORMED_CODE,
-                    f"finding:{finding['id']}",
+                    f"finding:{fid}",
                     "active finding must be resolved by at least one action",
                 )
             )
@@ -1237,7 +1248,7 @@ def validate_document(document: dict[str, Any]) -> dict[str, Any]:
     _validate_analysis(document, errors)
 
     _validate_unresolved_paths(document, status, owner_route, allowed, findings, actions, errors, warnings)
-    finding_ids = {item["id"] for item in findings}
+    finding_ids = {item["id"] for item in findings if isinstance(item, dict) and "id" in item}
     action_ids = {item["id"] for item in actions}
     for verification in verifications:
         for covered in verification.get("covers", []):
@@ -1765,7 +1776,7 @@ def _projected_plan_items(diagnostics, plans, projection_record_ids):
 
 
 def _analyze_criterion_coverage(document, plan_corpora, findings):
-    all_plan_text = "\n".join(plan_corpora.values())
+    all_plan_text = "\n".join(plan_corpora.values()).lower()
     for criterion in document["acceptanceCriteria"]:
         if criterion["id"].lower() not in all_plan_text and criterion["statement"].lower() not in all_plan_text:
             findings.append(

@@ -34,6 +34,31 @@ Ręczne `mkdir`, skopiowanie katalogu albo sam `fetch` nie tworzą rezerwacji.
    exact head.
 6. W profilu lokalnym napraw łączność z `origin` i ponów allocator; stale lock
    usuwaj tylko po potwierdzeniu braku procesu.
+7. Gdy zarezerwowany ticket (numer nie większy od high-water, rekord w
+   `.subactor/leases/`) stracił kanoniczny checkout, branch lub
+   niezacommitowane metadane, nie alokuj nowego numeru i nie odtwarzaj ich
+   ręcznie. Uruchom `new-ticket.sh --workstream W --restore-request FILE
+   --recovery-lease-store DIR`. Request
+   `new-project.ticket-restoration-request/v1` wiąże ticket, `worktreeId`,
+   dokładny HEAD (`null` oznacza bazę rezerwacji), snapshot
+   `new-project.ticket-metadata-snapshot/v1` z jego SHA-256 oraz CAS żywego
+   leasu kontrolera w fazie `claimed` lub `editing`. Restoration tworzy tylko
+   brakujący branch, względną rejestrację checkoutu oraz `README.md` i
+   `intent.json`; ponowienie po przerwaniu kończy brakujące kroki, a gotowy
+   stan zwraca `ALREADY_RESTORED`. Nie daje prawa do edycji ani merge: dalej
+   obowiązuje `work_start_check.py --ticket`.
+8. Dla istniejącej rezerwacji `local-single-clone` bez zewnętrznego store użyj
+   jawnego `--restore-local-request FILE`, z własnym writer actor/session oraz
+   `NEW_PROJECT_LEASE_REVISION` i `NEW_PROJECT_FENCING_TOKEN`. Request ma te same
+   pola co zewnętrzny, schema `new-project.local-ticket-restoration-request/v1`
+   i dodatkowe `reservationSha256`: SHA-256 dokładnych bajtów kanonicznego
+   `.subactor/leases/{worktreeId}.json`. CAS i właściciel odnoszą się do tego
+   pliku. Kontroler utrzymuje jego blokadę, sprawdza repozytorium i zakres oraz
+   ponawia kontrolę przed każdym skutkiem. Nie przekazuj `--recovery-lease-store`
+   w tej ścieżce; odmowa store nigdy nie przełącza automatycznie na local.
+   Wygasła, zamrożona lub zwolniona rezerwacja jest odrzucana. Najpierw wymagane
+   jest osobne, uprawnione przejęcie przez kontroler; restoration nie odnawia
+   lease, nie zwiększa fencing i nie przywraca źródeł ze snapshotu.
 
 ## Verification
 
@@ -50,6 +75,8 @@ Ręczne `mkdir`, skopiowanie katalogu albo sam `fetch` nie tworzą rezerwacji.
 - Nie zmieniaj numeru przez ręczne `mv` i nie kopiuj historii obu branchy.
 - Nie usuwaj dirty/unreachable worktree ani locka bez identyfikacji procesu.
 - Nie przydzielaj numeru offline ze starych refów.
+- Nie przejmuj cudzej rezerwacji po wygaśnięciu leasu; zmianę właściciela
+  wykonuje kontroler, a restoration jej wymaga.
 - Nie traktuj lokalnego high-water, receipt ani samego ERROR jako merge lub
   execution authority.
 - Nie zamykaj przegrywającego PR przed zachowaniem delta i utworzeniem

@@ -8,6 +8,26 @@ set -euo pipefail
 root="$(git rev-parse --show-toplevel)"
 branch="$(git symbolic-ref --short HEAD 2>/dev/null || true)"
 
+# A seed request can authorize only the allocator's exact prepared root commit.
+# Existing history, product files and an unprepared request fail closed here.
+if [[ -n "${NEW_PROJECT_SEED_REQUEST:-}" ]]; then
+  python3 -B "$root/.governance/seed_baseline.py" hook-check --root "$root" \
+    --request "$NEW_PROJECT_SEED_REQUEST"
+  exit $?
+fi
+
+# Run before every profile/status success path. Identity is supplied by the
+# session launcher; the hook must never infer it from the lease holder.
+if [[ "$branch" =~ (^|/)ticket[-/][0-9]{3,} ]]; then
+  writer_runner="$root/.governance/change_lease_check.py"
+  [[ -f "$writer_runner" ]] || writer_runner="$root/scripts/change_lease_check.py"
+  if [[ ! -f "$writer_runner" ]]; then
+    echo "GOV-CHANGE-LEASE-001: writer-lease checker is missing; restore the managed installation." >&2
+    exit 1
+  fi
+  python3 -B "$writer_runner" writer-check --root "$root" --operation commit --ref "refs/heads/$branch"
+fi
+
 run_worktree_guard() {
   local runner="$root/.governance/worktree_guard.py"
   if [[ -f "$runner" ]]; then
@@ -70,13 +90,13 @@ if [[ -z "$branch" || "$branch" == "HEAD" ]]; then
   exit 1
 fi
 
-if [[ ! "$branch" =~ ticket[-/]([0-9]{3,}) ]]; then
+if [[ ! "$branch" =~ (^|/)ticket[-/]([0-9]{3,}) ]]; then
   echo "GOV-AGENT-HOST-001: branch '$branch' is not bound to ticket-NNN." >&2
   echo "  Allocate with ./project/new-ticket.sh and commit on a ticket branch." >&2
   exit 1
 fi
 
-ticket="ticket-${BASH_REMATCH[1]}"
+ticket="ticket-${BASH_REMATCH[2]}"
 readme_rel="project/$ticket/README.md"
 
 ticket_storage="$(git config --local --get new-project.ticketStorage 2>/dev/null || true)"
@@ -97,6 +117,36 @@ else
   echo "GOV-AGENT-HOST-002: unknown ticket storage mode." >&2
   exit 1
 fi
+
+# A carrier-only follow-up commit (for example the delivery contract that the
+# gate asks for after the material change) is admitted only when the ticket
+# branch already delivers a material change relative to its target branch.
+# A branch without one still needs a material first commit; CI re-checks the
+# whole range (GOV-MATERIAL-001).
+branch_has_material_delivery() {
+  local target base path
+  target="$(PYTHONDONTWRITEBYTECODE=1 python3 - "$root/project/$ticket/intent.json" 2>/dev/null <<'PYTARGET'
+import json
+import sys
+try:
+    delivery = json.load(open(sys.argv[1], encoding="utf-8")).get("delivery")
+    value = delivery.get("targetBranch") if isinstance(delivery, dict) else None
+except (OSError, ValueError, AttributeError):
+    value = None
+ok = isinstance(value, str) and value and not any(c.isspace() for c in value) and ".." not in value
+print(value if ok else "main")
+PYTARGET
+)" || return 1
+  base="$(git merge-base HEAD "refs/remotes/origin/$target" 2>/dev/null)" || return 1
+  [[ -n "$base" ]] || return 1
+  while IFS= read -r -d '' path; do
+    case "$path" in
+      project/ticket-*/*|TODO.md|project/TICKETS.md|config/artifact-registry.json) ;;
+      *) return 0 ;;
+    esac
+  done < <(git diff --no-renames --name-only -z "$base" HEAD --)
+  return 1
+}
 
 governance_only_transition() {
   # SQLite transitions never require a Git carrier commit.
@@ -124,14 +174,25 @@ if grep -Eiq '^-[[:space:]]+\*\*Status\*\*:[[:space:]]*IN_PROGRESS([[:space:]]|$
     exit 0
   fi
 
+  # NUL-framed rename records carry both paths. Moving a material file into
+  # tracking storage still changes the material source at its previous path.
   material=false
-  while IFS= read -r -d '' path; do
-    case "$path" in
-      project/ticket-*/*|TODO.md|project/TICKETS.md|config/artifact-registry.json) ;;
-      *) material=true; break ;;
-    esac
-  done < <(git diff --cached --name-only -z --diff-filter=AM --)
-  if [[ "$material" != true ]]; then
+  while IFS= read -r -d '' change; do
+    IFS= read -r -d '' path || break
+    change_paths=("$path")
+    if [[ "$change" == R* ]]; then
+      IFS= read -r -d '' path || break
+      change_paths+=("$path")
+    fi
+    for path in "${change_paths[@]}"; do
+      case "$path" in
+        project/ticket-*/*|TODO.md|project/TICKETS.md|config/artifact-registry.json) ;;
+        *) material=true; break ;;
+      esac
+    done
+    if [[ "$material" == true ]]; then break; fi
+  done < <(git diff --cached --name-status -z --diff-filter=AMR --)
+  if [[ "$material" != true ]] && ! branch_has_material_delivery; then
     echo "GOV-AGENT-HOST-007: staged change contains only ticket tracking carriers." >&2
     echo "  Add a material deliverable, or emit an external no-change receipt without committing." >&2
     exit 1

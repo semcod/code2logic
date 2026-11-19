@@ -4,10 +4,12 @@
   "hook": {
     "path": ".githooks/pre-commit",
     "hooksPathConfig": ".githooks",
-    "additionalHooks": [".githooks/commit-msg"],
+    "additionalHooks": [".githooks/commit-msg", ".githooks/pre-push"],
     "runtimeFiles": [
       ".governance/worktree_guard.py",
       ".governance/worktree_overlap_check.py",
+      ".governance/change_lease_check.py",
+      ".governance/change-lease.schema.json",
       "worktree-guard.yaml"
     ]
   },

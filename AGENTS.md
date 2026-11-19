@@ -23,6 +23,7 @@ navigation only and are never fetched or executed by an agent.
 - Agent contract: [agent.schema.json](https://github.com/wellmanifest/agent/blob/main/standard/agent.schema.json)
 - LLM policy boundary: [wellmanifest/llm README](https://github.com/wellmanifest/llm/blob/main/README.md)
 - Session recovery: [session-recovery.schema.json](https://github.com/wellmanifest/session-recovery/blob/main/standard/session-recovery.schema.json)
+- Embedded SemVer & Heterogeneous Fleet: [embedded-release.schema.json](https://github.com/wellmanifest/semver/blob/main/schemas/embedded-release.schema.json)
 - Offer pointer: [wellmanifest/offer README](https://github.com/wellmanifest/offer/blob/main/README.md)
 - Brand pointer: [wellmanifest/brand README](https://github.com/wellmanifest/brand/blob/main/README.md)
 
@@ -48,7 +49,7 @@ files until a repository's protected CI adoption canary succeeds.
 This target repository follows `wellmanifest/new-project` policy-as-code.
 
 HOME vs ADOPT: wellmanifest owns standards; product CLI/daemons HOME in
-`subactor` or `semcod`. "w ramach wellmanifest" means ADOPT packs such as
+`subactor`, `semcod`, `paxlet-com` or `dockuri`. "w ramach wellmanifest" means ADOPT packs such as
 `wellmanifest/{new-project,dsl,logs}`, not HOME wellmanifest. For
 SERVICE/FEATURE that create a repo, fill `intent.json` `placement`
 (`home`, `shape`, `runtimeOwner`, `adopt`) in WAIT_FOR_APPROVAL.
@@ -63,6 +64,16 @@ authorized work, read-only assistance, accepted fenced handoff or serialization.
 A new ticket needs a free scope and WIP capacity. Recheck owner, intent, current
 state and controller fencing before writing. `--force-new` is not a bypass.
 Unknown ownership or remote/independent-clone state must not be guessed.
+Run `.governance/idle_takeover.py observe` and read
+`.subactor/cache/autonomy-board.md` (owner, idle time, canonical worktree path
+and links to project, branch, README, PR and issues for every ticket). A ticket
+with no activity for `coordination.idleTakeover.idleMinutes` is
+`IDLE_TAKEOVER_ELIGIBLE`; continue it only through `idle_takeover.py takeover`
+(`GOV-IDLE-TAKEOVER`). Take the ticket, branch, `worktreePath`, `leasePath` and
+`writerEnvironment` only from that JSON result and work only inside
+`<primaryCheckout>/.worktrees/<ticket>--<slug>` (wellmanifest/worktrees v5):
+never create, move or hand-write a worktree or lease, never treat a linked
+worktree as the primary checkout, and stop on the first non-zero exit.
 
 1. Read `.governance/manifest.json`, `TODO.md`, `project/TICKETS.md` and the
    active ticket.
@@ -271,6 +282,30 @@ Unknown ownership or remote/independent-clone state must not be guessed.
 Markdown approval is an audit note, not trusted merge approval. Required
 merge approval comes from the repository's protected review, attestation and
 ruleset boundary.
+
+## Project-bound development execution
+
+Before running Python or pytest, select the independently approved full Wellman
+runtime and verify its source pin and `run --help` capability. Use
+`<approved-tool-venv>/bin/wellman run --root <ticket-checkout> -- python -m pytest ...`
+or the executor's enrolled SDK adapter. Reuse the canonical `wellman.execution`
+implementation; do not copy admission logic into project scripts. The static
+checker is the separate `wellman-governance` command and cannot mediate a child
+process. Never select a runtime merely because a command named `wellman` is on PATH.
+
+The child cwd, candidate source, interpreter association and development
+temp/cache must bind to that Git checkout. Prepare its local `.venv` first.
+Reuse of the same repository's registered primary `.venv` must be explicit;
+another project's mutable environment is not a fallback. Development scratch
+belongs in the checkout's ignored private `.subactor/cache/`. Immutable tools,
+protected CI scratch and external receipt stores require distinct declared roles,
+pins and ownership; their location alone neither grants nor denies authority.
+
+Missing enrollment or a missing/mismatched execution receipt is a prerequisite
+to repair, never evidence of successful execution. Preserve the real command,
+stdout/stderr and exit status. A static governance PASS, a local execution
+observation or these instructions do not establish universal shell/IDE mediation,
+a filesystem sandbox, a writer lease or independent publication approval.
 
 ## Bounded session controls
 

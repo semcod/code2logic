@@ -44,4 +44,4 @@ Expected result: no `GOV-PHYS-*` finding.
 ## Related rules
 
 - `P-PHYS-001`, `P-PHYS-002`, `P-PHYS-003` in `POLICY.md`.
-- [Physical interface contracts](../docs/information/physical-interface-contracts.md).
+- [Physical interface contracts](https://github.com/wellmanifest/new-project/blob/main/docs/information/physical-interface-contracts.md).

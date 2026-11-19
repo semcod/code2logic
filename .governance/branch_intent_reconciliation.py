@@ -157,6 +157,7 @@ def reconcile_criterion_disposition(row, criteria, proof, decision, follow, unre
     elif row["outcome"] in ("partial", "missing"):
         require(decision is None or decision["facts"]["disposition"] == "discard",
                 "remaining work has contradictory decision")
+        require(decision is None or follow is None, "remaining work cannot both discard and defer")
         require(follow is not None or (decision is not None and decision["facts"]["disposition"] == "discard"),
                 "remaining work needs a follow-up or explicit discard decision")
     elif row["outcome"] == "unknown":

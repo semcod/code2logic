@@ -93,7 +93,7 @@ max_commits = 500
 badge_color_thresholds = { low = 1.0, medium = 5.0, high = 10.0, critical = 50.0 }
 
 [tool.wellmanifest]
-standard = "0.20.92"
-revision = "fcbb13e0ae04c688d825d5a87e2d2721dfab483d"
+standard = "0.20.162"
+revision = "8e6b51dc91a2ac7e1e771908e0fac5e12da0b9a0"
 gate = "project/governance-check.sh"
 # release-target: 1.0.51

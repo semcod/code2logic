@@ -63,6 +63,11 @@ class ActivityReadBatch:
         self.root = root.resolve()
         self.queries = {}
         self.files = {}
+        self.ancestors = {}
+        self.derived = {}
+        self.branch_heads = None
+        self.consulted_ticket_numbers = set()
+        self.worktree_registration = ""
         self.context_reset = None
 
     def __enter__(self):
@@ -70,13 +75,17 @@ class ActivityReadBatch:
             raise ActivityError("activity read batch is already open")
         self.queries.clear()
         self.files.clear()
+        self.ancestors.clear()
+        self.derived.clear()
+        self.branch_heads = None
+        self.consulted_ticket_numbers.clear()
         self.context_reset = _READ_BATCH.set(self)
         try:
-            # Fence checkout identity, HEAD and registration even when every
-            # historical receipt belongs to a different ticket branch.
+            # Fence checkout identity, HEAD and this checkout's own worktree
+            # registration without coupling unrelated sibling worktree commits.
             _git(self.root, "rev-parse", "--path-format=absolute", "--git-common-dir", check=False)
             _git(self.root, "rev-parse", "--verify", "HEAD", check=False)
-            _git(self.root, "worktree", "list", "--porcelain", check=False)
+            self.worktree_registration = self._worktree_registration()
             self.directory_names = self._directories()
         except BaseException as error:
             _READ_BATCH.reset(self.context_reset)
@@ -85,6 +94,23 @@ class ActivityReadBatch:
                 raise ActivityError("activity inputs unavailable during inspection") from error
             raise
         return self
+
+    def _worktree_registration(self) -> str:
+        raw = _run_git(self.root, "worktree", "list", "--porcelain", "-z", check=False)
+        if not raw:
+            return ""
+        matched: list[str] = []
+        for stanza in raw.split("\0\0"):
+            fields = [item for item in stanza.split("\0") if item]
+            if not fields or not fields[0].startswith("worktree "):
+                continue
+            path_str = fields[0].removeprefix("worktree ")
+            try:
+                if Path(path_str).resolve() == self.root:
+                    matched.append("\0".join(fields))
+            except OSError:
+                continue
+        return "\0\0".join(matched) if matched else raw
 
     def _directories(self):
         project = self.root / "project"
@@ -97,8 +123,25 @@ class ActivityReadBatch:
             if kind is None:
                 if self.directory_names != self._directories():
                     raise ActivityError("ticket inventory changed during activity inspection; retry")
+                if self.worktree_registration != self._worktree_registration():
+                    raise ActivityError("Git state changed during activity inspection; retry")
                 for (args, check), expected in self.queries.items():
                     if _run_git(self.root, *args, check=check) != expected:
+                        raise ActivityError("Git state changed during activity inspection; retry")
+                if self.branch_heads is not None and self.consulted_ticket_numbers:
+                    latest_listed = _run_git(
+                        self.root,
+                        "for-each-ref",
+                        "--format=%(refname) %(objectname)",
+                        "refs/remotes/origin",
+                        "refs/heads",
+                    )
+                    latest_heads = _branch_heads_by_ticket(latest_listed)
+                    for number in self.consulted_ticket_numbers:
+                        if latest_heads.get(number, ()) != self.branch_heads.get(number, ()):
+                            raise ActivityError("Git state changed during activity inspection; retry")
+                for (older, newer), expected in self.ancestors.items():
+                    if _run_ancestor(self.root, older, newer) != expected:
                         raise ActivityError("Git state changed during activity inspection; retry")
                 for (path, operation), expected in self.files.items():
                     if _file_observation(path, operation) != expected:
@@ -108,6 +151,10 @@ class ActivityReadBatch:
         finally:
             self.queries.clear()
             self.files.clear()
+            self.ancestors.clear()
+            self.derived.clear()
+            self.branch_heads = None
+            self.consulted_ticket_numbers.clear()
 
 
 def _file_observation(path: Path, operation: str):
@@ -256,13 +303,62 @@ def repository_ref(root: Path) -> str:
     return f"local:{common}"
 
 
+def _ticket_state_fields(text: str) -> tuple[set[str], set[str]]:
+    """Read explicit metadata, including the historical inline header.
+
+    A status projection never grants authority. Ignore fenced examples and
+    refuse contradictory declarations rather than select whichever comes first.
+    """
+    statuses: set[str] = set()
+    states: set[str] = set()
+    fence: str | None = None
+    fence_length = 0
+    for raw_line in text.split("\n"):
+        line = raw_line.removesuffix("\r")
+        delimiter = re.match(r"^[ \t]{0,3}(`{3,}|~{3,})(.*)$", line)
+        if fence is not None:
+            if (delimiter and delimiter.group(1)[0] == fence
+                    and len(delimiter.group(1)) >= fence_length
+                    and not delimiter.group(2).strip()):
+                fence = None
+            continue
+        if delimiter:
+            fence = delimiter.group(1)[0]
+            fence_length = len(delimiter.group(1))
+            continue
+        status = re.fullmatch(r"-[ \t]+\*\*Status\*\*:[ \t]*([A-Z_]+)[ \t]*", line, re.I)
+        workflow = re.fullmatch(r"-[ \t]+\*\*Workflow state\*\*:[ \t]*([A-Z_]+)[ \t]*", line, re.I)
+        legacy = re.fullmatch(
+            r"Status:[ \t]*([A-Z_]+)(?:[ \t]*/[ \t]*([A-Z_]+))?[ \t]*\.?[ \t]*",
+            line, re.I,
+        )
+        if status:
+            statuses.add(status.group(1).upper())
+        if workflow:
+            states.add(workflow.group(1).upper())
+        if legacy:
+            statuses.add(legacy.group(1).upper())
+            if legacy.group(2):
+                states.add(legacy.group(2).upper())
+    return statuses, states
+
+
+def parse_ticket_state_text(text: str) -> tuple[str | None, str | None]:
+    statuses, states = _ticket_state_fields(text)
+    if len(statuses) > 1 or len(states) > 1:
+        return None, None
+    return next(iter(statuses), None), next(iter(states), None)
+
+
 def projection_status(ticket_dir: Path) -> str | None:
     try:
         text = _read_text(ticket_dir / "README.md")
     except OSError:
         return None
-    match = re.search(r"(?mi)^-[ \t]+\*\*Status\*\*:[ \t]*([A-Z_]+)[ \t]*$", text)
-    return match.group(1).upper() if match else None
+    statuses, states = _ticket_state_fields(text)
+    if len(statuses) > 1 or len(states) > 1:
+        raise ActivityError("ticket status or workflow declarations conflict")
+    return next(iter(statuses), None)
 
 
 def _validate_terminal_receipt(receipt, seen):
@@ -302,13 +398,25 @@ def _validate_registry(value: Any, expected_repository: str) -> list[dict[str, s
     return receipts
 
 
-def _ancestor(root: Path, older: str, newer: str) -> bool:
+def _run_ancestor(root: Path, older: str, newer: str) -> bool:
     result = subprocess.run(
         ["git", "-C", str(root), "merge-base", "--is-ancestor", older, newer],
         capture_output=True, check=False, timeout=20,
         env={key: value for key, value in os.environ.items() if not key.startswith("GIT_")},
     )
     return result.returncode == 0
+
+
+def _ancestor(root: Path, older: str, newer: str) -> bool:
+    batch = _READ_BATCH.get()
+    if batch is None:
+        return _run_ancestor(root, older, newer)
+    if root.resolve() != batch.root:
+        raise ActivityError("activity read batch cannot cross checkouts")
+    key = (older, newer)
+    if key not in batch.ancestors:
+        batch.ancestors[key] = _run_ancestor(root, older, newer)
+    return batch.ancestors[key]
 
 
 def _linear_series(root: Path, base: str, head: str) -> list[str] | None:
@@ -342,6 +450,12 @@ def _stable_patch_id(payload: bytes, env: dict[str, str]) -> str | None:
     return fields[0] if len(fields) >= 2 and SHA_RE.fullmatch(fields[0]) else None
 
 
+# project/readme.sh regenerates this index from the ticket directories. A
+# squash or rebase onto a target where a sibling already added the same rows
+# drops its hunk, so patch identity covers every authored path but not it.
+GENERATED_INDEX_PATHSPEC = ("--", ":(top)", ":(top,exclude)project/TICKETS.md")
+
+
 def _patch_id(root: Path, commit: str) -> str | None:
     """Return Git's stable patch identity for one non-empty commit."""
     env = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
@@ -356,6 +470,7 @@ def _patch_id(root: Path, commit: str) -> str | None:
             "--binary",
             "--full-index",
             commit,
+            *GENERATED_INDEX_PATHSPEC,
         ],
         capture_output=True,
         check=False,
@@ -381,6 +496,7 @@ def _range_patch_id(root: Path, base: str, head: str) -> str | None:
             "--full-index",
             base,
             head,
+            *GENERATED_INDEX_PATHSPEC,
         ],
         capture_output=True,
         check=False,
@@ -468,17 +584,151 @@ def _advanced_ticket_branch(root: Path, ticket: str, head_sha: str, terminal_sha
     return bool(current and current != head_sha and _ancestor(root, head_sha, current) and not _ancestor(root, current, terminal_sha))
 
 
-def _unmerged_ticket_branch(root: Path, ticket: str, target: str) -> bool:
-    """Keep supported outstanding ticket branches active from a strict inventory."""
-    listed = _git(root, "for-each-ref", "--format=%(refname) %(objectname)",
-                  "refs/remotes/origin", "refs/heads")
+TICKET_BRANCH_TOKEN_RE = re.compile(
+    r"(?:^|[^0-9a-z])ticket[-_/]?0*([0-9]+)(?=[^0-9a-z]|$)", re.IGNORECASE
+)
+
+
+def _branch_heads_by_ticket(listed: str) -> dict[str, tuple[str, ...]]:
+    grouped: dict[str, list[str]] = {}
     for entry in listed.splitlines():
         ref, _, head = entry.partition(" ")
         branch = ref.removeprefix("refs/remotes/origin/").removeprefix("refs/heads/")
-        if _ticket_branch_matches(branch, ticket) and not _ancestor(root, head, target):
-            return True
-    return False
+        for match in TICKET_BRANCH_TOKEN_RE.finditer(branch):
+            number = str(int(match.group(1)))
+            heads = grouped.setdefault(number, [])
+            if head not in heads:
+                heads.append(head)
+    return {number: tuple(heads) for number, heads in grouped.items()}
 
+
+def _unmerged_ticket_branch(root: Path, ticket: str, target: str) -> bool:
+    """Keep supported outstanding ticket branches active from a strict inventory."""
+    batch = _READ_BATCH.get()
+    if batch is not None:
+        if root.resolve() != batch.root:
+            raise ActivityError("activity read batch cannot cross checkouts")
+        if batch.branch_heads is None:
+            listed = _run_git(
+                root,
+                "for-each-ref",
+                "--format=%(refname) %(objectname)",
+                "refs/remotes/origin",
+                "refs/heads",
+            )
+            batch.branch_heads = _branch_heads_by_ticket(listed)
+        number = str(int(ticket.removeprefix("ticket-")))
+        batch.consulted_ticket_numbers.add(number)
+        heads = batch.branch_heads.get(number, ())
+    else:
+        listed = _git(root, "for-each-ref", "--format=%(refname) %(objectname)",
+                      "refs/remotes/origin", "refs/heads")
+        heads = tuple(
+            entry.partition(" ")[2]
+            for entry in listed.splitlines()
+            if _ticket_branch_matches(
+                entry.partition(" ")[0].removeprefix("refs/remotes/origin/").removeprefix("refs/heads/"),
+                ticket,
+            )
+        )
+    return any(not _ancestor(root, head, target) for head in heads)
+
+
+def _target_tree_entries(root: Path, spec: str) -> frozenset[str]:
+    raw = _git(root, "ls-tree", "--name-only", spec, check=False)
+    batch = _READ_BATCH.get()
+    if batch is not None:
+        key = ("tree_entries", spec, raw)
+        if key not in batch.derived:
+            batch.derived[key] = frozenset(raw.splitlines())
+        return batch.derived[key]
+    return frozenset(raw.splitlines())
+
+
+def _is_tracking_carrier(path: str, parent: str) -> bool:
+    prefix = f"{parent}/" if parent else ""
+    if path in {"TODO.md", f"{prefix}TICKETS.md", "project/TICKETS.md"}:
+        return True
+    return re.match(rf"^{re.escape(prefix)}ticket-[0-9]{{3,}}(?:/|$)", path) is not None
+
+
+def _target_delivery_evidence(
+    root: Path,
+    target: str,
+    parent: str,
+) -> tuple[dict[str, str | None], frozenset[str], frozenset[str]]:
+    status_raw = _git(
+        root,
+        "grep",
+        "-I",
+        "-E",
+        r"^[[:space:]]*-[[:space:]]*\*\*Status\*\*:",
+        target,
+        "--",
+        parent or ".",
+        check=False,
+    )
+    log_raw = _git(
+        root,
+        "log",
+        "-m",
+        "--first-parent",
+        "--format=@@COMMIT@@%s",
+        "-z",
+        "--name-only",
+        target,
+        check=False,
+    )
+    batch = _READ_BATCH.get()
+    key = ("target_delivery_evidence", target, parent, status_raw, log_raw)
+    if batch is not None and key in batch.derived:
+        return batch.derived[key]
+
+    prefix = f"{parent}/" if parent else ""
+    readme_re = re.compile(rf"^{re.escape(prefix)}(ticket-[0-9]{{3,}})/README\.md$")
+    ticket_path_re = re.compile(rf"^{re.escape(prefix)}(ticket-[0-9]{{3,}})(?:/|$)")
+
+    statuses: dict[str, str | None] = {}
+    target_prefix = f"{target}:"
+    for line in status_raw.splitlines():
+        if not line.startswith(target_prefix):
+            continue
+        rel_path, sep, matched = line[len(target_prefix):].partition(":")
+        if not sep:
+            continue
+        match = readme_re.fullmatch(rel_path)
+        if match is None:
+            continue
+        ticket_name = match.group(1)
+        if ticket_name not in statuses:
+            parsed_status, _ = parse_ticket_state_text(matched)
+            statuses[ticket_name] = parsed_status
+
+    delivered_names: set[str] = set()
+    delivered_numbers: set[str] = set()
+    for record in log_raw.split("@@COMMIT@@"):
+        if not record:
+            continue
+        parts = record.split("\x00")
+        subject = parts[0]
+        paths: list[str] = []
+        for index, raw_path in enumerate(parts[1:]):
+            cleaned = raw_path.removeprefix("\n") if index == 0 else raw_path
+            if cleaned:
+                paths.append(cleaned)
+        if not any(not _is_tracking_carrier(path, parent) for path in paths):
+            continue
+        for path in paths:
+            path_match = ticket_path_re.match(path)
+            if path_match is not None:
+                delivered_names.add(path_match.group(1))
+        for token_match in TICKET_BRANCH_TOKEN_RE.finditer(subject):
+            delivered_numbers.add(str(int(token_match.group(1))))
+
+    result = (statuses, frozenset(delivered_names), frozenset(delivered_numbers))
+    if batch is not None:
+        batch.derived[key] = result
+    return result
 
 
 def delivery_landed(root: Path, ticket_dir: Path, target: str) -> bool:
@@ -496,24 +746,30 @@ def delivery_landed(root: Path, ticket_dir: Path, target: str) -> bool:
     release — was reasoning over that noise, which is why declaring a conflict
     never helped anyone.
 
-    A ticket's own directory is committed together with its delivery, because a
-    commit carrying only tracking carriers is refused. Its presence on the
-    target ref is therefore the ancestry evidence the policy asks for. A branch
-    for the same ticket that the target does not yet contain means more of the
-    delivery is still in flight, and the ticket stays active.
+    Mere directory existence on the target ref is insufficient when planning or
+    allocation commits the ticket stub before implementation lands. Require
+    either a terminal ticket status on the target ref or a first-parent commit
+    on the target ref tying the ticket to at least one non-carrier delivery
+    path, with no unmerged ticket branch still in flight.
     """
     try:
         relative = ticket_dir.resolve().relative_to(root.resolve()).as_posix()
     except ValueError:
         return False
-    present = subprocess.run(
-        ["git", "-C", str(root), "cat-file", "-e", f"{target}:{relative}"],
-        capture_output=True, check=False, timeout=20,
-        env={key: value for key, value in os.environ.items() if not key.startswith("GIT_")},
-    )
-    if present.returncode != 0:
+    parent, _, name = relative.rpartition("/")
+    spec = f"{target}:{parent}" if parent else target
+    if not name or name not in _target_tree_entries(root, spec):
         return False
-    return not _unmerged_ticket_branch(root, ticket_dir.name, target)
+    if _unmerged_ticket_branch(root, ticket_dir.name, target):
+        return False
+    statuses, delivered_names, delivered_numbers = _target_delivery_evidence(root, target, parent)
+    target_status = statuses.get(name)
+    if target_status in {"DONE", "CANCELLED", "CLOSED"}:
+        return True
+    if target_status in {"PLAN", "BACKLOG", "BLOCKED"}:
+        return False
+    number = str(int(name.removeprefix("ticket-"))) if TICKET_RE.fullmatch(name) else None
+    return name in delivered_names or (number is not None and number in delivered_numbers)
 
 
 def resolve(root: Path, ticket_dir: Path, active_statuses: set[str], *, status_override: str | None = None) -> ActivityResolution:

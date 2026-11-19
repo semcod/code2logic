@@ -4,7 +4,7 @@ Kody: `GOV-AGENT-HOST-001`, `GOV-AGENT-HOST-002`, `GOV-AGENT-HOST-003`,
 `GOV-AGENT-HOST-007`
 emitowane przez `.githooks/pre-commit`, oraz `GOV-AGENT-HOST-004`,
 `GOV-AGENT-HOST-005`, `GOV-AGENT-HOST-006` emitowane przez
-`scripts/agent_host_check.py`. Wszystkie siedem jest zarejestrowanych w
+`.governance/agent_host_check.py`. Wszystkie siedem jest zarejestrowanych w
 `governance/diagnostics.json`; `scripts/audit_diagnostics.py` skanuje teraz
 również `.githooks`, więc kod emitowany przez hooka nie może już wypaść z
 katalogu niezauważony.
@@ -13,6 +13,12 @@ Ten sam audyt emituje `GOV-AGENT-HOST-004`, gdy instrukcje przekraczają limit
 hosta, tracą `checkpoint`/`handoff`/`stop`, zawierają skonfigurowaną sprzeczność
 albo deklarują required check, którego workflow nie publikuje. To są blokery
 przed rozpoczęciem długiej sesji, a nie sygnały do kolejnych ślepych retry.
+
+W repozytorium adoptującym standard checker jest instalowany jako
+`.governance/agent_host_check.py`; poniższe polecenia dotyczą tego układu.
+W źródłowym hubie `wellmanifest/new-project` użyj zamiast tego
+`python3 scripts/agent_host_check.py --root .` (z opcją `--format json`
+przy weryfikacji JSON).
 
 ## Situation
 
@@ -47,13 +53,13 @@ rzeczywistości sprawdzany.
    i dołącz materialną zmianę poza katalogiem ticketu, TODO, indeksem i
    registry. Dla `003` nie twórz commita: chroniony kontroler dostawy zapisuje
    terminalny receipt poza checkoutem autora.
-4. Potwierdź stan: `python3 scripts/agent_host_check.py --root .`.
+4. Potwierdź stan: `python3 .governance/agent_host_check.py --root .`.
    Przy findingu anomalii napraw źródłowy kontrakt/projekcję lub CI, a potem
    uruchom audyt ponownie; nie obchodź go przez `--no-verify`.
 
 ## Verification
 
-- `python3 scripts/agent_host_check.py --root .` kończy się kodem 0.
+- `python3 .governance/agent_host_check.py --root .` kończy się kodem 0.
 - `git config --get core.hooksPath` zwraca wartość z `agent-hosts.json`.
 - Próbny commit na branchu bez ticketu jest odrzucony przez hook.
 - `./project/governance-check.sh` nie zgłasza kodów `GOV-AGENT-HOST-*`.

@@ -9,7 +9,7 @@
   ],
   "$defs": {
     "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "gitSha": {"type": "string", "pattern": "^[0-9a-f]{40,64}$"},
+    "gitSha": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})(?![\\s\\S])"},
     "phase": {"enum": ["claimed", "editing", "validating", "publication_frozen", "dispatching", "approved", "merged", "closed", "cancelled", "expired", "released"]},
     "action": {"enum": ["heartbeat", "begin-edit", "begin-validation", "freeze-publication", "dispatch-validation", "approve", "record-merge", "close", "cancel", "expire", "release", "supersede"]},
     "lease": {

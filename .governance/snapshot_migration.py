@@ -74,11 +74,16 @@ def tree(root, revision):
     for raw in git(root, 'ls-tree', '-r', '-z', '--full-tree', revision).split(b'\0'):
         if not raw:
             continue
-        metadata, name = raw.split(b'\t', 1)
-        mode, kind, oid = metadata.decode('ascii').split()
-        path = name.decode('utf-8')
+        try:
+            metadata, name = raw.split(b'\t', 1)
+            mode, kind, oid = metadata.decode('ascii').split()
+            path = name.decode('utf-8')
+        except ValueError:
+            raise MigrationError('GOV-SNAPSHOT-MIGRATION-005', 'Unreadable inventory path or metadata') from None
         if not safe_path(path) or kind != 'blob' or mode not in {'100644', '100755', '120000'}:
             raise MigrationError('GOV-SNAPSHOT-MIGRATION-005', 'Unsupported inventory path or object type')
+        if path in result:
+            raise MigrationError('GOV-SNAPSHOT-MIGRATION-005', 'Duplicate inventory path')
         result[path] = {'mode': mode, 'oid': oid}
     return result
 

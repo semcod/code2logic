@@ -20,7 +20,7 @@ keep it in private receipt storage, not a tracked ticket.
 | --- | --- | --- |
 | REUSE_EXISTING | Continue the matching canonical ticket checkout. | Revalidate intent, owner and current lease first. |
 | ASSIST_READ_ONLY | Help an active delivery with analysis or review. | No second writer or trusted self-approval. |
-| HANDOFF_REQUIRED | Reconcile pending work from an inactive ticket. | Accepted scope, snapshot and controller CAS; no automatic takeover. |
+| HANDOFF_REQUIRED | Reconcile pending work from an inactive ticket. | Accepted scope, snapshot and controller CAS; automatic takeover only through `GOV-IDLE-TAKEOVER` after the configured idle time. |
 | SERIALIZE | Workstream capacity is occupied. | Queue without another delivery worktree. |
 | RECONCILE | Owner, ancestry, pending branch or observations are uncertain. | Preserve work and resolve the specific missing evidence. |
 | NEW_TICKET_CANDIDATE | Scope and WIP capacity permit new allocation. | Planning candidate only; never write authority. |
@@ -48,6 +48,15 @@ task -> registered clone observation
 5. Reobserve immediately before allocation and before writing; verify intent,
    owner, fencing and the governance gate at the effect boundary. A saved
    report is evidence, never a replayable admission token.
+
+For an unfinished `released` slot, ordinary owner handoff and checkout
+restoration deliberately remain unavailable. A protected host may use the
+independently published `resume_released` API only with independently
+authenticated original-writer release/stopped evidence, exact lease/Git/intent
+CAS, a complete managed terminal registry and a fresh bounded successor.
+See [explicit owner handoff](../docs/EXPLICIT_OWNER_HANDOFF.md). Preserve dirty
+work and reuse the same ticket; never edit lease JSON, infer release authority
+from expiry/PID absence, or allocate a competing implementation.
 
 For a branch without a registered worktree, distinct commit IDs alone are not
 a competing delta. Admission compares the complete Git tree of **every**
@@ -139,6 +148,29 @@ The result explicitly lists PR, checks, approval, protected merge, release and
 deployment as unobserved stages. Preserve dirty work regardless of remote
 status. Gather those stages' own exact-head receipts before claiming DONE.
 
+### Optional controller availability
+
+`--controller-store DIR --controller-repository OWNER/NAME` adds a read-only
+`editingResource` observation (`new-project.editing-resource-observation/v1`)
+of the controller's exclusive editing resource for that repository and target
+branch. Run it before preparing an expiring editing credential or admission.
+The route still reports planning eligibility only: disjoint paths can select
+`NEW_TICKET_CANDIDATE` or `REUSE_EXISTING` while the resource is
+`HELD_BY_OTHER`. `HELD_EXPIRED` still blocks: expiry alone never authorizes a
+takeover; the controller must release it, record a protected handoff, or the
+ticket must qualify for `GOV-IDLE-TAKEOVER` (no observed activity for
+`coordination.idleTakeover.idleMinutes`).
+`UNAVAILABLE` carries a reason (`controller-store-missing`,
+`controller-state-unreadable`, `controller-state-invalid`,
+`controller-state-changed`; runtime clients may report transport, pin or
+policy failures) and never implies availability. The holder is a safe
+reference (lease, ticket, phase, expiry) without owner session or plan.
+`queueSupported` is `false` for the file controller, which has no queue; a
+runtime that queues reports `QUEUED`, and a queued request is not a grant.
+Follow `nextAction`, bind `stateDigest` and `observedAt` as the observation's
+freshness, and re-observe instead of retrying an admission whose window
+elapsed.
+
 ## Verification
 
 Report `new-project.work-start-report/v1` uses closed schema
@@ -181,3 +213,47 @@ retains its separate contract, not a development-gate exemption.
 
 P-WORKSPACE-005, P-WORKSPACE-006, C-START-004, C-CONCURRENCY-005,
 P-CORE-014, P-TICKET-ACTIVITY-001 and P-LEASE-001.
+
+## Ticket writer fencing
+
+Allocation requires `--writer-actor` and `--writer-session`, or the explicit
+`NEW_PROJECT_WRITER_ACTOR` and `NEW_PROJECT_WRITER_SESSION` environment values.
+The agent provider (`--agent`) is display metadata, not a session identity.
+The allocator keeps scaffolds in its canonical linked worktree and records the
+caller in the existing lease fields. Invalid identity fails before reservation.
+
+The launcher supplies these same identity values plus `NEW_PROJECT_LEASE_REVISION`
+and `NEW_PROJECT_FENCING_TOKEN` from current controller evidence to Git hooks.
+`change_lease_check.py writer-check --root . --operation commit --ref
+refs/heads/ticket/NNN-slug` performs a read-only check. Push checks resolve each
+source and destination ticket ref through Git's registered primary and worktrees,
+including when the push originates from another checkout. Missing or unsafe
+leases/runtime produce GOV-CHANGE-LEASE-001; identity, expired lease or stale CAS
+produce GOV-CHANGE-LEASE-002; released/frozen phases produce GOV-CHANGE-LEASE-003.
+The clone-local repository hash matches the allocator's existing lease binding.
+
+A successor must obtain an independently accepted handoff through the controller:
+observe the old owner gone or explicitly handed off, re-observe dirty work and
+HEAD, and have the controller publish the successor lease with fresh monotonic
+CAS values. Pass that evidence to the successor session. Hooks never consume a
+local handoff file, update ownership, renew a timeout, or infer caller identity
+from lease contents. Do not copy another session's identity or fencing values.
+These local checks do not defend against an OS user who can alter hooks or
+impersonate launcher environment, and do not replace protected publication.
+
+### Explicit owner consent with an expired local lease
+
+For the registered `local-single-clone` policy, a protected host adapter may
+use the public `owner_handoff.handoff` API independently of idle takeover.
+It must authenticate the previous owner's explicit consent and bind the full
+request to its protected authorization verifier. A request, actor label, FD or
+expiry alone never authenticates ownership. The standalone CLI is read-only;
+without the protected adapter, preserve the checkpoint and queue the handoff.
+See [Explicit local owner handoff](../docs/EXPLICIT_OWNER_HANDOFF.md).
+
+A successful operation preserves scope, intent and the worktree, archives the
+old lease and authorization before replacement, advances fencing and creates a
+bounded fresh session. Run work-start and writer checks with its returned
+context before editing. Exact replay re-authenticates and never renews the
+successor. Later file, Git, policy, authorization or fencing changes require a
+new observation and an authenticated handoff; never repair lease JSON manually.

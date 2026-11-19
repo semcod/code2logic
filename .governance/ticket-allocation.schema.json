@@ -26,8 +26,8 @@
           "additionalProperties": false,
           "required": ["processUri", "issuer", "maxReceiptAgeSeconds"],
           "properties": {
-            "processUri": {"type": "string", "pattern": "^[a-z][a-z0-9+.-]*://[^\\s]+$"},
-            "issuer": {"type": "string", "pattern": "^[a-z][a-z0-9+.-]*://[^\\s]+$"},
+            "processUri": {"type": "string", "pattern": "^[a-z][a-z0-9+.-]*://\\S+$"},
+            "issuer": {"type": "string", "pattern": "^[a-z][a-z0-9+.-]*://\\S+$"},
             "maxReceiptAgeSeconds": {"type": "integer", "minimum": 30, "maximum": 3600}
           }
         }

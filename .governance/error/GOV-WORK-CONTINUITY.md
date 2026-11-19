@@ -35,6 +35,13 @@ użycia zapisanego fencing tokenu.
 
 ## Verification
 
+Gdy pełny dziennik jest poprawny pod dawnym repositoryRef po zmianie origin,
+zachowaj obie tożsamości i wszystkie oryginalne receipty. Opublikowany runtime
+z `init-namespace` pozwala jawnie zaplanować osobną przestrzeń po walidacji
+całego starego chain i jego zaobserwowanego SHA-256; `--apply` wymaga istniejącej
+autoryzacji tej operacji. Patrz [procedura](../docs/information/continuity-namespaces.md).
+Nie reinterpretuj tej operacji jako migracji identity, lease lub approval.
+
 ```bash
 python3 .governance/work_continuity.py validate <checkpoint-or-registry.json>
 python3 .governance/work_continuity.py verify --root . --ticket ticket-NNN

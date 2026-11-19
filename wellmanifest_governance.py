@@ -136,9 +136,9 @@ def pytest_sessionstart(session: object) -> None:
     root = Path(str(rootpath)).resolve()
     gate_sh = root / "project" / "governance-check.sh"
     gate_bat = root / "project" / "governance-check.bat"
-    if not gate_sh.is_file() and not gate_bat.is_file():
+    if not gate_sh.is_file() and not (sys.platform.startswith("win") and gate_bat.is_file()):
         raise GovernanceGateError(
-            "GOV-PACKAGING-003: managed governance gate is missing"
+            "GOV-PACKAGING-003: managed governance gate for this platform is missing"
         )
     if os.environ.get("WELLMANIFEST_GOVERNANCE_ACTIVE") == "1":
         raise GovernanceGateError("GOV-PACKAGING-003: recursive gate invocation")

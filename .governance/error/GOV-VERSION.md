@@ -26,7 +26,12 @@ Ponadto w modelach podziału na workstreamy (`manifest.json`), workstream `integ
        from importlib.metadata import version as _meta_version
        __version__ = _meta_version("my-package")
    except Exception:
-       __version__ = (Path(__file__).resolve().parent / "VERSION").read_text(encoding="utf-8").strip()
+       from pathlib import Path
+       _root = Path(__file__).resolve().parent
+       while _root.parent != _root and not (_root / "VERSION").is_file():
+           _root = _root.parent
+       _version_file = _root / "VERSION"
+       __version__ = _version_file.read_text(encoding="utf-8").strip() if _version_file.is_file() else "0.0.0"
    ```
    Jeśli w kodzie pozostaje statyczne przypisanie `__version__ = "..."`, jego wartość musi być identyczna z `VERSION`.
 4. Uruchom bramkę: `./project/governance-check.sh`.

@@ -128,7 +128,13 @@
         "slug": {"$ref": "#/$defs/nullableSlug"},
         "anomalies": {
           "type": "array",
-          "items": {"const": "duplicate-delivery"},
+          "items": {
+            "enum": [
+              "duplicate-delivery",
+              "stale-registration",
+              "merged-leftover"
+            ]
+          },
           "uniqueItems": true
         },
         "head": {"$ref": "#/$defs/nullableString"},

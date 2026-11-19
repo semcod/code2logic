@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wellmanifest.com/schemas/standard-propagation-request.schema.json",
+  "title": "Advisory immutable standard propagation request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "readOnly",
+    "executionAuthorized",
+    "targets",
+    "source"
+  ],
+  "properties": {
+    "schema": {
+      "const": "new-project.standard-propagation-request/v1"
+    },
+    "readOnly": {
+      "const": true
+    },
+    "executionAuthorized": {
+      "const": false
+    },
+    "targets": {
+      "type": "array",
+      "maxItems": 0
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "version",
+        "tag",
+        "revision",
+        "publicationStatus",
+        "packageManifestSha256",
+        "adoptionToolSha256"
+      ],
+      "properties": {
+        "repository": {
+          "const": "wellmanifest/new-project"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+        },
+        "tag": {
+          "type": "string",
+          "pattern": "^v(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+        },
+        "revision": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "publicationStatus": {
+          "const": "published"
+        },
+        "packageManifestSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "adoptionToolSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  }
+}

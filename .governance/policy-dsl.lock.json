@@ -1,0 +1,17 @@
+{
+  "schema": "new-project.policy-dsl-lock/v1",
+  "dependency": {
+    "id": "wellmanifest/policy-dsl",
+    "version": "0.2.0-dev",
+    "sourceRepository": "wellmanifest/policy-dsl",
+    "sourceRevision": "0ffa41efd903d3e0fc3dbf4431f2771b34c1f70e",
+    "sourcePath": "tests/policy_dsl_check.py",
+    "sourceSha256": "9bc02c1805ef208a5d136c045c6a829b7394bc652208c26942dd2e31561881ac"
+  },
+  "installation": {
+    "packageSourcePath": "scripts/policy_dsl_check.py",
+    "managedTargetPath": ".governance/policy_dsl_check.py",
+    "lockTargetPath": ".governance/policy-dsl.lock.json",
+    "networkRequired": false
+  }
+}

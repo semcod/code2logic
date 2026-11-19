@@ -1,7 +1,13 @@
 # GOV-PACKAGING: metadane paczki nie egzekwują standardu
 
 Kody: `GOV-PACKAGING-001`, `GOV-PACKAGING-002`, `GOV-PACKAGING-003`
-(emitowane przez `scripts/agent_host_check.py`).
+(emitowane przez `.governance/agent_host_check.py`).
+
+W repozytorium adoptującym standard checker jest instalowany jako
+`.governance/agent_host_check.py`; poniższe polecenia dotyczą tego układu.
+W źródłowym hubie `wellmanifest/new-project` użyj zamiast tego
+`python3 scripts/agent_host_check.py --root .` (z opcją `--format json`
+przy weryfikacji JSON).
 
 ## Situation
 
@@ -46,11 +52,11 @@ egzekucji.
 
 3. Po każdym upgrade standardu zaktualizuj blok razem z lockiem — rozjazd jest
    wykrywany deterministycznie.
-4. Potwierdź: `python3 scripts/agent_host_check.py --root .`.
+4. Potwierdź: `python3 .governance/agent_host_check.py --root .`.
 
 ## Verification
 
-- `python3 scripts/agent_host_check.py --root . --format json` zwraca `ok: true`.
+- `python3 .governance/agent_host_check.py --root . --format json` zwraca `ok: true`.
 - `npm install` w czystym klonie ustawia `core.hooksPath` bez ręcznej komendy.
 - Zmiana wersji w locku bez zmiany metadanych paczki daje `GOV-PACKAGING-002`.
 

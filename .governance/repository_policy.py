@@ -139,6 +139,10 @@ def _safe_snapshot_path(root: Path, raw_path: str, *, staged: bool) -> str | Non
         return error
     if _index_has_symlink(root, raw_path) if staged else _working_tree_has_symlink(root, raw_path):
         return "path contains a symlink"
+    if staged:
+        # Syntax and index mode were checked above. Staged bytes are read only
+        # from Git; mutable working-tree links or missing paths are irrelevant.
+        return None
     try:
         repository = root.resolve()
         resolved = (root / raw_path).resolve(strict=False)
@@ -146,6 +150,19 @@ def _safe_snapshot_path(root: Path, raw_path: str, *, staged: bool) -> str | Non
         return f"path cannot be resolved: {error}"
     if resolved != repository and repository not in resolved.parents:
         return "path resolves outside the repository"
+    return None
+
+
+def _source_paths_error(paths: Any) -> str | None:
+    if (
+        not isinstance(paths, list)
+        or not paths
+        or any(relative_path_error(item, pattern=False) is not None for item in paths)
+    ):
+        return "repositoryPolicy.tickets.sourcePaths must be a safe non-empty path list"
+    normalized = [item.replace("\\", "/") for item in paths]
+    if len(normalized) != len(set(normalized)):
+        return "repositoryPolicy.tickets.sourcePaths must be a safe non-empty path list"
     return None
 
 
@@ -168,10 +185,12 @@ def policy_error(value: Any) -> str | None:
     if delivery.get("checkout") not in {"linked-worktree", "primary"}:
         return "repositoryPolicy.delivery.checkout is invalid"
     branches = delivery.get("targetBranches")
-    if not isinstance(branches, list) or not branches or len(branches) != len(set(branches)):
+    if not isinstance(branches, list) or not branches:
         return "repositoryPolicy.delivery.targetBranches must be unique and non-empty"
     if not all(isinstance(item, str) and item and "/" not in item for item in branches):
         return "repositoryPolicy.delivery.targetBranches contains an invalid branch"
+    if len(branches) != len(set(branches)):
+        return "repositoryPolicy.delivery.targetBranches must be unique and non-empty"
     tickets = value.get("tickets")
     if not isinstance(tickets, dict):
         return "repositoryPolicy.tickets must be an object"
@@ -192,13 +211,9 @@ def policy_error(value: Any) -> str | None:
         if field in tickets and relative_path_error(tickets[field]) is not None:
             return f"repositoryPolicy.tickets.{field} must be a safe repository-relative path"
     if "sourcePaths" in tickets:
-        paths = tickets["sourcePaths"]
-        if (
-            not isinstance(paths, list)
-            or not paths
-            or any(relative_path_error(item) is not None for item in paths)
-        ):
-            return "repositoryPolicy.tickets.sourcePaths must be a safe non-empty path list"
+        source_error = _source_paths_error(tickets["sourcePaths"])
+        if source_error is not None:
+            return source_error
     preset = PROFILES[profile]
     if (
         value.get("delivery", {}).get("mode") != preset["deliveryMode"]
@@ -209,8 +224,14 @@ def policy_error(value: Any) -> str | None:
         return f"repositoryPolicy profile {profile} does not match its ticket backend"
     if profile != "local-audit" and value.get("enforcement") != preset["enforcement"]:
         return f"repositoryPolicy profile {profile} must use enforcement={preset['enforcement']}"
-    if tickets.get("backend") == "planfile" and "adapterPath" not in tickets:
-        return "planfile profile requires tickets.adapterPath"
+    if tickets.get("backend") == "planfile":
+        if "adapterPath" not in tickets or "sourcePaths" not in tickets:
+            return "planfile profile requires tickets.adapterPath and tickets.sourcePaths"
+        if relative_path_error(tickets["adapterPath"], pattern=False) is not None:
+            return "repositoryPolicy.tickets.adapterPath must be a safe repository-relative path"
+        source_error = _source_paths_error(tickets["sourcePaths"])
+        if source_error is not None:
+            return source_error
     return None
 
 
@@ -265,14 +286,26 @@ def adapter_error(
         return "external ticket adapter workstream is invalid"
     for field in ("allowedPaths", "forbiddenPaths", "sourcePaths"):
         values = adapter.get(field)
-        if not isinstance(values, list) or len(values) != len(set(values)):
+        if not isinstance(values, list):
             return f"external ticket adapter {field} is invalid"
         for item in values:
             error = relative_path_error(item, pattern=field != "sourcePaths")
             if error:
                 return f"external ticket adapter {field} is invalid: {error}"
+        if len(values) != len(set(values)):
+            return f"external ticket adapter {field} is invalid"
     if not adapter["allowedPaths"]:
         return "external ticket adapter allowedPaths is empty"
+    if not adapter["sourcePaths"]:
+        return "external ticket adapter sourcePaths is empty"
+    declared_sources = tickets.get("sourcePaths")
+    source_error = _source_paths_error(declared_sources)
+    if source_error is not None:
+        return source_error
+    normalized_declared = {item.replace("\\", "/") for item in declared_sources}
+    normalized_adapter = {item.replace("\\", "/") for item in adapter["sourcePaths"]}
+    if normalized_adapter != normalized_declared:
+        return "external ticket adapter sourcePaths must match repositoryPolicy.tickets.sourcePaths"
     for source in adapter["sourcePaths"]:
         path_error = _safe_snapshot_path(root, source, staged=staged)
         if path_error:
@@ -296,7 +329,7 @@ def adapter_error(
             return f"external ticket source does not contain {ticket}: {source}"
         if observed.lower() in {"done", "cancelled", "canceled", "closed"}:
             return f"external ticket {ticket} is terminal in {source}"
-    if raw_path in adapter["allowedPaths"] or raw_path in adapter["forbiddenPaths"]:
+    if _matches(raw_path, adapter["allowedPaths"]) or _matches(raw_path, adapter["forbiddenPaths"]):
         return "external ticket adapter cannot own itself"
     return None
 

@@ -290,7 +290,7 @@ def check_hook(root: Path, contract: dict[str, Any], actor: str) -> list[Finding
     additional = contract["hook"].get("additionalHooks", [])
     if (not isinstance(additional, list)
             or any(not isinstance(path, str) or path not in {
-                ".githooks/commit-msg", ".githooks/prepare-commit-msg",
+                ".githooks/commit-msg", ".githooks/prepare-commit-msg", ".githooks/pre-push",
             } for path in additional)
             or len(additional) != len(set(additional))):
         findings.append(Finding(
@@ -342,7 +342,10 @@ def python_declaration(marker: Path) -> tuple[dict[str, Any] | None, dict[str, A
         document = tomllib.loads(marker.read_text(encoding="utf-8"))
     except (OSError, tomllib.TOMLDecodeError):
         return None, {}
-    declaration = document.get("tool", {}).get("wellmanifest")
+    if not isinstance(document, dict):
+        return None, {}
+    tool = document.get("tool")
+    declaration = tool.get("wellmanifest") if isinstance(tool, dict) else None
     return (declaration if isinstance(declaration, dict) else None), document
 
 
@@ -358,11 +361,15 @@ def node_declaration(marker: Path) -> tuple[dict[str, Any] | None, dict[str, Any
 
 
 def lifecycle_value(kind: str, document: dict[str, Any]) -> str:
+    if not isinstance(document, dict):
+        return ""
     if kind == "npm-script":
         scripts = document.get("scripts")
         value = scripts.get("prepare") if isinstance(scripts, dict) else None
     else:
-        options = document.get("tool", {}).get("pytest", {}).get("ini_options", {})
+        tool = document.get("tool")
+        pytest = tool.get("pytest") if isinstance(tool, dict) else None
+        options = pytest.get("ini_options") if isinstance(pytest, dict) else None
         value = options.get("addopts") if isinstance(options, dict) else None
     if isinstance(value, list):
         return " ".join(str(item) for item in value)
@@ -461,7 +468,7 @@ def check_declaration(
     return findings
 
 
-def workflow_job_names(path: Path) -> list[str]:
+def required_checks_validator():
     """Use the adjacent managed validator for the offline workflow contract.
 
     Load by the package path, never by a target-controlled import search path.
@@ -476,7 +483,11 @@ def workflow_job_names(path: Path) -> list[str]:
         raise ImportError("managed required-checks validator is missing")
     checker = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(checker)
-    return checker.workflow_job_names(path)
+    return checker
+
+
+def workflow_job_names(path: Path) -> list[str]:
+    return required_checks_validator().workflow_job_names(path)
 
 
 def check_guidance_anomalies(root: Path, contract: dict[str, Any]) -> list[Finding]:
@@ -587,6 +598,12 @@ def check_guidance_anomalies(root: Path, contract: dict[str, Any]) -> list[Findi
         ))
         return findings
     if not isinstance(declaration, dict):
+        findings.append(Finding(
+            "GOV-AGENT-HOST-004",
+            "CI required-checks declaration must be a JSON object.",
+            "Restore a valid managed required-checks declaration.",
+            [str(checks_path.relative_to(root))],
+        ))
         return findings
     pairs: list[tuple[str, str]] = []
     bound = declaration.get("requiredChecks")
@@ -598,6 +615,18 @@ def check_guidance_anomalies(root: Path, contract: dict[str, Any]) -> list[Findi
         pairs = [(str(name), declaration["workflowFile"])
                  for name in declaration["requiredCheckNames"]
                  if isinstance(name, str)]
+    if "externalChecks" in declaration:
+        try:
+            external = required_checks_validator().external_check_names(declaration)
+        except (OSError, UnicodeDecodeError, ImportError, AttributeError, ValueError, SystemExit):
+            findings.append(Finding(
+                "GOV-AGENT-HOST-004",
+                "CI external required-check declaration cannot be resolved.",
+                "Restore the managed validator and an explicit supported producer binding; run check_required_checks.py for the precise refusal.",
+                [str(checks_path.relative_to(root))],
+            ))
+            return findings
+        pairs = [(name, workflow) for name, workflow in pairs if name not in external]
     if not pairs:
         findings.append(Finding(
             "GOV-AGENT-HOST-004",
