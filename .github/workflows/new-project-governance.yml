@@ -103,12 +103,114 @@ jobs:
           python3 -c 'import sys; assert sys.version_info >= (3, 11), sys.version'
       - name: Install wellman governance runtime
         shell: bash
+        env:
+          PROTECTED_RUNTIME_SHA: ${{ vars.NEW_PROJECT_RUNTIME_SHA }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_SHA: ${{ github.sha }}
+          EVENT_REF: ${{ github.ref }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          GOVERNANCE_ROOT: .
         run: |
           set -euo pipefail
-          standard_version="$(python3 -c 'import json; print(json.load(open(".governance/manifest.json", encoding="utf-8"))["standard"]["version"])')"
-          runtime_ref="v${standard_version}"
-          python3 -m pip install --disable-pip-version-check "git+https://github.com/wellmanifest/new-project.git@${runtime_ref}#subdirectory=packages/wellman"
-          wellman --version
+          # Repository variable is protected configuration; candidate manifests are not.
+          runtime_ref="$(python3 -I - <<'PY_RUNTIME'
+          import json
+          import os
+          import re
+          import subprocess
+          from pathlib import PurePosixPath
+
+          def reject(message):
+              raise SystemExit("Trusted governance runtime pin: " + message)
+
+          def sha(value):
+              if not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{40}", value):
+                  reject("a full lowercase commit SHA is required")
+              return value
+
+          def unique(pairs):
+              result = {}
+              for key, value in pairs:
+                  if key in result:
+                      reject("duplicate lock key")
+                  result[key] = value
+              return result
+
+          protected = os.environ.get("PROTECTED_RUNTIME_SHA", "")
+          if protected:
+              print(sha(protected))
+          else:
+              if os.environ.get("EVENT_NAME") == "pull_request":
+                  branch = os.environ.get("DEFAULT_BRANCH", "")
+                  if not branch or os.environ.get("BASE_REF") != branch:
+                      reject("PR base must be the default branch or use a protected SHA")
+                  base = sha(os.environ.get("BASE_SHA", ""))
+              else:
+                  branch = os.environ.get("DEFAULT_BRANCH", "")
+                  if not branch or os.environ.get("EVENT_REF") != "refs/heads/" + branch:
+                      reject("non-PR runs require the default branch or a protected SHA")
+                  base = sha(os.environ.get("EVENT_SHA", ""))
+              target = os.path.relpath(os.path.abspath(os.environ.get("GOVERNANCE_ROOT", ".")), os.getcwd())
+              if ".." in PurePosixPath(target).parts or "\\" in target:
+                  reject("target-root must stay inside the repository")
+              lock_path = str(PurePosixPath(target) / ".governance/manifest.lock.json")
+              observed = subprocess.run(["git", "show", base + ":" + lock_path],
+                                        capture_output=True, text=True)
+              if observed.returncode:
+                  reject("trusted base lock unavailable; configure protected NEW_PROJECT_RUNTIME_SHA for initial adoption")
+              try:
+                  lock = json.loads(observed.stdout, object_pairs_hook=unique)
+                  standard = lock["standard"]
+                  if (lock["schema"] != "new-project.lock/v1"
+                          or standard["id"] != "wellmanifest/new-project"
+                          or standard["sourceRepository"] != "wellmanifest/new-project"
+                          or standard["publicationStatus"] != "published"):
+                      reject("unsupported or unpublished trusted adoption")
+                  print(sha(standard["sourceRevision"]))
+              except (ValueError, KeyError, TypeError):
+                  reject("malformed trusted base lock")
+          PY_RUNTIME
+          )"
+          runtime_venv="$(mktemp -d "${RUNNER_TEMP:-${TMPDIR:-/tmp}}/wellman-governance.XXXXXX")"
+          python3 -I -m venv "$runtime_venv"
+          "$runtime_venv/bin/python" -I -m pip install --disable-pip-version-check "git+https://github.com/wellmanifest/new-project.git@${runtime_ref}#subdirectory=packages/wellman"
+          # Accept only a recognized console entrypoint from this isolated runtime.
+          runtime_command="$("$runtime_venv/bin/python" -I - <<'PY_RUNTIME_COMMAND'
+          import os
+          import sys
+          from importlib.metadata import distributions
+          from pathlib import Path
+
+          if sys.prefix == sys.base_prefix:
+              raise SystemExit("Governance runtime requires its isolated environment")
+          found = []
+          for name, command, module in (
+              ("wellmanifest-governance", "wellman-governance", "wellmanifest_governance_runtime"),
+              ("wellman", "wellman", "wellman"),
+          ):
+              matches = list(distributions(name=name))
+              if not matches:
+                  continue
+              if len(matches) != 1:
+                  raise SystemExit("Ambiguous governance runtime distribution: " + name)
+              installed = matches[0]
+              entries = [entry.value for entry in installed.entry_points
+                         if entry.group == "console_scripts" and entry.name == command]
+              launcher = Path(sys.executable).parent / command
+              if (entries != [module + ".check:main"]
+                      or not Path(installed.locate_file("")).resolve().is_relative_to(Path(sys.prefix).resolve())
+                      or launcher.is_symlink() or not launcher.is_file() or not os.access(launcher, os.X_OK)):
+                  raise SystemExit("Unsupported governance runtime identity: " + name)
+              found.append(command)
+          if len(found) != 1:
+              raise SystemExit("Expected exactly one supported governance runtime")
+          print(found[0])
+          PY_RUNTIME_COMMAND
+          )"
+          "$runtime_venv/bin/$runtime_command" --version
+          printf '%s\n' "$runtime_venv/bin" >> "$GITHUB_PATH"
       - name: Run the managed governance gate
         shell: bash
         env:
@@ -126,7 +228,35 @@ jobs:
             fi
             range_arguments=(--base "$BASE_SHA" --head "$HEAD_SHA")
           fi
-          wellman check --root . --actor ci --json "${range_arguments[@]}"
+          # Resolve only the runtime installed from the independently selected pin.
+          runtime_module="$(python -I - <<'PY_GATE_RUNTIME'
+          import sys
+          from importlib.metadata import PackageNotFoundError, distribution
+          from pathlib import Path
+
+          if sys.prefix == sys.base_prefix:
+              raise SystemExit("Governance runtime requires its isolated environment")
+          for name, command, module in (
+              ("wellmanifest-governance", "wellman-governance", "wellmanifest_governance_runtime"),
+              ("wellman", "wellman", "wellman"),
+          ):
+              try:
+                  installed = distribution(name)
+              except PackageNotFoundError:
+                  continue
+              expected = module + ".check:main"
+              entries = [entry.value for entry in installed.entry_points
+                         if entry.group == "console_scripts" and entry.name == command]
+              if (entries != [expected]
+                      or not Path(installed.locate_file("")).resolve().is_relative_to(Path(sys.prefix).resolve())):
+                  raise SystemExit("Unsupported governance runtime identity: " + name)
+              print(module)
+              break
+          else:
+              raise SystemExit("Governance runtime is not installed")
+          PY_GATE_RUNTIME
+          )"
+          python -I -m "$runtime_module" check --root . --actor ci --json "${range_arguments[@]}"
           # The adopter's standard-adoption.json mode decides: "enforce" fails on
           # missing packs, "audit" reports them without failing the gate.
           python3 .governance/standard_pack_check.py --root . --format json

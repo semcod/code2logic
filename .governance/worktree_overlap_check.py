@@ -18,6 +18,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
@@ -379,7 +380,7 @@ def nul_records(output: str) -> list[str]:
     return records
 
 
-def dirty_paths(path: Path, ignore: tuple[str, ...]) -> tuple[str, ...]:
+def unignored_dirty_paths(path: Path) -> set[str]:
     names: set[str] = set()
     records = iter(nul_records(run_git(
         path, "status", "--porcelain=v1", "-z", "--untracked-files=all")))
@@ -395,7 +396,13 @@ def dirty_paths(path: Path, ignore: tuple[str, ...]) -> tuple[str, ...]:
             if original is None:
                 raise AuditError('Git status is missing a rename/copy source path')
             names.add(original)
-    return tuple(sorted(name for name in names if name and not path_ignored(name, ignore)))
+    return {name for name in names if name}
+
+
+def dirty_paths(path: Path, ignore: tuple[str, ...]) -> tuple[str, ...]:
+    return tuple(
+        sorted(name for name in unignored_dirty_paths(path) if not path_ignored(name, ignore))
+    )
 
 
 def committed_against(
@@ -444,10 +451,9 @@ def merge_tree_conflicts(path: Path, left: str, right: str) -> tuple[str, ...] |
     """
     try:
         result = subprocess.run(
-            ["git", "-C", str(path), "merge-tree", "--write-tree", "--name-only", left, right],
+            ["git", "-C", str(path), "merge-tree", "--write-tree", "--name-only", "-z", left, right],
             capture_output=True,
             check=False,
-            text=True,
             timeout=60,
             env=detached_git_env(),
         )
@@ -457,12 +463,12 @@ def merge_tree_conflicts(path: Path, left: str, right: str) -> tuple[str, ...] |
         return ()
     if result.returncode != 1:
         return None
-    lines = result.stdout.splitlines()
+    records = result.stdout.split(b"\x00")
     conflicted: list[str] = []
-    for line in lines[1:]:
-        if not line.strip():
+    for record in records[1:]:
+        if not record:
             break
-        conflicted.append(line.strip())
+        conflicted.append(record.decode("utf-8", errors="surrogateescape"))
     return tuple(sorted(set(conflicted)))
 
 
@@ -513,12 +519,12 @@ def changes_against_shared_default(first, second, first_dirty, second_dirty, fir
         if first_default == second_default:
             first_base = run_git(first.path, "merge-base", first.head, first_default)
             second_base = run_git(second.path, "merge-base", second.head, second_default)
-            first_committed = set(run_git(first.path, "diff", "--name-only", "--no-renames", first_base, first.head).splitlines())
-            second_committed = set(run_git(second.path, "diff", "--name-only", "--no-renames", second_base, second.head).splitlines())
-            first_renames = run_git(first.path, "diff", "--name-only", "--find-renames",
-                                    "--diff-filter=R", first_base, first.head)
-            second_renames = run_git(second.path, "diff", "--name-only", "--find-renames",
-                                     "--diff-filter=R", second_base, second.head)
+            first_committed = set(nul_records(run_git(first.path, "diff", "--name-only", "-z", "--no-renames", first_base, first.head)))
+            second_committed = set(nul_records(run_git(second.path, "diff", "--name-only", "-z", "--no-renames", second_base, second.head)))
+            first_renames = nul_records(run_git(first.path, "diff", "--name-only", "-z", "--find-renames",
+                                                "--diff-filter=R", first_base, first.head))
+            second_renames = nul_records(run_git(second.path, "diff", "--name-only", "-z", "--find-renames",
+                                                 "--diff-filter=R", second_base, second.head))
             # Replace both sides only after every strict Git read succeeds.
             # Rename/directory-rename conflicts can be reported at a path
             # edited under another name. Preserve the conservative path
@@ -560,8 +566,8 @@ def contested_paths(
             # Use strict reads here: committed_against's best-effort empty
             # result must not turn an unreadable peer into permission to write.
             try:
-                first_committed = set(run_git(first.path, "diff", "--name-only", base, first.head).splitlines())
-                second_committed = set(run_git(second.path, "diff", "--name-only", base, second.head).splitlines())
+                first_committed = set(nul_records(run_git(first.path, "diff", "--name-only", "-z", base, first.head)))
+                second_committed = set(nul_records(run_git(second.path, "diff", "--name-only", "-z", base, second.head)))
                 first_changes = first_committed | first_dirty
                 second_changes = second_committed | second_dirty
             except AuditError:
@@ -572,20 +578,22 @@ def contested_paths(
     dirty_overlap = (first_dirty & second_changes) | (second_dirty & first_changes)
     conflicts: set[str] = set()
     if first.head and second.head and first.head != second.head:
-        if not is_ancestor(first.path, first.head, second.head) and not is_ancestor(
-            first.path, second.head, first.head
-        ):
-            reported = merge_tree_conflicts(first.path, first.head, second.head)
-            if reported is None:
-                # No usable merge-tree: fall back to the path-intersection proxy.
-                conflicts = first_changes & second_changes
-            else:
-                conflicts = set(reported)
-                if shared_default:
-                    # A branch can conflict with main without contending with
-                    # this particular peer. Keep the conflict in its inventory,
-                    # but require contributions from both writers for pairing.
-                    conflicts &= first_changes & second_changes
+        shared_pair_overlap = first_changes & second_changes
+        if not (shared_default and not shared_pair_overlap):
+            if not is_ancestor(first.path, first.head, second.head) and not is_ancestor(
+                first.path, second.head, first.head
+            ):
+                reported = merge_tree_conflicts(first.path, first.head, second.head)
+                if reported is None:
+                    # No usable merge-tree: fall back to the path-intersection proxy.
+                    conflicts = shared_pair_overlap
+                else:
+                    conflicts = set(reported)
+                    if shared_default:
+                        # A branch can conflict with main without contending with
+                        # this particular peer. Keep the conflict in its inventory,
+                        # but require contributions from both writers for pairing.
+                        conflicts &= shared_pair_overlap
     return tuple(
         sorted(
             name
@@ -595,13 +603,18 @@ def contested_paths(
     )
 
 
-def changed_paths(path: Path, ignore: tuple[str, ...]) -> tuple[str, ...]:
+def changed_paths(
+    path: Path,
+    ignore: tuple[str, ...],
+    *,
+    dirty: tuple[str, ...] | None = None,
+) -> tuple[str, ...]:
     """Everything this checkout has touched relative to the default branch.
 
     Used for reporting and for attributing a ticket to the checkout writing it,
     never for deciding whether two checkouts collide.
     """
-    names: set[str] = set(dirty_paths(path, ignore))
+    names: set[str] = set(dirty_paths(path, ignore) if dirty is None else dirty)
     branch = default_branch(path)
     base = None
     for candidate in (f"origin/{branch}", branch):
@@ -711,30 +724,42 @@ def ticket_scopes(root: Path) -> tuple[tuple[TicketScope, ...], tuple[str, ...]]
     statuses = active_statuses(root)
     if not statuses:
         return (), ()
-    try:
-        with ActivityReadBatch(root):
-            directories = (project / name for name in virtual) if virtual is not None else project.iterdir()
-            for directory in sorted(directories, key=lambda item: item.name):
-                if (virtual is None and not directory.is_dir()) or TICKET_DIRECTORY_RE.fullmatch(directory.name) is None:
-                    continue
-                override = ticket_status_override(virtual, directory)
-                try:
-                    resolution = resolve_ticket_activity(root, directory, statuses, **override)
-                except ActivityError as error:
-                    errors.append(f"{directory.name}: {error}")
-                    resolution = None
-                if resolution is not None and not resolution.active:
-                    continue
-                try:
-                    intent = scope_intent(directory, virtual)
-                except AuditError as error:
-                    # Keep the checkout and its known identity. The error
-                    # fails its audit without blocking an unrelated identity.
-                    errors.append(f"{directory.name}: {error}")
-                    continue
-                scopes.append(ticket_scope_record(directory, intent))
-    except ActivityError as error:
-        errors.append(str(error))
+    transient_git_messages = {
+        "Git state changed during activity inspection; retry",
+        "ticket inventory changed during activity inspection; retry",
+    }
+    for attempt in range(3):
+        scopes = []
+        errors = []
+        try:
+            with ActivityReadBatch(root):
+                directories = (project / name for name in virtual) if virtual is not None else project.iterdir()
+                for directory in sorted(directories, key=lambda item: item.name):
+                    if (virtual is None and not directory.is_dir()) or TICKET_DIRECTORY_RE.fullmatch(directory.name) is None:
+                        continue
+                    override = ticket_status_override(virtual, directory)
+                    try:
+                        resolution = resolve_ticket_activity(root, directory, statuses, **override)
+                    except ActivityError as error:
+                        errors.append(f"{directory.name}: {error}")
+                        resolution = None
+                    if resolution is not None and not resolution.active:
+                        continue
+                    try:
+                        intent = scope_intent(directory, virtual)
+                    except AuditError as error:
+                        # Keep the checkout and its known identity. The error
+                        # fails its audit without blocking an unrelated identity.
+                        errors.append(f"{directory.name}: {error}")
+                        continue
+                    scopes.append(ticket_scope_record(directory, intent))
+            break
+        except ActivityError as error:
+            if str(error) in transient_git_messages and attempt < 2:
+                time.sleep(0.05 * (attempt + 1))
+                continue
+            errors.append(str(error))
+            break
     return tuple(scopes), tuple(errors)
 
 
@@ -756,28 +781,38 @@ def has_pending_work(path: Path, dirty: bool) -> bool:
     return True
 
 
-def inspect_checkout(path: Path, ignore: tuple[str, ...]) -> Checkout:
+def inspect_checkout(
+    path: Path, ignore: tuple[str, ...], only_identity: str | None = None
+) -> Checkout:
     common = Path(run_git(path, "rev-parse", "--path-format=absolute", "--git-common-dir")).resolve()
     try:
         head = run_git(path, "rev-parse", "--verify", "HEAD")
     except AuditError:
         head = None
     branch = run_git(path, "branch", "--show-current") or None
-    dirty = bool(run_git(path, "status", "--porcelain=v1", "--untracked-files=all"))
+    raw_dirty = unignored_dirty_paths(path)
+    dirty = bool(raw_dirty)
     pending = has_pending_work(path, dirty)
-    scopes, activity_errors = ticket_scopes(path) if pending else ((), ())
+    identity = repository_identity(path)
+    in_scope = pending and (only_identity is None or identity == only_identity)
+    scopes, activity_errors = ticket_scopes(path) if in_scope else ((), ())
+    filtered_dirty = (
+        tuple(sorted(name for name in raw_dirty if not path_ignored(name, ignore)))
+        if in_scope
+        else ()
+    )
     return Checkout(
         path=path.resolve(),
         common_git_dir=common,
-        identity=repository_identity(path),
+        identity=identity,
         head=head,
         branch=branch,
         dirty=dirty,
         pending=pending,
-        # A leftover contributes nothing to any merge, so skip the three
-        # expensive reads it would only feed into comparisons that are skipped.
-        dirty_paths=dirty_paths(path, ignore) if pending else (),
-        changed_paths=changed_paths(path, ignore) if pending else (),
+        # A leftover or out-of-scope identity contributes nothing to any merge
+        # in this audit, so skip the expensive reads that would be discarded.
+        dirty_paths=filtered_dirty,
+        changed_paths=changed_paths(path, ignore, dirty=filtered_dirty) if in_scope else (),
         tickets=scopes,
         activity_errors=activity_errors,
     )
@@ -822,7 +857,9 @@ def workspace_candidates(workspace_root):
     return candidate_paths
 
 
-def discover_checkouts(workspace_root: Path, ignore: tuple[str, ...]) -> list[Checkout]:
+def discover_checkouts(
+    workspace_root: Path, ignore: tuple[str, ...], only_identity: str | None = None
+) -> list[Checkout]:
     candidate_paths = workspace_candidates(workspace_root)
 
     pending = sorted(candidate_paths, key=str)
@@ -846,7 +883,7 @@ def discover_checkouts(workspace_root: Path, ignore: tuple[str, ...]) -> list[Ch
     checkouts: list[Checkout] = []
     for candidate in sorted(candidate_paths, key=str):
         try:
-            checkouts.append(inspect_checkout(candidate, ignore))
+            checkouts.append(inspect_checkout(candidate, ignore, only_identity))
         except AuditError as error:
             raise AuditError(f"Cannot inspect checkout {candidate}: {error}") from error
     return checkouts
@@ -1169,7 +1206,9 @@ def main(argv: list[str] | None = None) -> int:
             if args.focus_checkout is not None
             else None
         )
-        checkouts = discover_checkouts(args.workspace_root.expanduser().resolve(), ignore)
+        checkouts = discover_checkouts(
+            args.workspace_root.expanduser().resolve(), ignore, only_identity
+        )
         inventory = workspace_inventory(checkouts)
         findings = overlap_findings(
             checkouts, ignore, only_identity, focus_checkout, inventory

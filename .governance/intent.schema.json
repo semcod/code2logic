@@ -71,11 +71,11 @@
       "description": "Optional HOME vs ADOPT. Fill for SERVICE/FEATURE that create or place a repository. Missing is valid so existing tickets still parse; invalid values reject. runtime_service must not HOME wellmanifest.",
       "properties": {
         "home": {
-          "enum": ["wellmanifest", "subactor", "semcod"],
+          "enum": ["wellmanifest", "subactor", "semcod", "paxlet-com", "dockuri"],
           "description": "Org that owns the repository. Not the same as adopt."
         },
         "runtimeOwner": {
-          "enum": ["wellmanifest", "subactor", "semcod"],
+          "enum": ["wellmanifest", "subactor", "semcod", "paxlet-com", "dockuri"],
           "description": "Org that runs the CLI/daemon. Omit to inherit home. wellmanifest does not host product daemons."
         },
         "shape": {

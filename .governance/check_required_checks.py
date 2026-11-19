@@ -101,11 +101,35 @@ def declared_checks(data: dict) -> list[tuple[str, str]]:
     return [(name, workflow) for name in names]
 
 
+def external_check_names(data: dict) -> list[str]:
+    """Declare the existing OneDev producer; never infer or execute a check.
+
+    Keep this vocabulary closed so a hosted job cannot be moved outside the
+    workflow comparison by adding arbitrary provider metadata.
+    """
+    bindings = data.get("externalChecks", [])
+    if not isinstance(bindings, list):
+        raise SystemExit("externalChecks must be a list")
+    if bindings and "requiredChecks" in data:
+        raise SystemExit("externalChecks requires workflowFile+requiredCheckNames")
+    names: list[str] = []
+    required = [name for name, _workflow in declared_checks(data)]
+    for binding in bindings:
+        if binding != {"name": "onedev/local-verify", "provider": "onedev"}:
+            raise SystemExit("unsupported external check binding; expected the protected OneDev context")
+        name = binding["name"]
+        if name in names or required.count(name) != 1:
+            raise SystemExit("external check must be declared exactly once in requiredCheckNames and externalChecks")
+        names.append(name)
+    return names
+
+
 def load_source(path: Path) -> dict:
     data = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(data, dict) or data.get("schema") != SCHEMA:
         raise SystemExit(f"unsupported required-checks schema in {path}")
     declared_checks(data)
+    external_check_names(data)
     return data
 
 
@@ -238,13 +262,18 @@ def check_instance_identity(root: Path, data: dict, source_path: Path) -> list[s
     declared = data.get("repository")
     if not isinstance(declared, str) or not declared:
         return []
+    own = own_identity(root)
     if declared == UNRESOLVED_ADOPTER:
+        # The managed updater is the only writer of the adoption lock, so the
+        # remedy is a rerun that binds the detected name, never a manual edit.
+        detected = (f"detected {own!r}; rerun" if own else
+                    "no origin remote detected; add it or pass --repository OWNER/NAME and rerun")
         return [
             f"{source_path} still carries the unadapted template identity "
-            f"{UNRESOLVED_ADOPTER!r}; set repository, workflowFile and the check "
-            "names this repository's own workflows publish"
+            f"{UNRESOLVED_ADOPTER!r}; {detected} the managed updater "
+            "(create_adoption_lock.py --target-root . --source-revision <locked "
+            "sourceRevision> --upgrade) to bind it to the repository's own workflow checks"
         ]
-    own = own_identity(root)
     if own is None or declared.casefold() == own.casefold():
         return []
     return [
@@ -278,7 +307,7 @@ def source_for_check(root: Path, source_override: Path | None) -> Path | None:
     return source_path
 
 
-def print_check_success(root, source_path, required_names, published_names) -> None:
+def print_check_success(root, source_path, required_names, published_names, external_names=()) -> None:
     try:
         source_label = source_path.relative_to(root)
     except ValueError:
@@ -287,6 +316,8 @@ def print_check_success(root, source_path, required_names, published_names) -> N
         "required-checks gate OK: "
         f"source={source_label} "
         f"required={required_names} published={published_names}"
+        + (f" external_declared={list(external_names)} external_execution=not-observed"
+           if external_names else "")
     )
 
 
@@ -322,7 +353,11 @@ def main(argv: list[str] | None = None) -> int:
         for message in identity_errors:
             print(f"  - {message}", file=sys.stderr)
         return 1
-    pairs = declared_checks(data)
+    all_pairs = declared_checks(data)
+    external_names = external_check_names(data)
+    pairs = [(name, workflow) for name, workflow in all_pairs if name not in external_names]
+    if not pairs:
+        raise SystemExit("workflowFile declaration must retain its hosted check names")
     if args.workflow is not None:
         workflow_path = args.workflow
         if not workflow_path.is_file():
@@ -351,9 +386,9 @@ def main(argv: list[str] | None = None) -> int:
         for err in errors:
             print(f"  - {err}", file=sys.stderr)
         return 1
-    required_names = [name for name, _workflow in pairs]
+    required_names = [name for name, _workflow in all_pairs]
     if __name__ == "__main__":
-        print_check_success(root, source_path, required_names, published_names)
+        print_check_success(root, source_path, required_names, published_names, external_names)
     return 0
 
 

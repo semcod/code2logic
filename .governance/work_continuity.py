@@ -22,6 +22,8 @@ import stat
 import subprocess
 import sys
 import tempfile
+import secrets
+from contextvars import ContextVar
 import time
 from datetime import datetime, timezone
 from typing import Any, Iterable
@@ -61,6 +63,9 @@ IGNORED_DIRECTORIES = [
     ".subactor/cache/",
     ".subactor/snapshots/",
 ]
+
+
+_TRANSACTION_PARENTS = ContextVar("continuity_transaction_parents", default=None)
 
 
 class ContinuityError(RuntimeError):
@@ -501,52 +506,107 @@ def load_local_manifest(root: Path) -> dict[str, Any]:
     return validate_manifest_value(load_json(root / ".subactor" / "manifest.json"))
 
 
+def namespace_module():
+    spec = importlib.util.spec_from_file_location(
+        "_continuity_namespace", Path(__file__).with_name("continuity_namespace.py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def storage_paths(root: Path) -> tuple[Path, Path, int, int]:
     continuity = load_local_manifest(root)["continuity"]
-    return (
+    legacy = (
         root / continuity["eventStreamPath"],
         root / continuity["checkpointIndexPath"],
         continuity["checkpointIndexMaxEntries"],
         continuity["checkpointIndexMaxBytes"],
     )
+    return namespace_module().select(root, repository_ref(root), legacy, sys.modules[__name__])
 
+
+
+@contextmanager
+def _posix_parent_directory(path: Path, create: bool):
+    no_follow, directory_flag = getattr(os, "O_NOFOLLOW", None), getattr(os, "O_DIRECTORY", None)
+    if no_follow is None or directory_flag is None:
+        fail("GOV-CONTINUITY-001", "safe continuity directory opens are unavailable")
+    flags = os.O_RDONLY | directory_flag | no_follow | getattr(os, "O_CLOEXEC", 0)
+    directories = [os.open(path.anchor, flags)]
+    try:
+        for part in path.parts[1:-1]:
+            try:
+                child = os.open(part, flags, dir_fd=directories[-1])
+            except FileNotFoundError:
+                if not create:
+                    raise
+                try:
+                    os.mkdir(part, mode=0o700, dir_fd=directories[-1])
+                except FileExistsError:
+                    pass
+                child = os.open(part, flags, dir_fd=directories[-1])
+            directories.append(child)
+        def verify():
+            for parent, child, part in zip(directories, directories[1:], path.parts[1:-1]):
+                named, held = os.stat(part, dir_fd=parent, follow_symlinks=False), os.fstat(child)
+                if not stat.S_ISDIR(named.st_mode) or (named.st_dev, named.st_ino) != (held.st_dev, held.st_ino):
+                    fail("GOV-CONTINUITY-001", "continuity parent identity changed")
+        yield directories[-1], verify
+    finally:
+        for descriptor in reversed(directories):
+            os.close(descriptor)
+
+
+@contextmanager
+def _parent_directory(path: Path, create: bool):
+    path = path.absolute()
+    if not path.name or ".." in path.parts:
+        fail("GOV-CONTINUITY-001", "continuity needs a confined file path")
+    bindings = _TRANSACTION_PARENTS.get()
+    if bindings is not None:
+        if path.parent not in bindings:
+            fail("GOV-CONTINUITY-001", "continuity path was not bound before the transaction")
+        descriptor, verify = bindings[path.parent]
+        verify()
+        yield descriptor, verify
+        return
+    with ExitStack() as handles:
+        try:
+            if os.name == "posix":
+                descriptor, raw_verify = handles.enter_context(_posix_parent_directory(path, create))
+            elif os.name == "nt":
+                handles.enter_context(_windows_stream_descriptor(path, create, parents_only=True))
+                descriptor, raw_verify = None, lambda: None
+            else:
+                fail("GOV-CONTINUITY-001", "safe continuity directories are unavailable")
+        except FileNotFoundError:
+            raise
+        except (OSError, NotImplementedError) as error:
+            raise ContinuityError("GOV-CONTINUITY-001", "continuity directory is unsafe or unavailable") from error
+        def verify():
+            try:
+                raw_verify()
+            except (OSError, NotImplementedError) as error:
+                raise ContinuityError("GOV-CONTINUITY-001", "continuity directory identity is unavailable") from error
+        verify()
+        yield descriptor, verify
 
 
 @contextmanager
 def _posix_stream_descriptor(path: Path, append: bool):
-    no_follow = getattr(os, "O_NOFOLLOW", None)
-    directory_flag = getattr(os, "O_DIRECTORY", None)
-    if no_follow is None or directory_flag is None:
-        fail("GOV-CONTINUITY-001", "safe continuity directory opens are unavailable")
-    directory_flags = os.O_RDONLY | directory_flag | no_follow | getattr(os, "O_CLOEXEC", 0)
-    directory = os.open(path.anchor, directory_flags)
-    descriptor = None
-    try:
-        for part in path.parts[1:-1]:
-            try:
-                child = os.open(part, directory_flags, dir_fd=directory)
-            except FileNotFoundError:
-                if not append:
-                    raise
-                try:
-                    os.mkdir(part, mode=0o700, dir_fd=directory)
-                except FileExistsError:
-                    pass  # Reopen with no-follow; a concurrent link is never traversed.
-                child = os.open(part, directory_flags, dir_fd=directory)
-            os.close(directory)
-            directory = child
+    with _parent_directory(path, append) as (directory, verify):
         flags = (os.O_WRONLY | os.O_CREAT | os.O_APPEND) if append else os.O_RDONLY
-        flags |= no_follow | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NONBLOCK", 0)
+        flags |= os.O_NOFOLLOW | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NONBLOCK", 0)
         descriptor = os.open(path.name, flags, 0o600, dir_fd=directory)
-        yield descriptor
-    finally:
-        if descriptor is not None:
+        try:
+            yield descriptor
+            verify()
+        finally:
             os.close(descriptor)
-        os.close(directory)
 
 
 @contextmanager
-def _windows_stream_descriptor(path: Path, append: bool, *, readwrite: bool = False):
+def _windows_stream_descriptor(path: Path, append: bool, *, readwrite: bool = False, parents_only: bool = False):
     # Open reparse points themselves. Held directory handles omit DELETE
     # sharing, so parent names cannot be replaced during the file operation.
     # https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew
@@ -573,7 +633,9 @@ def _windows_stream_descriptor(path: Path, append: bool, *, readwrite: bool = Fa
     handles = []
     descriptor = None
     def open_handle(candidate, directory=False):
-        access = 0x80 if directory else (
+        # Attribute-only handles do not participate in delete-sharing checks.
+        # FILE_LIST_DIRECTORY | FILE_READ_ATTRIBUTES protects empty parents too.
+        access = 0x81 if directory else (
             0xC0000080 if readwrite else (0x40000080 if append else 0x80000000))
         flags = 0x00200000 | (0x02000000 if directory else 0)
         creation = 4 if append and not directory else 3  # OPEN_ALWAYS / OPEN_EXISTING
@@ -607,10 +669,13 @@ def _windows_stream_descriptor(path: Path, append: bool, *, readwrite: bool = Fa
                 except FileExistsError:
                     pass
                 open_handle(current, directory=True)
+        if parents_only:
+            yield None
+            return
         handle = open_handle(path)
         descriptor = msvcrt.open_osfhandle(
             handle, os.O_BINARY | os.O_NOINHERIT | (
-                os.O_RDWR if readwrite else (os.O_APPEND if append else os.O_RDONLY))
+                os.O_RDWR if readwrite else ((os.O_WRONLY | os.O_APPEND) if append else os.O_RDONLY))
         )
         handles.pop()  # The CRT descriptor now owns the file handle.
         yield descriptor
@@ -735,73 +800,64 @@ def index_payload(value: dict[str, Any], maximum_bytes: int) -> bytes:
 
 def write_index(path: Path, value: dict[str, Any], maximum_bytes: int) -> None:
     payload = index_payload(value, maximum_bytes)
-    path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
-    descriptor, temporary_name = tempfile.mkstemp(prefix="checkpoint-index.", suffix=".json", dir=path.parent)
-    temporary = Path(temporary_name)
-    try:
-        if hasattr(os, "fchmod"):
-            os.fchmod(descriptor, 0o600)
-        with os.fdopen(descriptor, "wb") as stream:
-            stream.write(payload)
-            stream.flush()
-            os.fsync(stream.fileno())
-        os.replace(temporary, path)
-        try:
-            directory_descriptor = os.open(path.parent, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+    if not path.name or ".." in path.absolute().parts:
+        fail("GOV-CONTINUITY-001", "continuity index needs a confined file path")
+    path = path.absolute()
+    with _parent_directory(path, True) as (directory, verify):
+        if os.name == "posix":
+            temporary = "checkpoint-index." + secrets.token_hex(16) + ".json"
+            flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW | getattr(os, "O_CLOEXEC", 0)
+            descriptor = os.open(temporary, flags, 0o600, dir_fd=directory)
             try:
-                os.fsync(directory_descriptor)
+                with os.fdopen(descriptor, "wb") as stream:
+                    stream.write(payload)
+                    stream.flush()
+                    os.fsync(stream.fileno())
+                verify()
+                os.replace(temporary, path.name, src_dir_fd=directory, dst_dir_fd=directory)
+                verify()
+                try:
+                    os.fsync(directory)
+                except OSError:
+                    pass  # Preserve support for filesystems without directory fsync.
             finally:
-                os.close(directory_descriptor)
-        except OSError:
-            pass
-    finally:
-        if temporary.exists():
-            temporary.unlink()
+                try:
+                    os.unlink(temporary, dir_fd=directory)
+                except FileNotFoundError:
+                    pass
+        else:
+            # All Windows ancestors remain held without DELETE sharing until
+            # replacement and cleanup finish. Preserve native atomic replace.
+            descriptor, name = tempfile.mkstemp(prefix="checkpoint-index.", suffix=".json", dir=path.parent)
+            temporary = Path(name)
+            try:
+                with os.fdopen(descriptor, "wb") as stream:
+                    stream.write(payload)
+                    stream.flush()
+                    os.fsync(stream.fileno())
+                os.replace(temporary, path)
+            finally:
+                if temporary.exists():
+                    temporary.unlink()
 
 
 @contextmanager
 def _posix_lock_descriptor(path: Path):
-    """Anchor every parent and recheck public names after a potentially long wait."""
-    no_follow = getattr(os, "O_NOFOLLOW", None)
-    directory_flag = getattr(os, "O_DIRECTORY", None)
-    if no_follow is None or directory_flag is None:
-        fail("GOV-CONTINUITY-001", "safe continuity lock directory opens are unavailable")
-    directory_flags = os.O_RDONLY | directory_flag | no_follow | getattr(os, "O_CLOEXEC", 0)
-    directories = [os.open(path.anchor, directory_flags)]
-    descriptor = None
-    try:
-        for part in path.parts[1:-1]:
-            try:
-                child = os.open(part, directory_flags, dir_fd=directories[-1])
-            except FileNotFoundError:
-                try:
-                    os.mkdir(part, mode=0o700, dir_fd=directories[-1])
-                except FileExistsError:
-                    pass
-                child = os.open(part, directory_flags, dir_fd=directories[-1])
-            directories.append(child)
-        descriptor = os.open(path.name, os.O_RDWR | os.O_CREAT | no_follow
+    with _parent_directory(path, True) as (directory, verify_parent):
+        descriptor = os.open(path.name, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW
                              | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NONBLOCK", 0),
-                             0o600, dir_fd=directories[-1])
-        def verify_identity():
-            # Held descriptors prevent traversal through a swapped link. They
-            # alone do not prove the public path still names the locked inode.
-            for parent, child, part in zip(directories, directories[1:], path.parts[1:-1]):
-                named = os.stat(part, dir_fd=parent, follow_symlinks=False)
-                held = os.fstat(child)
-                if not stat.S_ISDIR(named.st_mode) or (named.st_dev, named.st_ino) != (held.st_dev, held.st_ino):
-                    fail("GOV-CONTINUITY-001", "continuity lock parent identity changed")
-            named = os.stat(path.name, dir_fd=directories[-1], follow_symlinks=False)
-            held = os.fstat(descriptor)
-            if (not stat.S_ISREG(named.st_mode) or named.st_nlink != 1
-                    or (named.st_dev, named.st_ino) != (held.st_dev, held.st_ino)):
-                fail("GOV-CONTINUITY-001", "continuity lock file identity changed")
-        yield descriptor, verify_identity
-    finally:
-        if descriptor is not None:
+                             0o600, dir_fd=directory)
+        try:
+            def verify_identity():
+                verify_parent()
+                named = os.stat(path.name, dir_fd=directory, follow_symlinks=False)
+                held = os.fstat(descriptor)
+                if (not stat.S_ISREG(named.st_mode) or named.st_nlink != 1
+                        or (named.st_dev, named.st_ino) != (held.st_dev, held.st_ino)):
+                    fail("GOV-CONTINUITY-001", "continuity lock file identity changed")
+            yield descriptor, verify_identity
+        finally:
             os.close(descriptor)
-        for directory in reversed(directories):
-            os.close(directory)
 
 
 @contextmanager
@@ -830,14 +886,30 @@ def _lock_descriptor(path: Path):
 
 
 @contextmanager
-def storage_transaction(event_path: Path):
-    """Stable OS-owned lock; never unlink it while another writer can use it."""
-    if not event_path.name or ".." in event_path.absolute().parts:
-        fail("GOV-CONTINUITY-001", "continuity transaction needs a confined file path")
-    lock_path = event_path.with_name(event_path.name + ".lock").absolute()
-    with _lock_descriptor(lock_path) as (descriptor, verify_identity):
-        with _locked_transaction(descriptor, verify_identity):
-            yield
+def storage_transaction(event_path: Path, *additional_paths: Path):
+    """Bind every storage parent before waiting; never unlink the OS-owned lock."""
+    candidates = (event_path, *additional_paths)
+    if any(not path.name or ".." in path.absolute().parts for path in candidates):
+        fail("GOV-CONTINUITY-001", "continuity transaction needs confined file paths")
+    paths = [path.absolute() for path in candidates]
+    lock_path = paths[0].with_name(paths[0].name + ".lock")
+    with ExitStack() as handles:
+        bindings = {}
+        for path in paths:
+            if path.parent not in bindings:
+                bindings[path.parent] = handles.enter_context(_parent_directory(path, True))
+        token = _TRANSACTION_PARENTS.set(bindings)
+        try:
+            with _lock_descriptor(lock_path) as (descriptor, verify_lock):
+                def verify_identity():
+                    for _, verify in bindings.values():
+                        verify()
+                    verify_lock()
+                with _locked_transaction(descriptor, verify_identity):
+                    verify_identity()
+                    yield
+        finally:
+            _TRANSACTION_PARENTS.reset(token)
 
 
 @contextmanager
@@ -885,7 +957,7 @@ def commit_event(root: Path, event: dict[str, Any]) -> dict[str, Any]:
     repository = repository_ref(root)
     event_path, index_path, maximum, maximum_bytes = storage_paths(root)
     validate_event(event)
-    with storage_transaction(event_path):
+    with storage_transaction(event_path, index_path):
         events, _ = event_state(iter_events(event_path), repository)
         matching = next((existing for existing in events if existing["eventRef"] == event["eventRef"]), None)
         if matching is not None:
@@ -1151,7 +1223,7 @@ def rebuild_index(args: argparse.Namespace) -> dict[str, Any]:
     root = args.root.resolve()
     repository = repository_ref(root)
     event_path, index_path, maximum, maximum_bytes = storage_paths(root)
-    with storage_transaction(event_path):
+    with storage_transaction(event_path, index_path):
         events, _ = event_state(iter_events(event_path), repository)
         index = index_from_events(repository, events, maximum)
         write_index(index_path, index, maximum_bytes)
@@ -1331,6 +1403,11 @@ def parser() -> argparse.ArgumentParser:
     pin_parser = subparsers.add_parser("verify-pin", help="validate only the local immutable standard pin")
     pin_parser.add_argument("--root", type=Path, default=Path.cwd())
     pin_parser.add_argument("--staged", action="store_true", help="read managed candidates from the Git index")
+    namespace_parser = subparsers.add_parser("init-namespace", help="plan an isolated repository advisory store")
+    namespace_parser.add_argument("--root", type=Path, default=Path.cwd())
+    namespace_parser.add_argument("--expected-legacy-repository", required=True)
+    namespace_parser.add_argument("--expected-legacy-sha256", required=True)
+    namespace_parser.add_argument("--apply", action="store_true")
     return result
 
 
@@ -1350,6 +1427,8 @@ def main() -> int:
             output = verify(args)
         elif args.command == "rebuild-index":
             output = rebuild_index(args)
+        elif args.command == "init-namespace":
+            output = namespace_module().initialize(args, sys.modules[__name__])
         else:
             output = verify_pin(args)
         print(json.dumps(output, indent=2, sort_keys=True, ensure_ascii=False))

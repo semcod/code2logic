@@ -4,6 +4,12 @@
 set -euo pipefail
 
 root="$(git rev-parse --show-toplevel)"
+if [[ -n "${NEW_PROJECT_SEED_REQUEST:-}" ]]; then
+  [[ $# == 1 ]] || exit 1
+  python3 -B "$root/.governance/seed_baseline.py" hook-check --root "$root" \
+    --request "$NEW_PROJECT_SEED_REQUEST" --message-file "$1"
+  exit $?
+fi
 policy_runner="$root/.governance/repository_policy.py"
 [[ -f "$policy_runner" ]] || policy_runner="$root/scripts/repository_policy.py"
 if [[ -f "$policy_runner" ]]; then

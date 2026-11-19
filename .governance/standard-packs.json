@@ -2,7 +2,9 @@
   "schema": "wellmanifest.standard-pack-routing/v1",
   "owner": "wellmanifest/new-project",
   "purpose": "composition-only",
-  "aliases": {"wellmanifest/git": "wellmanifest/git-lifecycle"},
+  "aliases": {
+    "wellmanifest/git": "wellmanifest/git-lifecycle"
+  },
   "rules": {
     "oneSemanticOwner": true,
     "aliasesMustNotCreateRepositories": true,
@@ -11,10 +13,22 @@
     "runtimeBindingsRemainWithAdopter": true
   },
   "executionModels": {
-    "reference-only": {"maximumLevel": "S0", "authorizesEffects": false},
-    "local-conformance": {"maximumLevel": "S2", "authorizesEffects": false},
-    "protected-conformance": {"maximumLevel": "S4", "authorizesEffects": false},
-    "runtime-conformance": {"maximumLevel": "S5", "authorizesEffects": true}
+    "reference-only": {
+      "maximumLevel": "S0",
+      "authorizesEffects": false
+    },
+    "local-conformance": {
+      "maximumLevel": "S2",
+      "authorizesEffects": false
+    },
+    "protected-conformance": {
+      "maximumLevel": "S4",
+      "authorizesEffects": false
+    },
+    "runtime-conformance": {
+      "maximumLevel": "S5",
+      "authorizesEffects": true
+    }
   },
   "levels": {
     "S0": "Versioned normative contract with closed schemas and negative examples.",
@@ -28,41 +42,109 @@
     "baseline": {
       "extends": [],
       "requirements": [
-        {"id": "wellmanifest/new-project", "minimumLevel": "S4"},
-        {"id": "wellmanifest/git-lifecycle", "minimumLevel": "S4"},
-        {"id": "wellmanifest/worktrees", "minimumLevel": "S3"},
-        {"id": "wellmanifest/merge", "minimumLevel": "S4"},
-        {"id": "wellmanifest/validation-attestation", "minimumLevel": "S4"},
-        {"id": "wellmanifest/ticket-lifecycle", "minimumLevel": "S3"},
-        {"id": "wellmanifest/logs", "minimumLevel": "S3"},
-        {"id": "wellmanifest/docs", "minimumLevel": "S3"}
+        {
+          "id": "wellmanifest/new-project",
+          "minimumLevel": "S4"
+        },
+        {
+          "id": "wellmanifest/git-lifecycle",
+          "minimumLevel": "S4"
+        },
+        {
+          "id": "wellmanifest/worktrees",
+          "minimumLevel": "S2"
+        },
+        {
+          "id": "wellmanifest/merge",
+          "minimumLevel": "S4"
+        },
+        {
+          "id": "wellmanifest/validation-attestation",
+          "minimumLevel": "S4"
+        },
+        {
+          "id": "wellmanifest/ticket-lifecycle",
+          "minimumLevel": "S3"
+        },
+        {
+          "id": "wellmanifest/docs",
+          "minimumLevel": "S2"
+        }
       ]
     },
     "domain-pack": {
-      "extends": ["baseline"],
-      "requirements": [{"id": "wellmanifest/dsl", "minimumLevel": "S4"}]
+      "extends": [
+        "baseline"
+      ],
+      "requirements": [
+        {
+          "id": "wellmanifest/dsl",
+          "minimumLevel": "S4"
+        }
+      ]
     },
     "runtime-service": {
-      "extends": ["baseline"],
+      "extends": [
+        "baseline"
+      ],
       "requirements": [
-        {"id": "wellmanifest/poa", "minimumLevel": "S5"},
-        {"id": "wellmanifest/authority-lifecycle", "minimumLevel": "S5"},
-        {"id": "wellmanifest/logs", "minimumLevel": "S5"}
+        {
+          "id": "wellmanifest/poa",
+          "minimumLevel": "S5"
+        },
+        {
+          "id": "wellmanifest/authority-lifecycle",
+          "minimumLevel": "S5"
+        },
+        {
+          "id": "wellmanifest/logs",
+          "minimumLevel": "S5"
+        }
       ]
     },
     "agent-executor": {
-      "extends": ["runtime-service"],
+      "extends": [
+        "runtime-service"
+      ],
       "requirements": [
-        {"id": "wellmanifest/repair-lifecycle", "minimumLevel": "S5"},
-        {"id": "wellmanifest/validation-attestation", "minimumLevel": "S5"},
-        {"id": "wellmanifest/session-recovery", "minimumLevel": "S3"}
+        {
+          "id": "wellmanifest/repair-lifecycle",
+          "minimumLevel": "S5"
+        },
+        {
+          "id": "wellmanifest/validation-attestation",
+          "minimumLevel": "S5"
+        },
+        {
+          "id": "wellmanifest/session-recovery",
+          "minimumLevel": "S3"
+        }
       ]
     },
     "deployment": {
-      "extends": ["runtime-service"],
+      "extends": [
+        "runtime-service"
+      ],
       "requirements": [
-        {"id": "wellmanifest/deployment", "minimumLevel": "S5"},
-        {"id": "wellmanifest/merge", "minimumLevel": "S5"}
+        {
+          "id": "wellmanifest/deployment",
+          "minimumLevel": "S5"
+        },
+        {
+          "id": "wellmanifest/merge",
+          "minimumLevel": "S5"
+        }
+      ]
+    },
+    "embedded-fleet": {
+      "extends": [
+        "deployment"
+      ],
+      "requirements": [
+        {
+          "id": "wellmanifest/semver",
+          "minimumLevel": "S3"
+        }
       ]
     }
   },
@@ -79,22 +161,147 @@
     "transition": "Attach catalog and checker, record immutable evidence, enable the exact required check, then switch the adoption record to enforce."
   },
   "packs": [
-    {"id": "wellmanifest/new-project", "owns": ["repository bootstrap", "pack composition", "immutable adoption projection"]},
-    {"id": "wellmanifest/git-lifecycle", "owns": ["repository identity", "branch and ref lifecycle", "pull-request lifecycle", "remote hygiene"]},
-    {"id": "wellmanifest/worktrees", "owns": ["worktree placement", "worktree naming", "lease path identity", "local checkout audit handoff"]},
-    {"id": "wellmanifest/merge", "owns": ["divergent-work disposition", "merge decision contract"], "excludes": ["merge execution", "deletion"]},
-    {"id": "wellmanifest/validation-attestation", "owns": ["trusted exact-head evidence", "attestation validation"]},
-    {"id": "wellmanifest/ticket-lifecycle", "owns": ["ticket state semantics", "ticket transition semantics"]},
-    {"id": "wellmanifest/authority-lifecycle", "owns": ["authority lease semantics", "fencing and expiry semantics"]},
-    {"id": "wellmanifest/llm", "owns": ["LLM policy boundary"], "excludes": ["runtime provider credentials", "runtime model routing"]},
-    {"id": "wellmanifest/logs", "owns": ["structured log contract", "diagnostic event vocabulary"]},
-    {"id": "wellmanifest/docs", "owns": ["documentation ownership", "canonical document paths", "documentation gate"]},
-    {"id": "wellmanifest/poa", "owns": ["plan of action contract"]},
-    {"id": "wellmanifest/dsl", "owns": ["DSL interoperability contract"]},
-    {"id": "wellmanifest/code-dsl", "owns": ["code-level semantic query contract", "AST diagnostics model"]},
-    {"id": "wellmanifest/nl-dsl-llm", "owns": ["tripartite natural-language, canonical DSL, and adaptive LLM contract", "universal MCP/CLI parity"]},
-    {"id": "wellmanifest/repair-lifecycle", "owns": ["repair and remediation lifecycle"]},
-    {"id": "wellmanifest/deployment", "owns": ["deployment contract", "deployment verification"]},
-    {"id": "wellmanifest/session-recovery", "owns": ["LLM session recovery", "conversation storage resilience", "host resumption protocol", "session crash isolation", "state rehydration"]}
+    {
+      "id": "wellmanifest/new-project",
+      "owns": [
+        "repository bootstrap",
+        "pack composition",
+        "immutable adoption projection"
+      ]
+    },
+    {
+      "id": "wellmanifest/git-lifecycle",
+      "owns": [
+        "repository identity",
+        "branch and ref lifecycle",
+        "pull-request lifecycle",
+        "remote hygiene"
+      ]
+    },
+    {
+      "id": "wellmanifest/worktrees",
+      "owns": [
+        "worktree placement",
+        "worktree naming",
+        "lease path identity",
+        "local checkout audit handoff"
+      ]
+    },
+    {
+      "id": "wellmanifest/merge",
+      "owns": [
+        "divergent-work disposition",
+        "merge decision contract"
+      ],
+      "excludes": [
+        "merge execution",
+        "deletion"
+      ]
+    },
+    {
+      "id": "wellmanifest/validation-attestation",
+      "owns": [
+        "trusted exact-head evidence",
+        "attestation validation"
+      ]
+    },
+    {
+      "id": "wellmanifest/ticket-lifecycle",
+      "owns": [
+        "ticket state semantics",
+        "ticket transition semantics"
+      ]
+    },
+    {
+      "id": "wellmanifest/authority-lifecycle",
+      "owns": [
+        "authority lease semantics",
+        "fencing and expiry semantics"
+      ]
+    },
+    {
+      "id": "wellmanifest/llm",
+      "owns": [
+        "LLM policy boundary"
+      ],
+      "excludes": [
+        "runtime provider credentials",
+        "runtime model routing"
+      ]
+    },
+    {
+      "id": "wellmanifest/logs",
+      "owns": [
+        "structured log contract",
+        "diagnostic event vocabulary"
+      ]
+    },
+    {
+      "id": "wellmanifest/docs",
+      "owns": [
+        "documentation ownership",
+        "canonical document paths",
+        "documentation gate"
+      ]
+    },
+    {
+      "id": "wellmanifest/poa",
+      "owns": [
+        "plan of action contract"
+      ]
+    },
+    {
+      "id": "wellmanifest/dsl",
+      "owns": [
+        "DSL interoperability contract"
+      ]
+    },
+    {
+      "id": "wellmanifest/code-dsl",
+      "owns": [
+        "code-level semantic query contract",
+        "AST diagnostics model"
+      ]
+    },
+    {
+      "id": "wellmanifest/nl-dsl-llm",
+      "owns": [
+        "tripartite natural-language, canonical DSL, and adaptive LLM contract",
+        "universal MCP/CLI parity"
+      ]
+    },
+    {
+      "id": "wellmanifest/repair-lifecycle",
+      "owns": [
+        "repair and remediation lifecycle"
+      ]
+    },
+    {
+      "id": "wellmanifest/deployment",
+      "owns": [
+        "deployment contract",
+        "deployment verification"
+      ]
+    },
+    {
+      "id": "wellmanifest/session-recovery",
+      "owns": [
+        "LLM session recovery",
+        "conversation storage resilience",
+        "host resumption protocol",
+        "session crash isolation",
+        "state rehydration"
+      ]
+    },
+    {
+      "id": "wellmanifest/semver",
+      "owns": [
+        "embedded semantic versioning",
+        "heterogeneous fleet release manifest",
+        "dual-build CI/CD",
+        "hardware safety contracts",
+        "A/B dual-bank OTA lifecycle"
+      ]
+    }
   ]
 }

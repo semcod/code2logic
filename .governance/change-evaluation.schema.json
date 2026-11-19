@@ -38,7 +38,7 @@
       "allOf": [
         {
           "if": {
-            "properties": { "event": { "enum": ["pull_request", "merge_group"] } },
+            "properties": { "event": { "const": "pull_request" } },
             "required": ["event"]
           },
           "then": { "required": ["pullRequest"] }

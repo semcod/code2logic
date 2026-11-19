@@ -18,7 +18,7 @@
         "hooksPathConfig": { "type": "string", "minLength": 1 },
         "additionalHooks": {
           "type": "array", "uniqueItems": true,
-          "items": { "type": "string", "enum": [".githooks/commit-msg", ".githooks/prepare-commit-msg"] }
+          "items": { "type": "string", "enum": [".githooks/commit-msg", ".githooks/prepare-commit-msg", ".githooks/pre-push"] }
         },
         "runtimeFiles": {
           "type": "array",

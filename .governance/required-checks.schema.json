@@ -5,20 +5,34 @@
   "description": "Per-repository required-check declaration. The hub instance may keep workflowFile + requiredCheckNames. Adopters with two workflows use requiredChecks.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "repository"],
+  "required": [
+    "schema",
+    "repository"
+  ],
   "properties": {
-    "schema": { "const": "new-project.required-checks/v1" },
-    "version": { "type": "integer", "minimum": 1 },
+    "schema": {
+      "const": "new-project.required-checks/v1"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
     "repository": {
       "type": "string",
       "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
     },
-    "workflowFile": { "type": "string", "minLength": 1 },
+    "workflowFile": {
+      "type": "string",
+      "minLength": 1
+    },
     "requiredCheckNames": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
-      "items": { "type": "string", "minLength": 1 }
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
     },
     "requiredChecks": {
       "type": "array",
@@ -26,35 +40,114 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["name", "workflowFile"],
+        "required": [
+          "name",
+          "workflowFile"
+        ],
         "properties": {
-          "name": { "type": "string", "minLength": 1 },
-          "workflowFile": { "type": "string", "minLength": 1 }
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "workflowFile": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       }
     },
     "circularGovernanceChecksIgnoredByValidator": {
       "type": "array",
-      "items": { "type": "string", "minLength": 1 },
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
       "uniqueItems": true
     },
     "externalConsumers": {
       "type": "array",
-      "items": { "type": "object" }
+      "items": {
+        "type": "object"
+      }
+    },
+    "externalChecks": {
+      "type": "array",
+      "maxItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "provider"
+        ],
+        "properties": {
+          "name": {
+            "const": "onedev/local-verify"
+          },
+          "provider": {
+            "const": "onedev"
+          }
+        }
+      }
     }
   },
   "oneOf": [
     {
-      "required": ["workflowFile", "requiredCheckNames"],
-      "not": { "required": ["requiredChecks"] }
+      "required": [
+        "workflowFile",
+        "requiredCheckNames"
+      ],
+      "not": {
+        "required": [
+          "requiredChecks"
+        ]
+      }
     },
     {
-      "required": ["requiredChecks"],
+      "required": [
+        "requiredChecks"
+      ],
       "not": {
         "anyOf": [
-          { "required": ["workflowFile"] },
-          { "required": ["requiredCheckNames"] }
+          {
+            "required": [
+              "workflowFile"
+            ]
+          },
+          {
+            "required": [
+              "requiredCheckNames"
+            ]
+          }
         ]
+      }
+    }
+  ],
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "externalChecks"
+        ],
+        "properties": {
+          "externalChecks": {
+            "minItems": 1
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "workflowFile",
+          "requiredCheckNames"
+        ],
+        "properties": {
+          "requiredCheckNames": {
+            "contains": {
+              "const": "onedev/local-verify"
+            }
+          }
+        }
       }
     }
   ]

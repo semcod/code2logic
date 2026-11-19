@@ -48,6 +48,15 @@ both HEADs is inherited context. Two actual dirty writers remain contested;
 unresolved ancestry retains conservative checking. Intent ownership remains a
 separate check even when Git can merge file contents.
 
+For a non-primary detached checkout with no commits ahead of the observed
+target, a staged path already identical to that target is not an outstanding
+contribution. The query verifies exact target blob and mode, stage-zero index
+entry, and raw filesystem blob and mode. Different or unknown evidence remains
+pending. Named branches and active intent retain their reservations. All dirty
+paths remain visible, and the observation digest binds index entries as well
+as filesystem content. This does not classify the checkout as disposable or
+authorize its cleanup, lease transfer, source writes or publication.
+
 `wellmanifest/git-lifecycle` still owns cleanup effects; `ticket-lifecycle`
 owns reservations, and protected merge/publication controllers own external
 effects. Fix an incorrect checker at its HOME with a failing regression and

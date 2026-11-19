@@ -134,6 +134,17 @@
         "mode": { "const": "workstreams" },
         "maxActiveTicketsPerWorkstream": { "type": "integer", "minimum": 1 },
         "rejectActiveScopeOverlap": { "type": "boolean" },
+        "idleTakeover": {
+          "description": "Idle ticket takeover (new-project.idle-takeover/v1); see error/GOV-IDLE-TAKEOVER.md.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled", "idleMinutes", "leaseMinutes"],
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "idleMinutes": { "type": "integer", "minimum": 5, "maximum": 240 },
+            "leaseMinutes": { "type": "integer", "minimum": 15, "maximum": 480 }
+          }
+        },
         "workstreams": {
           "type": "object",
           "minProperties": 1,

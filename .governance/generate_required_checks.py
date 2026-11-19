@@ -28,7 +28,7 @@ SCHEMA = "new-project.required-checks/v1"
 JOB_LINE = re.compile(r"^  ([A-Za-z0-9][A-Za-z0-9_-]*):\s*(?:#.*)?$")
 JOB_NAME_LINE = re.compile(r"^    name:\s*(.+?)\s*$")
 TOP_LEVEL_KEY = re.compile(r"^[A-Za-z_][A-Za-z0-9_-]*:")
-REUSABLE_CALL = re.compile(r"^    (?:uses:|['\"]uses['\"]:)")
+REUSABLE_CALL = re.compile(r"^    (?:uses:|['\"]uses['\"]:)\s*(.*)$")
 IMMUTABLE_CALL = re.compile(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/\.github/workflows/[A-Za-z0-9_.-]+\.ya?ml@[0-9a-f]{40}")
 CONTRACT_PATH = Path('.github/reusable-workflows.lock.json')
 CONTRACT_SCHEMA = 'new-project.reusable-workflows/v1'
@@ -211,8 +211,8 @@ def resolved_checks_text(text: str, sources: dict[str, str], callers: list[str])
     if not unresolved:
         return names
     for key, body in literal_jobs(text):
-        calls = [scalar(line.split('uses:', 1)[1]) for line in body.splitlines()
-                 if REUSABLE_CALL.match(line)]
+        calls = [scalar(match.group(1)) for line in body.splitlines()
+                 if (match := REUSABLE_CALL.match(line))]
         if not calls:
             continue
         name = literal_name(key, body)
@@ -230,22 +230,146 @@ def resolved_checks_text(text: str, sources: dict[str, str], callers: list[str])
     return names
 
 
+def _trigger_line(line: str, *, complete: bool = False) -> str:
+    """Strip YAML comments while retaining hashes inside quoted scalars."""
+    quote = None
+    containers = []
+    index = 0
+    while index < len(line):
+        char = line[index]
+        if quote == '"' and char == '\\':
+            index += 2
+            continue
+        if quote == "'" and line[index:index + 2] == "''":
+            index += 2
+            continue
+        if char == quote:
+            quote = None
+        elif quote is None and char in "'\"":
+            quote = char
+        elif quote is None and char == '#' and (index == 0 or line[index - 1].isspace()):
+            line = line[:index]
+            break
+        elif complete and quote is None and char in '[{':
+            containers.append(char)
+        elif complete and quote is None and char in ']}':
+            if not containers or containers.pop() != {']': '[', '}': '{'}[char]:
+                raise SystemExit('unsupported workflow metadata flow value')
+        index += 1
+    if complete and (quote is not None or containers):
+        raise SystemExit('unsupported multiline workflow metadata value')
+    return line.rstrip()
+
+
+def _trigger_word(value: str) -> str:
+    if not re.fullmatch(r'''(?:[a-z][a-z0-9_]*|'[a-z][a-z0-9_]*'|"[a-z][a-z0-9_]*")''', value):
+        raise SystemExit('unsupported literal workflow trigger scalar')
+    return value.strip("'\"")
+
+
+def _trigger_sequence(value: str, children: list[str]) -> list[str]:
+    if value:
+        combined = ' '.join([value, *(line.strip() for line in children)])
+        if not (combined.startswith('[') and combined.endswith(']')):
+            raise SystemExit('unsupported workflow trigger sequence')
+        items = combined[1:-1].split(',')
+        if items[-1].strip() == '':
+            items.pop()  # YAML permits a trailing comma.
+    else:
+        items = []
+        indentation = None
+        for line in children:
+            match = re.fullmatch(r'( *)-\s+(.+)', line)
+            if match is None or (indentation is not None and len(match[1]) != indentation):
+                raise SystemExit('unsupported workflow trigger sequence')
+            indentation = len(match[1])
+            items.append(match[2])
+    if not items:
+        raise SystemExit('empty workflow trigger sequence')
+    return [_trigger_word(item.strip()) for item in items]
+
+
+def _trigger_mapping(lines: list[str], *, indentless_lists: bool = False) -> dict[str, tuple[str, list[str]]]:
+    """Read literal block fields; reject aliases, merge keys and mixed forms."""
+    result: dict[str, tuple[str, list[str]]] = {}
+    indentation = len(lines[0]) - len(lines[0].lstrip()) if lines else 0
+    current = None
+    for line in lines:
+        depth = len(line) - len(line.lstrip())
+        if '\t' in line[:depth] or depth < indentation:
+            raise SystemExit('unsupported workflow trigger indentation')
+        if depth == indentation and not line.lstrip().startswith('- '):
+            match = re.fullmatch(r'''\s*([a-z][a-z0-9_]*|'[a-z][a-z0-9_]*'|"[a-z][a-z0-9_]*"):\s*(.*)''', line)
+            if match is None:
+                raise SystemExit('unsupported workflow trigger mapping')
+            current = _trigger_word(match[1])
+            if current in result:
+                raise SystemExit('duplicate workflow trigger field')
+            result[current] = (match[2], [])
+        elif current is None or (depth == indentation and not indentless_lists):
+            raise SystemExit('unsupported workflow trigger mapping')
+        else:
+            result[current][1].append(line)
+    return result
+
+
 def pull_request_gating(text: str) -> bool:
-    """Keep after-merge-only callers out of pre-merge declarations."""
-    if "pull_request" not in text:
-        return False  # A workflow that never runs on a PR cannot gate one.
-    # A pull_request trigger with exclusively the 'closed' type publishes
-    # checks that run after the merge decision, never before.  They cannot
-    # gate a pull request and must not inflate the required-checks declaration.
-    has_closed_type = bool(re.search(r"\btypes:\s*\[\s*closed\s*\]", text)) or bool(
-        re.search(r"\btypes:\s*\n\s*-\s*closed\b", text)
-    )
-    has_gating_types = bool(
-        re.search(r"\btypes:\s*\[.*\b(?:opened|synchronize|reopened|ready_for_review)\b", text)
-    ) or bool(
-        re.search(r"\btypes:\s*\n(?:\s*-[^\n]*\n)*\s*-\s*(?:opened|synchronize|reopened|ready_for_review)\b", text)
-    )
-    return not (has_closed_type and not has_gating_types)
+    """Inspect only literal on.pull_request, never sibling events or payload text.
+
+    Like literal_jobs, this is an offline subset reader, not a general YAML
+    parser. Ambiguous or unsupported trigger forms must refuse derivation.
+    """
+    lines = [active for line in text.splitlines() if (active := _trigger_line(line)).strip()]
+    # Establish literal root boundaries before searching for on. A multiline
+    # quoted/flow metadata value may otherwise contain a line resembling a key.
+    roots = set()
+    root_key, root_value = None, ''
+    for line in lines:
+        if line.startswith((' ', '\t')) or (line == '---' and not roots):
+            continue
+        if line.startswith('- ') and root_key == 'on' and not root_value:
+            continue
+        match = re.fullmatch(r'''([A-Za-z_][A-Za-z0-9_-]*|'[A-Za-z_][A-Za-z0-9_-]*'|"[A-Za-z_][A-Za-z0-9_-]*")\s*:\s*(.*)''', line)
+        if match is None:
+            raise SystemExit('unsupported literal workflow root mapping')
+        root_key, root_value = match[1].strip("'\""), match[2]
+        if root_key in roots:
+            raise SystemExit('duplicate workflow root field')
+        roots.add(root_key)
+        if root_key != 'on':
+            if root_value.startswith(("'", '"')):
+                scalar(root_value)
+            elif root_value.startswith(('[', '{')):
+                _trigger_line(root_value, complete=True)
+    triggers = [(index, match[1]) for index, line in enumerate(lines)
+                if (match := re.fullmatch(r'''(?:on|'on'|"on")\s*:\s*(.*)''', line))]
+    if not triggers:
+        return False
+    if len(triggers) != 1:
+        raise SystemExit('duplicate workflow on declaration')
+    index, value = triggers[0]
+    children = []
+    for line in lines[index + 1:]:
+        if not line.startswith((' ', '\t', '- ')):
+            break
+        children.append(line)
+    if value.startswith('[') or (not value and children and children[0].lstrip().startswith('- ')):
+        return 'pull_request' in _trigger_sequence(value, children)
+    if value:
+        if children:
+            raise SystemExit('unsupported workflow trigger scalar children')
+        return _trigger_word(value) == 'pull_request'
+    events = _trigger_mapping(children)
+    if 'pull_request' not in events:
+        return False
+    value, children = events['pull_request']
+    if value not in ('', 'null', '~', '{}') or (value and children):
+        raise SystemExit('unsupported pull_request trigger mapping')
+    fields = _trigger_mapping(children, indentless_lists=True)
+    if 'types' not in fields:
+        return True
+    types, children = fields['types']
+    return any(activity != 'closed' for activity in _trigger_sequence(types, children))
 
 
 def published_checks_text(text: str, callers: list[str]) -> list[str]:
@@ -309,21 +433,25 @@ def declaration_for(
     root: Path,
     ignored: tuple[str, ...] = (),
     workflow_payloads: dict[str, bytes] | None = None,
+    repository: str | None = None,
 ) -> dict[str, Any] | None:
-    repository = repository_name(root)
+    repository = repository or repository_name(root)
     if repository is None:
         return None
     directory = root / ".github/workflows"
     overlays = workflow_payloads or {}
+    ignored_set = set(ignored)
     workflows: dict[str, tuple[Path, bytes | None]] = {}
     if directory.is_dir():
         for workflow in sorted(directory.glob("*.y*ml")):
             relative = workflow.relative_to(root).as_posix()
-            workflows[relative] = (workflow, None)
+            if relative not in ignored_set and workflow.name not in ignored_set:
+                workflows[relative] = (workflow, None)
     for relative, content in overlays.items():
         if not relative.startswith(".github/workflows/") or not relative.endswith((".yml", ".yaml")):
             continue
-        workflows[relative] = (root / relative, content)
+        if relative not in ignored_set and Path(relative).name not in ignored_set:
+            workflows[relative] = (root / relative, content)
     if not workflows:
         return None
     checks: list[dict[str, str]] = []

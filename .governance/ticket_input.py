@@ -155,9 +155,10 @@ def database_rows(root, database):
                 or connection.execute("PRAGMA user_version").fetchone()[0] != 1):
             raise TicketInputError("unsupported Registry database schema")
         rows, total = [], 0
-        for row in connection.execute("""SELECT ticket, revision, document_sha256, document_json
+        cursor = connection.execute("""SELECT ticket, revision, document_sha256, document_json
             FROM ticket_versions AS t WHERE revision=(SELECT MAX(revision)
-            FROM ticket_versions WHERE ticket=t.ticket) ORDER BY ticket"""):
+            FROM ticket_versions WHERE ticket=t.ticket) ORDER BY ticket""")
+        for row in cursor:
             total += len(row[3].encode("utf-8"))
             if total > MAX_BYTES or len(rows) >= 10000:
                 raise TicketInputError("ticket input exceeds bound")

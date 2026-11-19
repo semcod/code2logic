@@ -302,6 +302,9 @@
         },
         "publication": {
           "$ref": "#/$defs/publicationObservation"
+        },
+        "editingResource": {
+          "$ref": "#/$defs/editingResourceObservation"
         }
       }
     },
@@ -343,6 +346,43 @@
     }
   ],
   "$defs": {
+    "editingResourceObservation": {
+      "$anchor": "editingResourceObservation",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "observedAt", "readOnly", "grantsAuthority", "queueSupported", "repositoryRef", "targetBranch", "ticket", "resource", "state", "reason", "holder", "stateDigest", "nextAction"],
+      "properties": {
+        "schema": {"const": "new-project.editing-resource-observation/v1"},
+        "observedAt": {"type": "string", "format": "date-time"},
+        "readOnly": {"const": true},
+        "grantsAuthority": {"const": false},
+        "queueSupported": {"type": "boolean"},
+        "repositoryRef": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "targetBranch": {"type": "string"},
+        "ticket": {"type": ["string", "null"]},
+        "resource": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "state": {"enum": ["AVAILABLE", "QUEUED", "HELD_BY_TICKET", "HELD_BY_OTHER", "HELD_EXPIRED", "UNAVAILABLE"]},
+        "reason": {"enum": [null, "controller-store-missing", "controller-state-unreadable", "controller-state-invalid", "controller-state-changed", "controller-transport-failure", "controller-pin-mismatch", "controller-policy-denied"]},
+        "holder": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["leaseId", "ticketId", "phase", "expiresAt"],
+              "properties": {
+                "leaseId": {"type": "string"},
+                "ticketId": {"type": ["string", "null"]},
+                "phase": {"type": "string"},
+                "expiresAt": {"type": "string"}
+              }
+            }
+          ]
+        },
+        "stateDigest": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+        "nextAction": {"type": "string", "minLength": 1}
+      }
+    },
     "publicationObservation": {
       "$anchor": "publicationObservation",
       "type": "object",

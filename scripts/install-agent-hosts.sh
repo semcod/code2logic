@@ -60,90 +60,214 @@ if [[ -z "$TARGET" && "$USER_INSTALL" == false ]]; then
   fi
 fi
 
-contract_path() {
-  local root="$1"
-  for candidate in "governance/agent-hosts.json" ".governance/agent-hosts.json"; do
-    if [[ -f "$root/$candidate" ]]; then
-      python3 - "$root/$candidate" <<'PY' || return 1
-import json, sys
-contract = json.load(open(sys.argv[1], encoding="utf-8"))
-hooks = contract.get("hook", {}).get("additionalHooks", [])
-allowed = {".githooks/commit-msg", ".githooks/prepare-commit-msg"}
-if (not isinstance(hooks, list)
-        or any(not isinstance(hook, str) or hook not in allowed for hook in hooks)
-        or len(hooks) != len(set(hooks))):
-    raise SystemExit("GOV-AGENT-HOST-004: invalid additional hook declaration")
-PY
-      printf '%s\n' "$root/$candidate"
-      return 0
-    fi
-  done
-  echo "Agent host contract not found under $root" >&2
-  return 1
-}
+# Validate the complete selected package before copying anything. The caller
+# owns the target checkout exclusively; observed path changes fail closed.
+bootstrap_host_files() {
+  python3 - "$1" "$2" "$3" "${4:-bootstrap}" <<'PY'
+import json
+import os
+from pathlib import Path, PurePosixPath, PureWindowsPath
+import stat
+import sys
+import tempfile
 
-# Emits "<target-path>\t<is-hook>" lines for every file the contract governs.
-contract_targets() {
-  python3 - "$1" "$2" <<'PY'
-import json, pathlib, sys
-contract = json.load(open(sys.argv[1], encoding="utf-8"))
-root = pathlib.Path(sys.argv[2])
-hub = root / "governance/manifest.hub.json"
-source_paths = {}
-if hub.is_file():
-    package = json.loads((root / "governance/package-manifest.json").read_text())
-    source_paths = {item["target"]: item["source"] for item in package["files"]}
-for host in contract["hosts"]:
-    print(f"{host['file']}\t0")
-print(f"{contract['hook']['path']}\t1")
-for hook in contract["hook"].get("additionalHooks", []):
-    print(f"{hook}\t1")
-for runtime_file in contract["hook"]["runtimeFiles"]:
-    # The hub owns package sources; adopters own the managed target paths.
-    relative = source_paths.get(runtime_file, runtime_file)
-    print(f"{relative}\t0")
-PY
-}
 
-hooks_path_config() {
-  python3 - "$1" <<'PY'
-import json, sys
-print(json.load(open(sys.argv[1], encoding="utf-8"))["hook"]["hooksPathConfig"])
-PY
-}
+def fail(message):
+    raise SystemExit("GOV-AGENT-HOST-004: " + message)
 
-# Emits "<source>\t<target>\t<executable>" for every file the host contract
-# needs in a target checkout: the instruction files, the hook, and the contract
-# itself, because activate_in_place reads the contract from the target.
-package_host_files() {
-  python3 - "$1" "$2" "$3" <<'PY'
-import json, sys
-manifest = json.load(open(sys.argv[1], encoding="utf-8"))
-contract = json.load(open(sys.argv[2], encoding="utf-8"))
-contract_source = sys.argv[3]
-governed = (
-    {host["file"] for host in contract["hosts"]}
-    | {contract["hook"]["path"]}
-    | set(contract["hook"].get("additionalHooks", []))
-    | set(contract["hook"]["runtimeFiles"])
-)
-selected = [item for item in manifest["files"]
-            if item["target"] in governed or item["source"] == contract_source]
-missing = governed - {item["target"] for item in selected}
-if missing or not any(item["source"] == contract_source for item in selected):
-    raise SystemExit("Incomplete host package mapping")
-for item in selected:
-    print(f"{item['source']}\t{item['target']}\t{int(bool(item['executable']))}")
+
+def alias(metadata):
+    return stat.S_ISLNK(metadata.st_mode) or bool(getattr(metadata, 'st_file_attributes', 0) & 0x400)
+
+
+def relative(value):
+    if (not isinstance(value, str) or not value or '\\' in value or ':' in value
+            or any(ord(char) < 32 or ord(char) == 127 for char in value)):
+        fail('invalid host package path')
+    path = PurePosixPath(value)
+    if (path.is_absolute() or PureWindowsPath(value).drive or path.as_posix() != value
+            or any(part in {'', '.', '..'} or part.casefold() == '.git'
+                   or part.endswith(('.', ' ')) for part in value.split('/'))):
+        fail('host package paths must be canonical and repository-relative')
+    return path.parts
+
+
+def directory_root(value):
+    path = Path(value).absolute()
+    for item in (path, *path.parents):
+        metadata = item.lstat()
+        if alias(metadata) or not stat.S_ISDIR(metadata.st_mode):
+            fail('bootstrap roots must be regular directories without aliases')
+    return path.resolve()
+
+
+def checked(root, name, *, required=False, directory=False):
+    parts = relative(name)
+    path = root
+    for index, part in enumerate(parts):
+        path /= part
+        try:
+            metadata = path.lstat()
+        except FileNotFoundError:
+            if required:
+                fail('a required host package file is missing')
+            continue
+        if alias(metadata):
+            fail('symlink or reparse point in host package path')
+        expect_directory = index < len(parts) - 1 or directory
+        if not (stat.S_ISDIR(metadata.st_mode) if expect_directory else stat.S_ISREG(metadata.st_mode)):
+            fail('unsupported host package filesystem entry')
+    return path
+
+
+def identity(metadata):
+    return metadata.st_dev, metadata.st_ino, metadata.st_mode, metadata.st_size, metadata.st_mtime_ns
+
+
+def source_bytes(root, name):
+    path = checked(root, name, required=True)
+    before = path.lstat()
+    flags = os.O_RDONLY | getattr(os, 'O_NOFOLLOW', 0) | getattr(os, 'O_NONBLOCK', 0) | getattr(os, 'O_BINARY', 0)
+    descriptor = os.open(path, flags)
+    with os.fdopen(descriptor, 'rb') as stream:
+        opened = os.fstat(stream.fileno())
+        if alias(opened) or not stat.S_ISREG(opened.st_mode) or identity(opened) != identity(before):
+            fail('host package source changed before reading')
+        data = stream.read()
+        after = os.fstat(stream.fileno())
+    observed = checked(root, name, required=True).lstat()
+    if identity(before) != identity(after) or identity(before) != identity(observed):
+        fail('host package source changed while reading')
+    return data
+
+
+def unique_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            fail('duplicate host package JSON key')
+        result[key] = value
+    return result
+
+
+def document(data):
+    value = json.loads(data.decode('utf-8'), object_pairs_hook=unique_object)
+    if not isinstance(value, dict):
+        fail('host package metadata must be an object')
+    return value
+
+
+try:
+    source, target = directory_root(sys.argv[1]), directory_root(sys.argv[2])
+    contract_names = ('governance/agent-hosts.json', '.governance/agent-hosts.json')
+    contract_source = next((name for name in contract_names if (source / name).exists() or (source / name).is_symlink()), None)
+    if contract_source is None:
+        fail('source host contract is missing')
+    frozen = {contract_source: source_bytes(source, contract_source)}
+    contract = document(frozen[contract_source])
+    hook = contract['hook']
+    if not isinstance(hook, dict):
+        fail('host hook declaration must be an object')
+    hosts = [host['file'] for host in contract['hosts']]
+    additional = hook.get('additionalHooks', [])
+    allowed = {'.githooks/commit-msg', '.githooks/prepare-commit-msg', '.githooks/pre-push'}
+    if not isinstance(additional, list) or len(set(additional)) != len(additional) or any(name not in allowed for name in additional):
+        fail('invalid additional hook declaration')
+    runtime = hook['runtimeFiles']
+    if not isinstance(runtime, list):
+        fail('host runtime files must be an array')
+    governed = set(hosts + [hook['path']] + additional + runtime)
+    for name in governed:
+        relative(name)
+    relative(hook['hooksPathConfig'])
+    if PurePosixPath(hook['path']).parent.as_posix() != hook['hooksPathConfig']:
+        fail('hook path and hooksPathConfig disagree')
+    if len(sys.argv) > 4 and sys.argv[4] == 'in-place':
+        source_paths = {}
+        if (source / 'governance/manifest.hub.json').is_file():
+            package = document(source_bytes(source, 'governance/package-manifest.json'))
+            if not isinstance(package['files'], list):
+                fail('host package mappings must be an array')
+            for item in package['files']:
+                relative(item['target'])
+                relative(item['source'])
+                source_paths[item['target']] = item['source']
+        activation = [(name, False) for name in hosts]
+        activation += [(hook['path'], True), *((name, True) for name in additional)]
+        activation += [(source_paths.get(name, name), False) for name in runtime]
+        checked(target, hook['hooksPathConfig'], required=True, directory=True)
+        for name, _ in activation:
+            checked(target, name, required=True)
+        # Return only this validated snapshot; activation never re-reads the contract.
+        print(hook['hooksPathConfig'])
+        for name, executable in activation:
+            print(name + '\t' + ('1' if executable else '0'))
+        raise SystemExit(0)
+    frozen['governance/package-manifest.json'] = source_bytes(source, 'governance/package-manifest.json')
+    manifest = document(frozen['governance/package-manifest.json'])
+    selected, targets, plan, contracts = [], set(), [], []
+    if not isinstance(manifest['files'], list):
+        fail('host package mappings must be an array')
+    for item in manifest['files']:
+        if not isinstance(item, dict):
+            fail('host package mappings must be objects')
+        if item['target'] in governed or item['source'] == contract_source:
+            relative(item['source'])
+            relative(item['target'])
+            folded = item['target'].casefold()
+            if folded in targets or not isinstance(item['executable'], bool):
+                fail('duplicate target or invalid executable flag')
+            targets.add(folded)
+            checked(target, item['target'])
+            if item['source'] not in frozen:
+                frozen[item['source']] = source_bytes(source, item['source'])
+            data = frozen[item['source']]
+            plan.append((item['target'], data, item['executable']))
+            selected.append(item['target'])
+            if item['source'] == contract_source:
+                contracts.append(item['target'])
+    if governed - set(selected) or len(contracts) != 1 or contracts[0] not in contract_names:
+        fail('incomplete or ambiguous host package mapping')
+    # Activation prefers governance/ over .governance/. Preserve an unrelated
+    # existing contract rather than copying files and activating another one.
+    for name in contract_names:
+        if name in selected:
+            break
+        if (target / name).exists() or (target / name).is_symlink():
+            if document(source_bytes(target, name)) != contract:
+                fail('existing target host contract differs from the selected package')
+            break
+    if sys.argv[3] != 'true':
+        for name, data, executable in plan:
+            parts = relative(name)
+            for index in range(1, len(parts)):
+                parent_name = '/'.join(parts[:index])
+                parent = checked(target, parent_name, directory=True)
+                parent.mkdir(exist_ok=True)
+                checked(target, parent_name, required=True, directory=True)
+            destination = checked(target, name)
+            descriptor, temporary = tempfile.mkstemp(prefix='.host-bootstrap.', dir=destination.parent)
+            try:
+                with os.fdopen(descriptor, 'wb') as stream:
+                    stream.write(data)
+                os.chmod(temporary, 0o755 if executable else 0o644)
+                checked(target, name)
+                os.replace(temporary, destination)
+            finally:
+                if os.path.exists(temporary):
+                    os.unlink(temporary)
+except (OSError, ValueError, TypeError, KeyError):
+    fail('host package is invalid, unreadable or changed during bootstrap')
 PY
 }
 
 activate_in_place() {
   local dest="$1"
   dest="$(cd "$dest" && pwd)"
-  local contract hooks targets
-  contract="$(contract_path "$dest")" || return 1
-  hooks="$(hooks_path_config "$contract")" || return 1
-  targets="$(contract_targets "$contract" "$dest")" || return 1
+  local activation hooks targets
+  activation="$(bootstrap_host_files "$dest" "$dest" true in-place)" || return 1
+  hooks="${activation%%$'\n'*}"
+  targets="${activation#*$'\n'}"
   local missing=()
 
   while IFS=$'\t' read -r target is_hook; do
@@ -185,14 +309,16 @@ activate_in_place() {
 
   local driver_path=""
   for candidate in ".governance/ticket_index_merge_driver.py" "scripts/ticket_index_merge_driver.py"; do
-    if [[ -f "$dest/$candidate" ]]; then
+    if [[ -f "$dest/$candidate" && ! -L "$dest/$candidate" ]]; then
       driver_path="$candidate"
       break
     fi
   done
   if [[ -n "$driver_path" ]]; then
-    git -C "$dest" config merge.wellmanifest-ticket-index.name "Wellmanifest Ticket Index Merge Driver" || true
-    git -C "$dest" config merge.wellmanifest-ticket-index.driver "python3 $driver_path %O %A %B %P" || true
+    for driver_key in "wellmanifest-ticket-index" "ticket-index"; do
+      git -C "$dest" config "merge.${driver_key}.name" "Wellmanifest Ticket Index Merge Driver" || return 1
+      git -C "$dest" config "merge.${driver_key}.driver" "python3 $driver_path %O %A %B" || return 1
+    done
   fi
 
   echo "Activated host contract and core.hooksPath=$hooks in $dest"
@@ -205,34 +331,7 @@ bootstrap_into() {
     echo "Target is not a git work tree: $dest" >&2
     exit 1
   fi
-  local contract files
-  contract="$(contract_path "$SOURCE")" || return 1
-  local manifest="$SOURCE/governance/package-manifest.json"
-  if [[ ! -f "$manifest" ]]; then
-    echo "Source has no governance/package-manifest.json: $SOURCE" >&2
-    exit 1
-  fi
-
-  files="$(package_host_files "$manifest" "$contract" "${contract#"$SOURCE/"}")" || return 1
-  # Validate the entire input before the first destination write.
-  while IFS=$'\t' read -r source target executable; do
-    if [[ ! -f "$SOURCE/$source" ]]; then
-      echo "Source file missing: $SOURCE/$source" >&2
-      return 1
-    fi
-  done <<< "$files"
-  if [[ "$CHECK_ONLY" == true ]]; then
-    activate_in_place "$dest"
-    return $?
-  fi
-  while IFS=$'\t' read -r source target executable; do
-    mkdir -p "$dest/$(dirname "$target")" || return 1
-    cp -f "$SOURCE/$source" "$dest/$target" || return 1
-    if [[ "$executable" == "1" ]]; then
-      chmod +x "$dest/$target" || return 1
-    fi
-  done <<< "$files"
-
+  bootstrap_host_files "$SOURCE" "$dest" "$CHECK_ONLY" || return 1
   activate_in_place "$dest"
 }
 
@@ -268,6 +367,13 @@ paragraph = [
     "Allocate tickets only through that script. Never commit on main or a dirty",
     "primary checkout. Run `./scripts/install-agent-hosts.sh` once per clone so",
     "the git hook is active.",
+    "Put every final result in the owning repository through its ticket:",
+    "reports and analyses under `docs/` per `wellmanifest/docs` (`check.py --prepare`",
+    "before writing, `--deliverable` after commit), error runbooks under `errors/`",
+    "per `wellmanifest/logs`. Never leave a final result only in /tmp, a scratchpad,",
+    "`$HOME/.local/state` or the chat. Before claiming done run",
+    "`./project/governance-check.sh` and the Wellman standards check (`wellman check`);",
+    "a required standard that is not installed is an error to fix, not to skip.",
 ]
 text = path.read_text(encoding="utf-8") if path.exists() else ""
 lines = text.splitlines()

@@ -76,15 +76,33 @@ def parse_config(path: Path) -> dict:
 
 
 def canonical_repository_ref(url: str) -> str:
+    if not isinstance(url, str) or not url or any(ch.isspace() for ch in url):
+        raise AllocationError("origin URL must be a non-empty URL without whitespace")
     match = re.fullmatch(r"git@([^:]+):(.+?)(?:\.git)?", url)
     if match:
         host, path = match.groups()
-        return f"git+ssh://{host.lower()}/{path.removesuffix('.git')}"
-    parsed = urlparse(url)
-    if parsed.scheme and parsed.hostname:
+        url = f"ssh://git@{host}/{path}"
+    try:
+        parsed = urlparse(url)
+        host, port = parsed.hostname, parsed.port
+    except ValueError:
+        raise AllocationError("origin URL has an invalid authority") from None
+    if parsed.scheme and host:
+        if parsed.password is not None or parsed.query or parsed.fragment:
+            raise AllocationError("origin URL contains credentials or an ambiguous suffix")
         path = parsed.path.lstrip("/").removesuffix(".git")
-        scheme = "git+ssh" if parsed.scheme == "ssh" else parsed.scheme.lower()
-        return f"{scheme}://{parsed.hostname.lower()}/{path}"
+        if not path:
+            raise AllocationError("origin URL must identify a repository path")
+        scheme = "git+ssh" if parsed.scheme.lower() in {"ssh", "git+ssh"} else parsed.scheme.lower()
+        if scheme == "git+ssh" and not parsed.username:
+            raise AllocationError("SSH origin URL requires an explicit username")
+        authority = f"[{host.lower()}]" if ':' in host else host.lower()
+        if scheme == "git+ssh" and parsed.username != "git":
+            authority = f"{parsed.username}@{authority}"
+        default_port = {"git+ssh": 22, "https": 443, "http": 80, "git": 9418}.get(scheme)
+        if port is not None and port != default_port:
+            authority += f":{port}"
+        return f"{scheme}://{authority}/{path}"
     raise AllocationError("origin URL cannot be normalized to a repository URI")
 
 

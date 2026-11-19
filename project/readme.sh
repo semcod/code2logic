@@ -17,6 +17,15 @@ if [[ "$index_file" == *".."* ]]; then
   exit 2
 fi
 
+# The allocator names the ticket it has just created in this checkout. That one
+# untracked directory is indexed so the ticket's own PR carries exactly its own
+# row, instead of the next ticket's PR adding it (issue #516).
+own_ticket="${T2C_TICKET_INDEX_OWN:-}"
+if [[ -n "$own_ticket" && ! "$own_ticket" =~ ^project/ticket-[0-9]+$ ]]; then
+  echo "Own ticket must be project/ticket-NNN: $own_ticket" >&2
+  exit 2
+fi
+
 mkdir -p project
 if [[ ! -f "$index_file" ]]; then
   if [[ -f template/files/project.template.md ]]; then
@@ -35,15 +44,21 @@ EOF
   fi
 fi
 
-start_count="$(grep -c '^<!-- AUTO:TICKET_INDEX:START -->$' "$index_file" || true)"
-end_count="$(grep -c '^<!-- AUTO:TICKET_INDEX:END -->$' "$index_file" || true)"
-if [[ "$start_count" -eq 0 && "$end_count" -eq 0 ]]; then
+start_line="$(grep -n '^<!-- AUTO:TICKET_INDEX:START -->$' "$index_file" | cut -d: -f1 || true)"
+end_line="$(grep -n '^<!-- AUTO:TICKET_INDEX:END -->$' "$index_file" | cut -d: -f1 || true)"
+if [[ -z "$start_line" && -z "$end_line" ]]; then
   printf '\n<!-- AUTO:TICKET_INDEX:START -->\n<!-- AUTO:TICKET_INDEX:END -->\n' >> "$index_file"
-  start_count=1
-  end_count=1
+  start_line="$(grep -n '^<!-- AUTO:TICKET_INDEX:START -->$' "$index_file" | cut -d: -f1 || true)"
+  end_line="$(grep -n '^<!-- AUTO:TICKET_INDEX:END -->$' "$index_file" | cut -d: -f1 || true)"
 fi
+start_count="$(echo -n "$start_line" | grep -c . || true)"
+end_count="$(echo -n "$end_line" | grep -c . || true)"
 if [[ "$start_count" != 1 || "$end_count" != 1 ]]; then
   echo "$index_file must contain exactly one ticket-index marker pair" >&2
+  exit 2
+fi
+if [[ "$start_line" -ge "$end_line" ]]; then
+  echo "$index_file ticket-index markers must appear in order (START before END)" >&2
   exit 2
 fi
 
@@ -65,7 +80,7 @@ for dir in project/ticket-*; do
   # else's. Indexing it writes rows whose links resolve in no commit but that
   # author's working tree, so whoever regenerates the index next ships broken
   # links. An untracked ticket appears in the index once it is committed.
-  if git rev-parse --git-dir >/dev/null 2>&1 && [[ -z "$(git ls-files -- "$dir")" ]]; then
+  if [[ "$dir" != "$own_ticket" ]] && git rev-parse --git-dir >/dev/null 2>&1 && [[ -z "$(git ls-files -- "$dir")" ]]; then
     printf 'skipping untracked %s; commit it to have it indexed\n' "$dir" >&2
     continue
   fi

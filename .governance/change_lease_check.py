@@ -5,21 +5,32 @@ from __future__ import annotations
 
 import argparse
 import json
+import hashlib
+import os
+import stat
+import subprocess
 import re
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 LEASE_SCHEMA = "wellmanifest.change-lease/v1"
 REQUEST_SCHEMA = "wellmanifest.change-lease-transition/v1"
 RECEIPT_SCHEMA = "wellmanifest.change-lease-receipt/v1"
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
-GIT_SHA_RE = re.compile(r"^[0-9a-f]{40,64}$")
+# JSON Schema patterns search strings; unlike $, this assertion cannot match
+# just before a final line terminator and is portable to ECMAScript engines.
+GIT_SHA_RE = re.compile(r"^(?:[0-9a-f]{40}|[0-9a-f]{64})(?![\s\S])")
 PHASES = {"claimed", "editing", "validating", "publication_frozen", "dispatching", "approved", "merged", "closed", "cancelled", "expired", "released"}
 FROZEN_PHASES = {"publication_frozen", "dispatching", "approved"}
 TERMINAL_REPLACEMENT_PHASES = {"merged", "closed", "cancelled", "released"}
+# wellmanifest/worktrees v5 layout: the single source for every lease and worktree reader.
+WORKTREES_ROOT = ".worktrees"
+LEASE_ROOT = ".subactor/leases"
+MAX_LEASE_BYTES = 65536
 TRANSITIONS = {
     "heartbeat": {phase: phase for phase in PHASES - {"released"}},
     "begin-edit": {"claimed": "editing"},
@@ -343,6 +354,144 @@ def print_findings(findings: list[dict[str, Any]], output_format: str) -> None:
     for item in findings: print(f"{item['code']} ERROR: {item['message']}")
 
 
+TICKET_REF = re.compile(r"^refs/heads/ticket[-/]([0-9]{3,})-[a-z0-9]+(?:-[a-z0-9]+)*$")
+
+
+def read_writer_lease(path: Path) -> dict[str, Any]:
+    """Open bounded regular data without following any symlink component."""
+    if os.name == "nt":
+        if path.is_symlink() or any(p.is_symlink() for p in path.parents):
+            raise ValueError("Lease path contains symlinks")
+        if not path.is_file():
+            raise ValueError("Lease must be a regular file")
+        raw = path.read_bytes()
+        if len(raw) > MAX_LEASE_BYTES:
+            raise ValueError("Lease exceeds bounded size")
+        value = json.loads(raw.decode("utf-8"))
+        if not isinstance(value, dict):
+            raise ValueError("Lease must be an object")
+        return value
+    flags = os.O_RDONLY | os.O_NOFOLLOW
+    descriptor = os.open(path.anchor, flags | os.O_DIRECTORY)
+    try:
+        for component in path.parts[1:-1]:
+            child = os.open(component, flags | os.O_DIRECTORY, dir_fd=descriptor)
+            os.close(descriptor)
+            descriptor = child
+        leaf = os.open(path.name, flags | os.O_NONBLOCK, dir_fd=descriptor)
+        with os.fdopen(leaf, "rb") as stream:
+            if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
+                raise ValueError("Lease must be a regular file")
+            raw = stream.read(MAX_LEASE_BYTES + 1)
+            if len(raw) > MAX_LEASE_BYTES:
+                raise ValueError("Lease exceeds bounded size")
+            value = json.loads(raw)
+            if not isinstance(value, dict):
+                raise ValueError("Lease must be an object")
+            return value
+    finally:
+        os.close(descriptor)
+
+
+def canonical_owner_repository(url: str) -> str | None:
+    """Return the ``owner/name`` repository identity an origin URL carries.
+
+    Mirrors the allocator's canonical repository URI reduction so a lease can
+    bind either the canonical identity or the legacy ``local/<digest>`` label.
+    """
+    value = (url or "").strip()
+    if not value:
+        return None
+    match = re.fullmatch(r"git@([^:]+):(.+?)(?:\.git)?", value)
+    if match:
+        value = f"ssh://git@{match.group(1)}/{match.group(2)}"
+    try:
+        parsed = urlparse(value)
+    except ValueError:
+        return None
+    parts = [part for part in parsed.path.strip("/").split("/") if part]
+    if parts:
+        parts[-1] = parts[-1].removesuffix(".git")
+    if len(parts) == 2 and parsed.netloc and all(part not in {"", ".", ".."} for part in parts):
+        return "/".join(parts)
+    return None
+
+
+def check_writer(root: Path, ref: str, operation: str, actor: str, session: str,
+                 revision: str, fencing: str) -> list[dict[str, Any]]:
+    """Read the canonical controller projection; never renew or accept handoffs.
+
+    Identity and CAS values must come from the invoking session, not this file.
+    Local hooks defend against accidental competing writers, not a hostile OS user.
+    """
+    match = TICKET_REF.fullmatch(ref)
+    if not match:
+        return [finding("GOV-CHANGE-LEASE-001", "Writer check requires an exact ticket branch ref.")]
+    if (not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:@/-]{0,159}", actor)
+            or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:@/-]{0,254}", session)
+            or not re.fullmatch(r"[1-9][0-9]{0,18}", revision)
+            or not re.fullmatch(r"[1-9][0-9]{0,18}", fencing)):
+        return [finding("GOV-CHANGE-LEASE-001", "Supply writer actor/session and current lease revision/fencing from the controller.")]
+    try:
+        # Git hook variables may name another checkout's index/git-dir. Discovery
+        # must be relative to the explicitly supplied root.
+        env = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
+        def git(*args: str) -> str:
+            return subprocess.run(["git", "-C", str(root), *args], env=env,
+                                  check=True, capture_output=True, text=True).stdout.strip()
+        rows = git("worktree", "list", "--porcelain", "-z").split("\0\0")
+        records = [dict(field.split(" ", 1) for field in row.split("\0") if " " in field)
+                   for row in rows if row]
+        primary = Path(records[0]["worktree"]).resolve()
+        owners = [row for row in records if row.get("branch") == ref]
+        if len(owners) != 1:
+            raise ValueError("Ticket ref needs exactly one registered canonical worktree")
+        ticket = "ticket-" + match[1]
+        slug = ref.split(match[1] + "-", 1)[1]
+        worktree_id = ticket + "--" + slug
+        expected = primary / WORKTREES_ROOT / worktree_id
+        owner_worktree = Path(owners[0]["worktree"])
+        if os.name == "nt":
+            if owner_worktree.resolve() != expected.resolve() or expected.is_symlink():
+                raise ValueError("Ticket worktree is not canonical")
+            if operation == "commit" and root.resolve() != expected.resolve():
+                raise ValueError("Commit must run in the owned worktree")
+        else:
+            if owner_worktree != expected or expected.resolve() != expected:
+                raise ValueError("Ticket worktree is not canonical")
+            if operation == "commit" and root.resolve() != expected:
+                raise ValueError("Commit must run in the owned worktree")
+        lease = read_writer_lease(primary / LEASE_ROOT / (worktree_id + ".json"))
+        errors = validate_lease(lease)
+        if errors:
+            return errors
+        repository = "local/" + hashlib.sha256(str(primary).encode("utf-8")).hexdigest()
+        accepted_repositories = {repository}
+        try:
+            canonical = canonical_owner_repository(git("config", "--get", "remote.origin.url"))
+        except subprocess.SubprocessError:
+            canonical = None
+        if canonical:
+            accepted_repositories.add(canonical)
+        if (lease["branchRef"] != ref or lease["ticketId"] != ticket
+                or lease["worktreeId"] != worktree_id
+                or lease["repositoryRef"] not in accepted_repositories):
+            raise ValueError("Lease repository, ticket, branch or worktree binding differs")
+        if (lease["ownerActor"] != actor or lease["ownerSession"] != session
+                or lease["leaseRevision"] != int(revision) or lease["fencingToken"] != int(fencing)):
+            return [finding("GOV-CHANGE-LEASE-002", "Writer/session or controller fencing differs; use GOV-WORK-START accepted handoff, never copy the holder identity.")]
+        now = datetime.now(timezone.utc)
+        times = [datetime.fromisoformat(lease[key].replace("Z", "+00:00").replace("z", "+00:00"))
+                 for key in ("issuedAt", "heartbeatAt", "expiresAt")]
+        if not times[0] <= times[1] <= now < times[2]:
+            return [finding("GOV-CHANGE-LEASE-002", "Lease is expired or its clock bounds are invalid; timeout is not a handoff.")]
+        if lease["phase"] not in {"claimed", "editing", "validating"} or lease["publicationFrozen"]:
+            return [finding("GOV-CHANGE-LEASE-003", "Lease phase forbids Git mutation; preserve the frozen or released writer state.")]
+    except (OSError, ValueError, KeyError, IndexError, AttributeError, subprocess.SubprocessError):
+        return [finding("GOV-CHANGE-LEASE-001", "Cannot verify canonical writer lease; restore controller evidence without taking ownership.")]
+    return []
+
+
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--format", choices=("text", "json"), default="text")
@@ -351,12 +500,23 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     transition = sub.add_parser("transition"); transition.add_argument("--lease", type=Path, required=True); transition.add_argument("--request", type=Path, required=True); transition.add_argument("--replacement-receipt", type=Path)
     trace = sub.add_parser("trace"); trace.add_argument("document", type=Path)
     repository = sub.add_parser("repository"); repository.add_argument("root", type=Path)
+    writer = sub.add_parser("writer-check")
+    writer.add_argument("--root", type=Path, required=True)
+    writer.add_argument("--ref", required=True)
+    writer.add_argument("--operation", choices=("commit", "push"), required=True)
+    for name in ("actor", "session", "revision", "fencing"):
+        variable = {"actor": "WRITER_ACTOR", "session": "WRITER_SESSION",
+                    "revision": "LEASE_REVISION", "fencing": "FENCING_TOKEN"}[name]
+        writer.add_argument("--" + name, default=os.environ.get("NEW_PROJECT_" + variable, ""))
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv or sys.argv[1:])
-    if args.command == "validate": findings = validate_document(args.document)
+    if args.command == "writer-check":
+        findings = check_writer(args.root, args.ref, args.operation, args.actor, args.session,
+                                args.revision, args.fencing)
+    elif args.command == "validate": findings = validate_document(args.document)
     elif args.command == "trace": findings = validate_trace(args.document)
     elif args.command == "repository": findings = validate_repository(args.root.resolve())
     else:

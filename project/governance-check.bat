@@ -7,9 +7,9 @@ if errorlevel 1 (
   exit /b 1
 )
 if exist "%REPO_ROOT%\.governance\governance_check.py" (
-  python "%REPO_ROOT%\.governance\governance_check.py" --root "%REPO_ROOT%" --manifest .governance/manifest.json --lock .governance/manifest.lock.json --stack-profiles .governance/stack-profiles.json %*
+  python "%REPO_ROOT%\.governance\governance_check.py" --root "%REPO_ROOT%" --manifest .governance/manifest.json --lock .governance/manifest.lock.json --stack-profiles .governance/stack-profiles.json --infer-ticket-base %*
 ) else (
-  python "%REPO_ROOT%\scripts\governance_check.py" --root "%REPO_ROOT%" --manifest governance\manifest.hub.json --stack-profiles governance\stack-profiles.json --work-classification governance\work-classification.dsl.json %*
+  python "%REPO_ROOT%\scripts\governance_check.py" --root "%REPO_ROOT%" --manifest governance\manifest.hub.json --stack-profiles governance\stack-profiles.json --work-classification governance\work-classification.dsl.json --infer-ticket-base %*
 )
 set "GOVERNANCE_EXIT=%ERRORLEVEL%"
 exit /b %GOVERNANCE_EXIT%

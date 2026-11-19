@@ -201,7 +201,7 @@ def parse_worktree_porcelain(raw: bytes) -> list[dict[str, Any]]:
 
 def registered_worktrees(start_path: str) -> list[dict[str, Any]]:
     """Observe Git's registered worktrees; this function performs no repair."""
-    raw = _git_output(["-C", start_path, "worktree", "list", "--porcelain", "-z"])
+    raw = _git_output(["-C", start_path, "worktree", "list", "--porcelain", "-z"], cwd=None)
     records = parse_worktree_porcelain(raw)
     if not records:
         raise ValueError("Git returned no registered worktrees")
@@ -362,6 +362,14 @@ def inventory(
             branch=observed.get("branch"),
             path_style=path_style,
         )
+        anomalies = list(entry.get("anomalies", []))
+        if observed.get("stale") or (observed.get("prunable") and not os.path.exists(path)):
+            if "stale-registration" not in anomalies:
+                anomalies.append("stale-registration")
+        if observed.get("merged"):
+            if "merged-leftover" not in anomalies:
+                anomalies.append("merged-leftover")
+        entry["anomalies"] = anomalies
         entry.update(
             {
                 "head": observed.get("head"),
@@ -411,6 +419,8 @@ def validate_inventory(record: dict[str, Any]) -> list[str]:
             "detached": entry.get("detached", False),
             "locked": entry.get("locked", False),
             "prunable": entry.get("prunable", False),
+            "stale": "stale-registration" in entry.get("anomalies", []),
+            "merged": "merged-leftover" in entry.get("anomalies", []),
         }
         for entry in record["entries"]
         if isinstance(entry, dict)
@@ -559,6 +569,7 @@ def main() -> int:
             repository_name=args.repository_name,
             primary_checkout=primary,
             registered=registered_worktrees(args.from_worktree),
+            path_style="windows" if os.name == "nt" else "posix",
         )
         print(json.dumps(record, indent=2))
         return 0
